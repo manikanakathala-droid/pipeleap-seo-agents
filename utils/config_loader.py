@@ -76,7 +76,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
 
 def _expand_env(value: Any) -> Any:
     if isinstance(value, str):
-        return ENV_PATTERN.sub(lambda match: os.getenv(match.group(1), match.group(0)), value)
+        return ENV_PATTERN.sub(lambda match: os.getenv(match.group(1), ""), value)
     if isinstance(value, list):
         return [_expand_env(item) for item in value]
     if isinstance(value, dict):
