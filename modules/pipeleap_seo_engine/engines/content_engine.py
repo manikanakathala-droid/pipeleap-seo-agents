@@ -602,6 +602,18 @@ class GrowthContentEngine:
             "twitter:image": f"{self.site_url}/og-image.png",
         }
 
+    # ─── Author byline ────────────────────────────────────────────────────────
+
+    def author_byline(self, author: dict) -> str:
+        name = author.get("name", "Pipeleap Team")
+        title = author.get("title", "")
+        slug = author.get("slug", "")
+        url = f"{self.site_url}/team/{slug}" if slug else self.site_url
+        byline = f"*By [{name}]({url})*"
+        if title:
+            byline += f" — {title}"
+        return byline
+
     # ─── AI Overview / Featured Snippet block ────────────────────────────────
 
     def ai_answer_block(self, question: str, answer: str, entity: str = "") -> str:
