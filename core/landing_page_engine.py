@@ -1,0 +1,272 @@
+from __future__ import annotations
+
+from datetime import date as _date
+from typing import Any
+
+from utils.models import ContentAsset, KeywordCluster
+from utils.stage_messaging import STAGES, STAGE_CTA, STAGE_BEFORE_AFTER
+from utils.text import slugify, title_case_keyword
+
+_LOCATION_TO_HREFLANG: dict[int, str] = {
+    2840: "en-us",
+    2826: "en-gb",
+    2036: "en-au",
+    2124: "en-ca",
+    2356: "en-in",
+    2702: "en-sg",
+}
+
+
+class LandingPageEngine:
+    """Generates high-intent landing pages for Pipeleap's revenue workflows."""
+
+    def __init__(self, config: dict[str, Any], logger) -> None:
+        self.config = config
+        self.logger = logger
+        self.site = config.get("site", {})
+        self.cta = self.site.get("cta", {})
+        self.features = self.site.get("core_features", [])
+
+    def generate(self, clusters: list[KeywordCluster], limit: int = 5) -> list[ContentAsset]:
+        high_intent_clusters = [
+            cluster
+            for cluster in clusters
+            if cluster.recommended_asset_type == "landing_page"
+        ][:limit]
+        return [self._generate_landing_page(cluster) for cluster in high_intent_clusters]
+
+    def _generate_landing_page(self, cluster: KeywordCluster) -> ContentAsset:
+        keyword = cluster.primary_keyword
+        keyword_title = title_case_keyword(keyword)
+        slug = slugify(keyword)
+        stage = self._detect_stage(keyword)
+        stage_data = STAGES.get(stage, {})
+
+        # Stage-specific headline and framing
+        if stage == "early":
+            title = f"{keyword_title} — Build Pipeline Before You Hire Your First Rep"
+            target_persona = "Founders and early-stage SaaS teams"
+        elif stage == "growth":
+            title = f"{keyword_title} — Scale Your Team's Outbound Without Adding Headcount"
+            target_persona = "VP Sales and sales managers at growth-stage SaaS"
+        elif stage == "scale":
+            title = f"{keyword_title} — One Orchestration Layer for Enterprise Revenue Teams"
+            target_persona = "CROs and RevOps at scale-stage SaaS"
+        else:
+            title = f"{keyword_title} for Revenue Teams That Need More Qualified Pipeline"
+            target_persona = "RevOps teams and growth operators"
+
+        seo_title = f"{keyword_title} | Pipeleap Revenue Automation"
+        meta_description = (
+            f"Launch {keyword} with Pipeleap's workflow automation stack for outbound, enrichment, "
+            f"CRM routing, and demo-driving execution."
+        )[:158]
+
+        # Stage context callout
+        stage_callout = ""
+        if stage_data:
+            stage_callout = (
+                f"\n> **Built for {stage_data.get('label', '')} ({stage_data.get('arr_range', '')}):** "
+                f"{stage_data.get('hero_stat', '')}\n"
+            )
+
+        # Stage-specific pain points
+        if stage_data.get("pain_points"):
+            pain_items = "\n".join(f"- {p}" for p in stage_data["pain_points"][:4])
+        else:
+            pain_items = (
+                "- Manual enrichment and sequencing that doesn't scale.\n"
+                "- Fragmented tools with no unified execution layer.\n"
+                "- No repeatable outbound playbook.\n"
+                "- Poor visibility into which workflows drive pipeline."
+            )
+
+        # Stage-specific before/after table
+        before_after_rows = STAGE_BEFORE_AFTER.get(stage, [])
+        if before_after_rows:
+            ba_lines = [
+                "",
+                "## Before Pipeleap vs. With Pipeleap",
+                "",
+                "| Dimension | Before Pipeleap | With Pipeleap |",
+                "| --- | --- | --- |",
+            ]
+            for dimension, before, after in before_after_rows:
+                ba_lines.append(f"| {dimension} | {before} | {after} |")
+            before_after_block = "\n".join(ba_lines)
+        else:
+            before_after_block = ""
+
+        direct_answer = (
+            f"> **TL;DR — {keyword_title}:** A production-ready {keyword} system captures intent signals, "
+            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outbound "
+            f"sequences automatically — replacing fragmented point tools with one governed revenue workflow.\n"
+        )
+
+        body = "\n".join(filter(None, [
+            direct_answer,
+            f"# {keyword_title}",
+            "",
+            stage_callout,
+            f"Teams evaluating **{keyword}** are already close to choosing a system. This page connects that demand directly to Pipeleap's workflow automation value.",
+            "",
+            f"## The problem with fragmented {cluster.cluster_name}",
+            f"Most {'early-stage' if stage == 'early' else 'growing' if stage == 'growth' else 'enterprise' if stage == 'scale' else 'revenue'} teams have the pieces but not the operating system.",
+            pain_items,
+            "",
+            "## The Pipeleap solution",
+            f"Pipeleap gives teams a workflow layer built for outbound, enrichment, CRM automation, and pipeline acceleration — replacing fragmented point solutions with one governed execution system.",
+            "",
+            "## How Pipeleap works",
+            "1. Capture the trigger or account signal.",
+            "2. Enrich and score the account or contact.",
+            "3. Sync clean data into the CRM with routing logic.",
+            "4. Trigger outbound or follow-up workflows.",
+            "5. Push replies, demos, and task states back into reporting.",
+            "",
+            before_after_block,
+            "",
+            "## Workflow diagram",
+            "```text",
+            "Signal -> Enrichment -> Qualification -> CRM update -> Outbound step -> Reply routing -> Demo booked",
+            "```",
+            "",
+            "## Why teams pick Pipeleap",
+            "- n8n-based flexibility without losing revenue workflow structure.",
+            "- Built for outbound, CRM automation, and enrichment-heavy systems.",
+            "- Fast iteration for growth and RevOps teams.",
+            "",
+            "## FAQ",
+            f"### Who should use {keyword}?",
+            "Teams that need a governed outbound and workflow system, not one-off automations.",
+            "",
+            f"### What makes Pipeleap different in {cluster.cluster_name}?",
+            "It maps the keyword directly to the revenue workflow that has to execute after traffic converts.",
+            "",
+            "## CTA",
+            self._cta_block(stage),
+        ]))
+
+        today = _date.today().isoformat()
+        brand = self.site.get("brand", "Pipeleap")
+        site_url = self.site.get("site_url", "https://pipeleap.com")
+        page_url = f"{site_url.rstrip('/')}/{slug}"
+        org_ref = {"@type": "Organization", "name": brand, "url": site_url}
+
+        schema_markup = [
+            {
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": seo_title,
+                "description": meta_description,
+                "url": page_url,
+                "datePublished": today,
+                "dateModified": today,
+                "author": org_ref,
+                "publisher": org_ref,
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": brand,
+                "applicationCategory": "BusinessApplication",
+                "description": self.site.get(
+                    "product_summary",
+                    "Workflow automation and outbound engine for revenue teams.",
+                ),
+            },
+        ]
+
+        body += (
+            "\n\n---\n"
+            "*This content was produced with AI assistance and reviewed for factual accuracy. "
+            "For verified product details, workflow screenshots, and live examples, "
+            f"visit the [{brand} product page]({site_url}) or speak with a workflow specialist.*"
+        )
+
+        return ContentAsset(
+            slug=slug,
+            page_type="landing_page",
+            title=title,
+            seo_title=seo_title,
+            meta_description=meta_description,
+            h1=title,
+            body_markdown=body,
+            schema_markup=schema_markup,
+            internal_link_suggestions=[],
+            call_to_action=self._cta_block(stage),
+            source_keywords=[keyword, *[item.keyword for item in cluster.opportunities[1:4]]],
+            target_persona=target_persona,
+            eeat_notes=[
+                "Add a product screenshot and a real workflow example for this landing page.",
+                "Add outcome proof tied to demos, reply rates, or operational lift.",
+            ],
+            stage=stage,
+            industry="SaaS",
+            date_published=today,
+            date_modified=today,
+            author_name=self.config.get("growth_engine", {}).get("default_author", "Pipeleap Team"),
+            cta_variants=self._lp_cta_variants(stage),
+            hreflang_hints=self._lp_hreflang_hints(slug),
+            eeat_checklist=[
+                {"item": "Author byline", "status": "missing", "instructions": "Add a RevOps or growth operator byline with a LinkedIn or bio link."},
+                {"item": "Publication date", "status": "auto-filled", "instructions": "datePublished set in schema. Verify CMS renders it in the HTML head."},
+                {"item": "Product screenshot", "status": "missing", "instructions": "Insert at least one real product screenshot showing the workflow builder or CRM sync output."},
+                {"item": "Outcome proof point", "status": "missing", "instructions": "Add a quantified result: reply rate lift, CRM hygiene improvement, or a named customer quote."},
+                {"item": "Third-party validation", "status": "missing", "instructions": "Link to a G2 review, Capterra listing, or press mention."},
+            ],
+        )
+
+    def _lp_hreflang_hints(self, slug: str) -> list[dict[str, str]]:
+        location_codes: list[int] = self.config.get("growth_engine", {}).get(
+            "dataforseo_global_location_codes", []
+        )
+        site_url = self.site.get("site_url", "https://pipeleap.com").rstrip("/")
+        page_url = f"{site_url}/{slug}"
+        hints: list[dict[str, str]] = [
+            {"hreflang": "x-default", "href": page_url},
+            {"hreflang": "en", "href": page_url},
+        ]
+        for code in location_codes:
+            lang = _LOCATION_TO_HREFLANG.get(code)
+            if lang:
+                hints.append({"hreflang": lang, "href": page_url})
+        return hints
+
+    def _lp_cta_variants(self, stage: str = "") -> list[dict[str, Any]]:
+        primary_url = self.cta.get("primary_url", self.site.get("site_url", "https://pipeleap.com"))
+        return [
+            {"label": "Book a demo", "url": primary_url, "variant": "A"},
+            {"label": "Get a free GTM audit", "url": primary_url, "variant": "B"},
+            {"label": "Book a 30-minute strategy call", "url": primary_url, "variant": "C"},
+        ]
+
+    @staticmethod
+    def _detect_stage(keyword: str) -> str:
+        kw = keyword.lower()
+        early_signals = {"startup", "early stage", "pre-sdr", "founder", "early-stage", "0 to 1", "pre-seed", "seed"}
+        growth_signals = {"series a", "series b", "growing", "sdr team", "growth stage", "growth-stage"}
+        scale_signals = {"enterprise", "revops", "multi-territory", "governance", "at scale", "enterprise-saas"}
+        if any(s in kw for s in early_signals):
+            return "early"
+        if any(s in kw for s in scale_signals):
+            return "scale"
+        if any(s in kw for s in growth_signals):
+            return "growth"
+        return ""
+
+    def _cta_block(self, stage: str = "") -> str:
+        stage_cta = STAGE_CTA.get(stage, {})
+        primary_label = stage_cta.get("primary_label") or self.cta.get("primary_label", "Book a demo")
+        primary_url = self.cta.get("primary_url", self.site.get("site_url", "https://pipeleap.com"))
+        secondary_label = self.cta.get("secondary_label", "See how it works")
+        secondary_url = self.cta.get("secondary_url", self.site.get("site_url", "https://pipeleap.com"))
+        urgency = stage_cta.get("urgency", "")
+        subtext = stage_cta.get("primary_subtext", "")
+        cta = f"[{primary_label}]({primary_url})"
+        if subtext:
+            cta += f" — {subtext}"
+        cta += f" or [{secondary_label}]({secondary_url}) to start building immediately."
+        if urgency:
+            cta += f"\n\n_{urgency}_"
+        return cta

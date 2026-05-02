@@ -1,0 +1,253 @@
+from __future__ import annotations
+
+import json
+from collections import defaultdict
+from typing import Any
+
+from utils.models import AuditIssue, CrawlerReport, PageSnapshot
+
+
+class AuditEngine:
+    """Runs a practical technical SEO audit against the crawled Pipeleap site."""
+
+    def __init__(self, config: dict[str, Any], logger) -> None:
+        self.config = config
+        self.logger = logger
+        self.pagespeed_config = config.get("integrations", {}).get("pagespeed", {})
+
+    def run(self, crawl_report: CrawlerReport) -> list[AuditIssue]:
+        issues: list[AuditIssue] = []
+        pages = crawl_report.pages
+
+        if not pages:
+            issues.append(
+                AuditIssue(
+                    severity="Critical",
+                    category="crawl",
+                    url=crawl_report.site_url,
+                    title="Site crawl returned no HTML pages",
+                    description="The crawler could not fetch any HTML pages, so technical SEO checks are incomplete.",
+                    fix_instructions="Verify the site is reachable from the runtime, confirm DNS/TLS, and rerun the crawl.",
+                    impact_score=95.0,
+                )
+            )
+            return issues
+
+        if not crawl_report.robots_txt_present:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="robots",
+                    url=f"{crawl_report.site_url.rstrip('/')}/robots.txt",
+                    title="Missing robots.txt",
+                    description="robots.txt was not detected during the crawl.",
+                    fix_instructions="Add a robots.txt file that allows key public pages and references the sitemap.",
+                    impact_score=58.0,
+                    auto_fix_script="User-agent: *\nAllow: /\nSitemap: https://pipeleap.com/sitemap.xml\n",
+                )
+            )
+
+        if not crawl_report.sitemap_urls:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title="Missing or unreadable sitemap",
+                    description="No sitemap URLs were discovered from robots.txt or sitemap.xml.",
+                    fix_instructions="Publish a sitemap containing canonical landing pages, blog posts, and product pages.",
+                    impact_score=62.0,
+                )
+            )
+
+        if not self.pagespeed_config.get("api_key"):
+            issues.append(
+                AuditIssue(
+                    severity="Critical",
+                    category="core_web_vitals",
+                    url=crawl_report.site_url,
+                    title="PageSpeed API not configured — Core Web Vitals blind spot",
+                    description=(
+                        "LCP, CLS, and INP are confirmed Google ranking signals. Without the PageSpeed Insights API, "
+                        "the audit cannot measure or flag CWV regressions. This creates a ranking blind spot "
+                        "that cannot be resolved by server-response heuristics alone."
+                    ),
+                    fix_instructions=(
+                        "Add integrations.pagespeed.api_key in config.yaml. "
+                        "Get a free key at https://developers.google.com/speed/docs/insights/v5/get-started. "
+                        "Once set, the audit will report LCP, CLS, and INP scores per page."
+                    ),
+                    impact_score=87.0,
+                )
+            )
+
+        title_map: dict[str, list[str]] = defaultdict(list)
+        meta_map: dict[str, list[str]] = defaultdict(list)
+        content_map: dict[str, list[str]] = defaultdict(list)
+
+        for page in pages:
+            title_map[page.title].append(page.url)
+            meta_map[page.meta_description].append(page.url)
+            content_map[page.content_hash].append(page.url)
+            issues.extend(self._page_level_issues(page))
+
+        issues.extend(self._duplicate_issues(title_map, "title", "Title tag"))
+        issues.extend(self._duplicate_issues(meta_map, "meta_description", "Meta description"))
+        issues.extend(self._duplicate_issues(content_map, "content", "Page body"))
+
+        return sorted(issues, key=lambda item: item.impact_score, reverse=True)
+
+    def _page_level_issues(self, page: PageSnapshot) -> list[AuditIssue]:
+        issues: list[AuditIssue] = []
+        if page.status_code >= 400:
+            issues.append(
+                AuditIssue(
+                    severity="Critical",
+                    category="broken_page",
+                    url=page.url,
+                    title="Broken page response",
+                    description=f"Page returned HTTP {page.status_code}.",
+                    fix_instructions="Restore the page, redirect it to the canonical replacement, or remove internal references.",
+                    impact_score=96.0,
+                )
+            )
+
+        if not page.title:
+            issues.append(
+                self._metadata_issue(
+                    page,
+                    field_name="title",
+                    title="Missing title tag",
+                    impact_score=84.0,
+                    suggestion=f"{page.h1 or 'Pipeleap'} | Pipeleap",
+                )
+            )
+
+        if not page.meta_description:
+            issues.append(
+                self._metadata_issue(
+                    page,
+                    field_name="meta_description",
+                    title="Missing meta description",
+                    impact_score=73.0,
+                    suggestion="Write a 140-160 character description tied to the page keyword and CTA.",
+                )
+            )
+
+        if not page.h1:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="heading",
+                    url=page.url,
+                    title="Missing H1",
+                    description="The page does not expose a primary H1 heading.",
+                    fix_instructions="Add one H1 that reflects the primary keyword and user intent.",
+                    impact_score=60.0,
+                )
+            )
+
+        if not page.canonical:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="canonical",
+                    url=page.url,
+                    title="Missing canonical",
+                    description="The page does not define a canonical URL.",
+                    fix_instructions="Add a self-referencing canonical tag to reduce duplicate indexing ambiguity.",
+                    impact_score=55.0,
+                )
+            )
+
+        if page.meta_robots and "noindex" in page.meta_robots.lower():
+            issues.append(
+                AuditIssue(
+                    severity="Critical",
+                    category="indexing",
+                    url=page.url,
+                    title="Indexed page is marked noindex",
+                    description="The crawler detected a noindex directive.",
+                    fix_instructions="Remove noindex from pages that should rank, or confirm it is intentionally excluded.",
+                    impact_score=92.0,
+                )
+            )
+
+        if page.response_time_ms > 4000:
+            issues.append(
+                AuditIssue(
+                    severity="Critical",
+                    category="performance",
+                    url=page.url,
+                    title="Very slow page response",
+                    description=f"HTML response time was {page.response_time_ms}ms.",
+                    fix_instructions="Profile backend latency, cache HTML where possible, and defer heavy third-party scripts.",
+                    impact_score=88.0,
+                )
+            )
+        elif page.response_time_ms > 2500:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="performance",
+                    url=page.url,
+                    title="Slow page response",
+                    description=f"HTML response time was {page.response_time_ms}ms.",
+                    fix_instructions="Reduce server latency, optimize render path, and audit script weight.",
+                    impact_score=63.0,
+                )
+            )
+
+        if len(page.internal_links) == 0 and page.url.rstrip("/") != self.config.get("site", {}).get("site_url", "").rstrip("/"):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="internal_linking",
+                    url=page.url,
+                    title="Page has no internal links out",
+                    description="The page does not link deeper into the site, which weakens crawl flow and conversion routing.",
+                    fix_instructions="Add contextual links to a product page, related cluster content, and one conversion-focused landing page.",
+                    impact_score=34.0,
+                )
+            )
+
+        return issues
+
+    def _metadata_issue(
+        self,
+        page: PageSnapshot,
+        field_name: str,
+        title: str,
+        impact_score: float,
+        suggestion: str,
+    ) -> AuditIssue:
+        payload = json.dumps({"url": page.url, field_name: suggestion}, indent=2)
+        return AuditIssue(
+            severity="Critical" if field_name == "title" else "Medium",
+            category="metadata",
+            url=page.url,
+            title=title,
+            description=f"The page is missing a {field_name.replace('_', ' ')}.",
+            fix_instructions=f"Add a unique {field_name.replace('_', ' ')} aligned to the primary keyword and CTA.",
+            impact_score=impact_score,
+            auto_fix_script=payload,
+        )
+
+    def _duplicate_issues(self, duplicates: dict[str, list[str]], category: str, label: str) -> list[AuditIssue]:
+        issues: list[AuditIssue] = []
+        for value, urls in duplicates.items():
+            if not value or len(urls) <= 1:
+                continue
+            for url in urls[1:]:
+                issues.append(
+                    AuditIssue(
+                        severity="Medium",
+                        category=category,
+                        url=url,
+                        title=f"Duplicate {label.lower()}",
+                        description=f"{label} duplicates another crawled page.",
+                        fix_instructions=f"Rewrite the {label.lower()} to target the page's distinct keyword and intent.",
+                        impact_score=57.0 if category != "content" else 69.0,
+                    )
+                )
+        return issues

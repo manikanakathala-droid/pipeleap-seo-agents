@@ -1,0 +1,40 @@
+# Website checkout used only as a publish target in CI/local runs
+pipeleap-launchpad/
+
+# Credentials
+service_account.json
+*.json.key
+secrets/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Generated outputs
+outputs/
+*.sqlite
+*.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE and local assistant state
+.vscode/
+.idea/
+.claude/
