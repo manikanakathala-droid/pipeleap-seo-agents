@@ -259,6 +259,79 @@ class CMSConnector:
 
         return body
 
+    def backfill_inbound_links(self, new_pages: list[Any]) -> dict[str, Any]:
+        """
+        Scan all existing published pages and inject a contextual link to each
+        newly published page where the page's primary keyword appears as plain
+        text. Ensures new content inherits inbound PageRank from the first run.
+        """
+        from types import SimpleNamespace
+
+        publish_dir = self.config.get("publish_dir", "")
+        publish_root = Path(publish_dir) if publish_dir else None
+        if publish_root and not publish_root.is_absolute():
+            publish_root = Path.cwd() / publish_root
+        if not publish_root or not publish_root.exists():
+            self.logger.warning("backfill_inbound_links: publish_root not found, skipping.")
+            return {"files_updated": 0, "links_injected": 0}
+
+        # Build link targets for each new page
+        new_page_links = []
+        for page in new_pages:
+            slug = getattr(page, "slug", "").strip("/")
+            keywords = getattr(page, "source_keywords", [])
+            anchor = keywords[0] if keywords else getattr(page, "seo_title", "")
+            if not slug or not anchor:
+                continue
+            new_page_links.append(SimpleNamespace(
+                slug=slug,
+                anchor_text=anchor,
+                target_url=f"{self.site_url}/blog/{slug}",
+                confidence=0.7,
+            ))
+
+        if not new_page_links:
+            return {"files_updated": 0, "links_injected": 0}
+
+        new_slugs = {link.slug for link in new_page_links}
+        files_updated = 0
+        links_injected = 0
+
+        for slug_dir in sorted(publish_root.iterdir()):
+            if not slug_dir.is_dir() or slug_dir.name in new_slugs:
+                continue
+            index_md = slug_dir / "index.md"
+            if not index_md.exists():
+                continue
+
+            original = index_md.read_text(encoding="utf-8")
+            updated = original
+            injected_this_page = 0
+
+            for link in new_page_links:
+                # Skip if a link to this slug already exists in the page
+                if f"/{link.slug})" in updated:
+                    continue
+                candidate = self._inject_internal_links(updated, [link])
+                if candidate != updated:
+                    updated = candidate
+                    injected_this_page += 1
+                    if injected_this_page >= 2:
+                        break
+
+            if updated != original:
+                index_md.write_text(updated, encoding="utf-8")
+                files_updated += 1
+                links_injected += injected_this_page
+                self.logger.debug("Backfill: %d link(s) → %s", injected_this_page, slug_dir.name)
+
+        self.logger.info(
+            "Backfill complete: %d links injected across %d existing pages.",
+            links_injected,
+            files_updated,
+        )
+        return {"files_updated": files_updated, "links_injected": links_injected}
+
     def _publish_via_webhook(self, assets: list[Any]) -> dict[str, Any]:
         endpoint = self.config["webhook_url"]
         payload = [item.to_dict() if hasattr(item, "to_dict") else item for item in assets]

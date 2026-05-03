@@ -3,13 +3,10 @@ GlossaryUpdater — automatically maintains src/data/glossary-terms.ts.
 
 Runs at the end of every growth engine orchestration run and:
   1. Loads all existing terms from glossary-terms.ts
-  2. Collects new terms from: entities.py, generated page primary_keywords,
-     topical pillars, and competitor names encountered in this run
-  3. Appends new terms (never deletes existing ones)
-  4. Writes the updated glossary-terms.ts to the launchpad src/data/ directory
-
-This ensures the /glossary page is always current and every internal
-link target has a valid definition — enforcing system rule 5 and 6.
+  2. Runs DuplicateDetector to prevent near-duplicate entries
+  3. Collects new terms from: entities.py, generated page primary_keywords
+  4. Appends new terms (never deletes existing ones); updates updated_at on changed terms
+  5. Writes the updated glossary-terms.ts to the launchpad src/data/ directory
 """
 from __future__ import annotations
 
@@ -64,6 +61,9 @@ class GlossaryUpdater:
     to src/data/glossary-terms.ts for the /glossary React page.
     """
 
+    # Minimum confidence for a fuzzy duplicate match (85%)
+    DUPLICATE_THRESHOLD = 0.85
+
     TS_HEADER = (
         "// AUTO-GENERATED — updated on every agent run by GlossaryUpdater.\n"
         "// Do not edit manually. Add new terms via the Python agent (glossary_updater.py) or entities.py.\n"
@@ -75,6 +75,7 @@ class GlossaryUpdater:
         "  definition: string;\n"
         "  relatedTerms: string[];\n"
         "  pipeLeapContext?: string;\n"
+        "  updatedAt?: string;\n"
         "}\n\n"
     )
 
@@ -102,6 +103,13 @@ class GlossaryUpdater:
         # Load existing slugs from TS file
         existing_content = self.terms_file.read_text(encoding="utf-8")
         existing_slugs = set(re.findall(r'slug:\s*"([a-z0-9-]+)"', existing_content))
+
+        # Initialise duplicate detector against current corpus
+        try:
+            from modules.pipeleap_seo_engine.glossary.duplicate_detector import DuplicateDetector
+            detector = DuplicateDetector(existing_slugs, threshold=self.DUPLICATE_THRESHOLD)
+        except Exception:
+            detector = None
 
         # Collect candidate new terms from this run
         candidates: list[dict] = []
@@ -134,6 +142,11 @@ class GlossaryUpdater:
             slug = re.sub(r"[^a-z0-9]+", "-", kw).strip("-")
             if slug in existing_slugs or slug in _BLOCKLIST:
                 continue
+            # Run duplicate detection — skip if already covered by a canonical term
+            if detector:
+                result = detector.check(kw)
+                if result.is_duplicate:
+                    continue
             if any(s in slug for s in _BLOCKLIST):
                 continue
             page_type = getattr(page, "page_type", "")
@@ -199,6 +212,7 @@ class GlossaryUpdater:
             if term.get("pipeLeapContext")
             else ""
         )
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         return (
             f'  {{\n'
             f'    slug: {json.dumps(term["slug"])},\n'
@@ -206,5 +220,6 @@ class GlossaryUpdater:
             f'    category: {json.dumps(term["category"])},\n'
             f'    definition: {json.dumps(term["definition"])},\n'
             f'    relatedTerms: {related},{context_line}\n'
+            f'    updatedAt: {json.dumps(today)},\n'
             f'  }},\n'
         )
