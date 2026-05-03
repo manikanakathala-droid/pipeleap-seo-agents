@@ -107,11 +107,9 @@ class GrowthEngineOrchestrator:
             seo_db_path=self._resolve_output_dir().parent / Path(seo_db_path).name,
             cms_publish_dir=cms_dir,
         )
-        # Glossary updater — keeps /glossary page in sync with every run
-        cms_config = config.get("integrations", {}).get("cms", {})
-        publish_dir = cms_config.get("publish_dir", "")
-        launchpad_root = str(Path(publish_dir).parents[2]) if publish_dir else ""
-        self.glossary_updater = GlossaryUpdater(launchpad_root) if launchpad_root else None
+        # GlossaryUpdater disabled — glossary-terms.ts is managed as static
+        # frontend code in the Loveable repo, not by the Python agent.
+        self.glossary_updater = None
 
         # Connectors
         growth_cfg = self.module_config
@@ -155,11 +153,7 @@ class GrowthEngineOrchestrator:
         all_pages.extend(vs_pages + alt_pages + multi_pages)
         self._log(f"  Competitor pages: {len(vs_pages)} vs, {len(alt_pages)} alt, {len(multi_pages)} multi")
 
-        # ── 3. Glossary pages (entity SEO + AI Overview) ─────────────────────
-        if mc.get("generate_glossary", True):
-            gloss_pages = self.glossary_gen.generate_index(existing_slugs)
-            all_pages.extend(gloss_pages)
-            self._log(f"  Glossary pages:   {len(gloss_pages)}")
+        # ── 3. Glossary pages — disabled; glossary is a static frontend feature ─
 
         # ── 4. Integration pages ──────────────────────────────────────────────
         if mc.get("generate_integrations", True):
