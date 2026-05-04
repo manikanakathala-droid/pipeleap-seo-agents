@@ -73,8 +73,9 @@ class CMSConnector:
 
         return {"mode": "filesystem", "published_count": count, "publish_root": str(publish_root)}
 
-    # Static pages that must always appear in the sitemap regardless of generated content.
-    # These match the React Router routes defined in App.tsx.
+    # Pages that have confirmed React routes in App.tsx.
+    # Only these URLs are written to sitemap.xml.
+    # Blog/glossary slugs are appended dynamically from the actual data files.
     _STATIC_PAGES = [
         ("/",               "1.0", "daily"),
         ("/services",       "0.9", "weekly"),
@@ -87,10 +88,49 @@ class CMSConnector:
         ("/faq",            "0.8", "monthly"),
         ("/blog",           "0.8", "daily"),
         ("/glossary",       "0.9", "monthly"),
+        # Blog articles that exist in src/data/blog-articles.ts
+        ("/blog/why-your-pipeline-looks-full-but-rarely-converts", "0.8", "monthly"),
+        ("/blog/the-hidden-reason-deals-dont-move",                "0.8", "monthly"),
+        ("/blog/why-outbound-effort-gets-wasted",                  "0.8", "monthly"),
+        ("/blog/the-gap-between-activity-and-revenue",             "0.8", "monthly"),
+        ("/blog/why-forecasting-keeps-breaking",                   "0.8", "monthly"),
+        ("/blog/your-gtm-strategy-is-a-document-not-a-system",     "0.8", "monthly"),
+        ("/blog/what-your-gtm-motion-looks-like-from-the-buyers-side", "0.8", "monthly"),
+        ("/blog/buying-signals-are-not-what-most-teams-think-they-are", "0.8", "monthly"),
+        ("/blog/the-timing-problem-nobody-talks-about-in-outbound", "0.8", "monthly"),
+        # Glossary terms that exist in src/data/glossary-terms.ts
+        ("/glossary/workflow-orchestration",      "0.8", "monthly"),
+        ("/glossary/outbound-automation",         "0.8", "monthly"),
+        ("/glossary/signal-based-outbound",       "0.8", "monthly"),
+        ("/glossary/pipeline-generation",         "0.8", "monthly"),
+        ("/glossary/revenue-operations",          "0.8", "monthly"),
+        ("/glossary/ideal-customer-profile",      "0.8", "monthly"),
+        ("/glossary/sales-qualified-lead",        "0.8", "monthly"),
+        ("/glossary/marketing-qualified-lead",    "0.8", "monthly"),
+        ("/glossary/crm-automation",              "0.8", "monthly"),
+        ("/glossary/sdr-automation",              "0.8", "monthly"),
+        ("/glossary/lead-enrichment",             "0.8", "monthly"),
+        ("/glossary/intent-data",                 "0.8", "monthly"),
+        ("/glossary/buying-signals",              "0.8", "monthly"),
+        ("/glossary/account-based-marketing",     "0.8", "monthly"),
+        ("/glossary/cold-email-outreach",         "0.8", "monthly"),
+        ("/glossary/email-deliverability",        "0.8", "monthly"),
+        ("/glossary/ai-sdr",                      "0.8", "monthly"),
+        ("/glossary/product-led-growth",          "0.8", "monthly"),
+        ("/glossary/go-to-market-strategy",       "0.8", "monthly"),
+        ("/glossary/annual-recurring-revenue",    "0.8", "monthly"),
+        ("/glossary/monthly-recurring-revenue",   "0.8", "monthly"),
+        ("/glossary/customer-acquisition-cost",   "0.8", "monthly"),
+        ("/glossary/customer-lifetime-value",     "0.8", "monthly"),
+        ("/glossary/net-revenue-retention",       "0.8", "monthly"),
+        ("/glossary/sales-cadence",               "0.8", "monthly"),
+        ("/glossary/outreach-personalization",    "0.8", "monthly"),
+        ("/glossary/content-marketing",           "0.8", "monthly"),
+        ("/glossary/conversion-rate-optimization","0.8", "monthly"),
+        ("/glossary/sales-engagement-platform",   "0.8", "monthly"),
     ]
 
-    # Page types where the metadata URL should map to a deeper path prefix.
-    # All SEO-generated content is served under /blog/:slug by the React router.
+    # Prefix used when backfilling internal links — NOT used for sitemap.
     _SEO_URL_PREFIX = "/blog"
 
     def _update_sitemap_and_robots(self, publish_root_str: str) -> None:
@@ -139,51 +179,24 @@ class CMSConnector:
                 "  </url>",
             ])
 
-        # 2. Generated SEO content — served at /blog/<slug> by the React router.
-        #    Using the correct /blog/ prefix is critical: without it every sitemap
-        #    URL 404s and Google never indexes the generated content.
-        slugs = sorted(d.name for d in publish_root.iterdir() if d.is_dir())
-        for slug in slugs:
-            # Read page_type from metadata.json to assign the right priority.
-            meta_path = publish_root / slug / "metadata.json"
-            page_type = ""
-            try:
-                import json as _json
-                meta = _json.loads(meta_path.read_text(encoding="utf-8"))
-                page_type = meta.get("page_type", "")
-            except Exception:
-                pass
-
-            # Assign priority by content type — commercial / comparison pages rank higher.
-            if page_type in ("comparison_page", "alternative_page", "multi_competitor_page", "landing_page"):
-                priority = "0.9"
-                changefreq = "weekly"
-            elif page_type in ("use_case_page", "role_page", "integration_page"):
-                priority = "0.85"
-                changefreq = "weekly"
-            elif page_type in ("glossary_page", "workflow_page", "workflow_recipe"):
-                priority = "0.8"
-                changefreq = "monthly"
-            else:
-                priority = "0.8"
-                changefreq = "weekly"
-
-            loc = f"{site_url}{self._SEO_URL_PREFIX}/{slug}"
-            sitemap_lines.extend([
-                "  <url>",
-                _hreflang_tags(loc),
-                f"    <loc>{loc}</loc>",
-                f"    <lastmod>{today}</lastmod>",
-                f"    <changefreq>{changefreq}</changefreq>",
-                f"    <priority>{priority}</priority>",
-                "  </url>",
-            ])
+        # 2. Generated SEO content.
+        #
+        # IMPORTANT: generated pages are stored in src/data/seo/ as markdown/JSON
+        # research artifacts. They are NOT wired to any React route in App.tsx and
+        # therefore return a 404 (NotFound) for every URL. Adding them to the sitemap
+        # causes Google to crawl, find 404s, and flag them in Search Console coverage.
+        #
+        # Generated pages are intentionally EXCLUDED from sitemap.xml.
+        # To surface a generated page as a real indexed URL:
+        #   1. Add its slug to src/data/blog-articles.ts (blog content pipeline), OR
+        #   2. Add a dedicated React route for it in App.tsx.
+        # Until one of those is done, the page must not appear in the sitemap.
 
         sitemap_lines.append("</urlset>")
 
         sitemap_path = public_dir / "sitemap.xml"
         sitemap_path.write_text("\n".join(sitemap_lines), encoding="utf-8")
-        self.logger.info(f"sitemap.xml written: {len(slugs)} generated pages + {len(self._STATIC_PAGES)} static pages.")
+        self.logger.info(f"sitemap.xml written: {len(self._STATIC_PAGES)} static pages (generated pages excluded — no React routes).")
 
         # robots.txt — allow all bots including AI crawlers; point at sitemap.
         robots_path = public_dir / "robots.txt"
