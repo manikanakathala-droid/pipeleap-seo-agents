@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeleap SEO Command Centre</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: { 950: '#020617', 900: '#0f172a', 800: '#1e293b', 700: '#334155', 600: '#475569', 500: '#64748b', 400: '#94a3b8', 300: '#cbd5e1' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #020617; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; margin: 0; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #1e293b; } ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    .ring-chart { transition: stroke-dasharray 1s ease; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 1s linear infinite; }
+    .card { background: rgba(15,23,42,0.7); border: 1px solid rgba(51,65,85,0.6); border-radius: 12px; }
+    .tab-active { background: #334155 !important; color: white !important; }
+    .tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: #94a3b8; border: none; background: none; }
+    .tab:hover { color: #cbd5e1; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const { useState, useEffect, useCallback } = React;
+const { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = Recharts;
+
+// ── Data source — reads from /data/ in same repo (updated by SEO OS) ─────────
+const DATA_BASE = "./data";
+async function fetchJSON(path) {
+  const r = await fetch(`${DATA_BASE}/${path}?t=${Date.now()}`);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+// ── Colours ───────────────────────────────────────────────────────────────────
+const CAT_COLORS = { keywords:"#3b82f6", content:"#10b981", technical:"#ef4444", linking:"#8b5cf6", indexing:"#f59e0b", metadata:"#06b6d4", competitor:"#ec4899" };
+const PRI_COLORS = { high:"#ef4444", medium:"#f59e0b", low:"#10b981" };
+const STA_COLORS = { pending:"#f59e0b", completed:"#10b981", requires_review:"#ef4444" };
+
+// ── Mock data (shown until SEO OS seeds real data) ────────────────────────────
+function mockSummary() {
+  const today = new Date().toISOString().slice(0,10);
+  const days = Array.from({length:14},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(13-i)); return d.toISOString().slice(0,10); });
+  return {
+    last_updated: new Date().toISOString(), current_run_id:"preview", current_score:62,
+    current_score_breakdown:{technical:55,content:70,indexing:68,authority:40},
+    today:{date:today,total_actions:24,safe_actions:18,dev_review_items:3,content_pieces:4,keywords_found:20,indexing_actions:6,active_alerts:3,mode:"change_response",pages_total:19,pages_new:0,pages_updated:2,broken_pages:0,orphan_pages:4,categories:{keywords:8,content:4,technical:5,linking:4,indexing:3}},
+    category_totals:{keywords:60,content:28,technical:35,linking:42,indexing:38,metadata:22},
+    score_history: days.map((date,i)=>({date,value:45+i*1.5,technical:40+i*1.2,content:50+i*1.8,indexing:55+i})),
+    daily_metrics: days.map(date=>({date,total_actions:Math.floor(15+Math.random()*20),safe_actions:Math.floor(10+Math.random()*12),dev_review_items:Math.floor(Math.random()*5),categories:{keywords:8,content:4,technical:5,linking:4,indexing:3}})),
+    content_velocity: days.map(date=>({date,value:Math.floor(Math.random()*5)})),
+    keyword_growth:  days.map(date=>({date,value:Math.floor(10+Math.random()*15)})),
+    technical_trend: days.map(date=>({date,value:Math.floor(1+Math.random()*8)})),
+    indexing_trend:  days.map(date=>({date,value:Math.floor(2+Math.random()*8)})),
+    next_day_plan:["Execute 18 high-priority safe actions","Publish 4 content pieces — comparison cluster first","Submit 6 pages via GSC URL Inspection","Begin Apollo.io vs Pipeleap comparison page","Monitor GSC CTR after meta updates (48h window)"],
+    errors:[],
+  };
+}
+function mockAlerts() {
+  return {last_updated:new Date().toISOString(),active_alerts:[
+    {id:"a1",priority:"high",category:"technical",status:"requires_review",impact_score:9,title:"Page newly marked noindex",description:"/services has noindex — confirm intentional.",dev_note:"REQUIRES DEV REVIEW",resolved:false},
+    {id:"a2",priority:"medium",category:"metadata",status:"pending",impact_score:6,title:"High impressions / low CTR",description:"Pricing: 340 impressions, 1.8% CTR — meta copy mismatch.",dev_note:"",resolved:false},
+  ],alert_history:[]};
+}
+function mockActivity() {
+  const cats=["keywords","content","technical","linking","indexing","metadata"];
+  const types=["create","update","fix","suggest"];
+  return Array.from({length:30},(_,i)=>({id:`p${i}`,timestamp:new Date(Date.now()-i*3600000).toISOString(),category:cats[i%cats.length],action_type:types[i%types.length],priority:["high","high","medium","low"][i%4],status:["pending","pending","completed","requires_review"][i%4],impact_score:3+(i%7),page_url:`https://pipeleap.com/${["","gtm-audit","blog","faq","pricing","about"][i%6]}`,title:["Add title tag","Keyword: Apollo.io alternatives","Submit page for indexing","Add internal links","Content draft: SDR vs Automation","Fix orphan page"][i%6],requires_dev:i%7===0,safe_mode:i%7!==0}));
+}
+
+// ── Components ────────────────────────────────────────────────────────────────
+function ScoreRing({score,label,size=120}) {
+  const r=size/2-10, circ=2*Math.PI*r, fill=(score/100)*circ;
+  const color=score>=70?"#10b981":score>=45?"#f59e0b":"#ef4444";
+  return React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4}},
+    React.createElement("div",{style:{position:"relative",width:size,height:size}},
+      React.createElement("svg",{width:size,height:size,style:{transform:"rotate(-90deg)"}},
+        React.createElement("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:"#1e293b",strokeWidth:8}),
+        React.createElement("circle",{cx:size/2,cy:size/2,r,fill:"none",stroke:color,strokeWidth:8,strokeDasharray:`${fill} ${circ}`,strokeLinecap:"round",className:"ring-chart"})
+      ),
+      React.createElement("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center"}},
+        React.createElement("div",{style:{fontSize:size*0.22,fontWeight:"bold",color:"white"}},""+score),
+        React.createElement("div",{style:{fontSize:size*0.11,color:"#64748b"}},"/100")
+      )
+    ),
+    React.createElement("p",{style:{fontSize:11,color:"#94a3b8",margin:0}},label)
+  );
+}
+
+function Badge({text,color}) {
+  return React.createElement("span",{style:{display:"inline-flex",alignItems:"center",padding:"2px 8px",borderRadius:99,fontSize:11,fontWeight:500,backgroundColor:`${color}22`,color}},text);
+}
+
+function TT({active,payload,label}) {
+  if(!active||!payload?.length) return null;
+  return React.createElement("div",{style:{background:"#0f172a",border:"1px solid #334155",borderRadius:8,padding:"8px 12px",fontSize:11}},
+    React.createElement("p",{style:{color:"#94a3b8",marginBottom:4}},label),
+    payload.map(p=>React.createElement("p",{key:p.dataKey,style:{color:p.color,margin:0}},`${p.name||p.dataKey}: ${p.value}`))
+  );
+}
+
+// ── Main App ──────────────────────────────────────────────────────────────────
+function App() {
+  const [summary,setSummary]=useState(null);
+  const [activity,setActivity]=useState([]);
+  const [alerts,setAlerts]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [mock,setMock]=useState(false);
+  const [tab,setTab]=useState("overview");
+  const [lastRefresh,setLastRefresh]=useState(new Date());
+
+  const load=useCallback(async()=>{
+    setLoading(true);
+    try {
+      const [s,a,al]=await Promise.all([fetchJSON("summary.json"),fetchJSON("activity-log.json"),fetchJSON("alerts.json")]);
+      // Use real data only if summary has been seeded (current_score > 0)
+      if(s.current_score>0){setSummary(s);setActivity((Array.isArray(a)?a:[]).slice(-100).reverse());setAlerts(al);setMock(false);}
+      else throw new Error("empty");
+    } catch {setSummary(mockSummary());setActivity(mockActivity());setAlerts(mockAlerts());setMock(true);}
+    setLoading(false);setLastRefresh(new Date());
+  },[]);
+
+  useEffect(()=>{load();},[]);
+  useEffect(()=>{const id=setInterval(load,5*60*1000);return()=>clearInterval(id);},[]);
+
+  if(loading||!summary||!alerts) return React.createElement("div",{style:{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12}},
+    React.createElement("div",{style:{width:32,height:32,border:"2px solid #3b82f6",borderTopColor:"transparent",borderRadius:"50%",className:"spin",animation:"spin 1s linear infinite"}}),
+    React.createElement("p",{style:{color:"#64748b",fontSize:13}},"Loading SEO Command Centre...")
+  );
+
+  const score=summary.current_score, bd=summary.current_score_breakdown, td=summary.today;
+  const activeAlerts=alerts.active_alerts.filter(a=>!a.resolved);
+  const scoreData=summary.score_history.slice(-30).map(d=>({date:d.date.slice(5),score:d.value,technical:d.technical,content:d.content,indexing:d.indexing}));
+  const dailyData=summary.daily_metrics.slice(-14).map(d=>({date:d.date.slice(5),safe:d.safe_actions||0,dev:d.dev_review_items||0}));
+  const velData=summary.content_velocity.slice(-14).map(d=>({date:d.date.slice(5),pieces:d.value}));
+  const kwData=summary.keyword_growth.slice(-14).map(d=>({date:d.date.slice(5),keywords:d.value}));
+  const techData=summary.technical_trend.slice(-14).map(d=>({date:d.date.slice(5),issues:d.value}));
+  const idxData=summary.indexing_trend.slice(-14).map(d=>({date:d.date.slice(5),actions:d.value}));
+
+  const H=React.createElement;
+  const xProps={tick:{fill:"#475569",fontSize:10},tickLine:false,axisLine:false};
+  const yProps={tick:{fill:"#475569",fontSize:10},tickLine:false,axisLine:false};
+
+  return H("div",{style:{minHeight:"100vh"}},
+
+    // Header
+    H("div",{style:{background:"rgba(15,23,42,0.95)",borderBottom:"1px solid #1e293b",position:"sticky",top:0,zIndex:20,backdropFilter:"blur(8px)"}},
+      H("div",{style:{maxWidth:1200,margin:"0 auto",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+        H("div",{style:{display:"flex",alignItems:"center",gap:12}},
+          H("div",{style:{width:32,height:32,borderRadius:8,background:"rgba(59,130,246,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}},"📊"),
+          H("div",null,
+            H("h1",{style:{margin:0,fontSize:14,fontWeight:"bold",color:"white"}},"Pipeleap SEO Command Centre"),
+            H("p",{style:{margin:0,fontSize:11,color:"#475569"}},mock?"Preview mode — run SEO OS to seed live data":`Run: ${summary.current_run_id}`)
+          )
+        ),
+        H("div",{style:{display:"flex",alignItems:"center",gap:12}},
+          mock&&H("span",{style:{fontSize:11,color:"#fbbf24",border:"1px solid rgba(251,191,36,0.3)",borderRadius:99,padding:"2px 8px",background:"rgba(251,191,36,0.08)"}},"Preview data"),
+          H("span",{style:{fontSize:11,color:"#475569"}},`Updated ${lastRefresh.toLocaleTimeString()}`),
+          H("button",{onClick:load,style:{fontSize:11,color:"#94a3b8",border:"1px solid #334155",borderRadius:8,padding:"6px 12px",background:"#1e293b",cursor:"pointer"}},"⟳ Refresh")
+        )
+      )
+    ),
+
+    H("div",{style:{maxWidth:1200,margin:"0 auto",padding:"24px 16px"}},
+
+      // Score banner
+      H("div",{className:"card",style:{padding:24,marginBottom:20}},
+        H("div",{style:{display:"flex",flexWrap:"wrap",alignItems:"center",gap:32}},
+          H(ScoreRing,{score,label:"Overall SEO Score",size:140}),
+          H("div",{style:{display:"flex",gap:20,flexWrap:"wrap"}},
+            [["Technical",bd.technical,"#ef4444"],["Content",bd.content,"#10b981"],["Indexing",bd.indexing,"#f59e0b"],["Authority",bd.authority,"#8b5cf6"]]
+              .map(([lbl,val,col])=>H("div",{key:lbl,style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4}},
+                H("div",{style:{position:"relative",width:68,height:68}},
+                  H("svg",{width:68,height:68,style:{transform:"rotate(-90deg)"}},
+                    H("circle",{cx:34,cy:34,r:26,fill:"none",stroke:"#1e293b",strokeWidth:6}),
+                    H("circle",{cx:34,cy:34,r:26,fill:"none",stroke:col,strokeWidth:6,strokeDasharray:`${(val/100)*2*Math.PI*26} ${2*Math.PI*26}`,strokeLinecap:"round",className:"ring-chart"})
+                  ),
+                  H("div",{style:{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:14,fontWeight:"bold",color:"white"}},val)
+                ),
+                H("p",{style:{fontSize:11,color:"#94a3b8",margin:0}},lbl)
+              ))
+          ),
+          H("div",{style:{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,minWidth:200}},
+            [["Actions",td.total_actions,"#3b82f6","⚡"],["Alerts",activeAlerts.length,"#ef4444","🔔"],["Content",td.content_pieces,"#10b981","📝"],["Keywords",td.keywords_found,"#8b5cf6","🔍"]]
+              .map(([lbl,val,col,ico])=>H("div",{key:lbl,className:"card",style:{padding:"10px 14px",display:"flex",alignItems:"center",gap:10}},
+                H("span",{style:{fontSize:18}},""+ico),
+                H("div",null,H("p",{style:{margin:0,fontSize:11,color:"#475569"}},lbl),H("p",{style:{margin:0,fontSize:16,fontWeight:"bold",color:"white"}},""+val))
+              ))
+          )
+        )
+      ),
+
+      // Alerts
+      activeAlerts.length>0&&H("div",{style:{background:"rgba(127,29,29,0.15)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:12,padding:16,marginBottom:20}},
+        H("p",{style:{margin:"0 0 12px",fontSize:13,fontWeight:600,color:"#fca5a5"}},"🚨 "+activeAlerts.length+" Active Alert"+(activeAlerts.length>1?"s":"")),
+        H("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+          activeAlerts.slice(0,4).map(a=>H("div",{key:a.id,className:"card",style:{padding:"10px 14px"}},
+            H("div",{style:{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}},
+              H("div",{style:{flex:1}},
+                H("div",{style:{display:"flex",gap:6,marginBottom:4,flexWrap:"wrap"}},
+                  H(Badge,{text:a.priority,color:PRI_COLORS[a.priority]||"#94a3b8"}),
+                  H(Badge,{text:a.category,color:CAT_COLORS[a.category]||"#94a3b8"}),
+                  a.dev_note&&H(Badge,{text:"DEV REVIEW",color:"#f59e0b"})
+                ),
+                H("p",{style:{margin:"0 0 2px",fontSize:13,fontWeight:500,color:"white"}},a.title),
+                H("p",{style:{margin:0,fontSize:11,color:"#64748b"}},a.description)
+              ),
+              H("span",{style:{fontSize:13,fontWeight:"bold",color:"#ef4444",whiteSpace:"nowrap"}},a.impact_score+"/10")
+            )
+          ))
+        )
+      ),
+
+      // Tabs
+      H("div",null,
+        H("div",{style:{display:"flex",gap:4,background:"rgba(30,41,59,0.5)",border:"1px solid #1e293b",borderRadius:10,padding:4,marginBottom:20,width:"fit-content"}},
+          [["overview","Overview"],["trends","Trends"],["activity","Activity"],["keywords","Keywords"],["plan","Next Steps"]]
+            .map(([v,l])=>H("button",{key:v,className:"tab"+(tab===v?" tab-active":""),onClick:()=>setTab(v)},l))
+        ),
+
+        // Overview
+        tab==="overview"&&H("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
+          H("div",{className:"card",style:{padding:20}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"📈 SEO Score — 30 Days"),
+            H(ResponsiveContainer,{width:"100%",height:200},
+              H(AreaChart,{data:scoreData},
+                H("defs",null,H("linearGradient",{id:"gs",x1:"0",y1:"0",x2:"0",y2:"1"},H("stop",{offset:"5%",stopColor:"#3b82f6",stopOpacity:0.3}),H("stop",{offset:"95%",stopColor:"#3b82f6",stopOpacity:0}))),
+                H(CartesianGrid,{strokeDasharray:"3 3",stroke:"#1e293b"}),H(XAxis,{dataKey:"date",...xProps}),H(YAxis,{domain:[0,100],...yProps}),H(Tooltip,{content:H(TT,null)}),
+                H(Area,{type:"monotone",dataKey:"score",stroke:"#3b82f6",strokeWidth:2,fill:"url(#gs)",name:"Overall"}),
+                H(Area,{type:"monotone",dataKey:"technical",stroke:"#ef4444",strokeWidth:1.5,fill:"none",name:"Technical"}),
+                H(Area,{type:"monotone",dataKey:"content",stroke:"#10b981",strokeWidth:1.5,fill:"none",name:"Content"}),
+                H(Area,{type:"monotone",dataKey:"indexing",stroke:"#f59e0b",strokeWidth:1.5,fill:"none",name:"Indexing"})
+              )
+            )
+          ),
+          H("div",{className:"card",style:{padding:20}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"⚡ Daily Actions — 14 Days"),
+            H(ResponsiveContainer,{width:"100%",height:200},
+              H(BarChart,{data:dailyData,barSize:18},
+                H(CartesianGrid,{strokeDasharray:"3 3",stroke:"#1e293b"}),H(XAxis,{dataKey:"date",...xProps}),H(YAxis,{...yProps}),H(Tooltip,{content:H(TT,null)}),
+                H(Legend,{wrapperStyle:{fontSize:11,color:"#64748b"}}),
+                H(Bar,{dataKey:"safe",name:"Safe",fill:"#10b981",stackId:"a"}),
+                H(Bar,{dataKey:"dev",name:"Dev Review",fill:"#ef4444",stackId:"a",radius:[4,4,0,0]})
+              )
+            )
+          ),
+          H("div",{className:"card",style:{padding:20,gridColumn:"1/-1"}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"All-Time Actions by Category"),
+            H("div",{style:{display:"flex",flexWrap:"wrap",gap:10}},
+              Object.entries(summary.category_totals).sort((a,b)=>b[1]-a[1]).map(([cat,count])=>
+                H("div",{key:cat,className:"card",style:{padding:"8px 14px",display:"flex",alignItems:"center",gap:8}},
+                  H("span",{style:{width:8,height:8,borderRadius:4,background:CAT_COLORS[cat]||"#94a3b8",display:"inline-block"}}),
+                  H("span",{style:{fontSize:12,color:"#94a3b8"}},cat),
+                  H("span",{style:{fontSize:14,fontWeight:"bold",color:"white"}},""+count)
+                )
+              )
+            )
+          )
+        ),
+
+        // Trends
+        tab==="trends"&&H("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
+          [["Content Velocity","📝",velData,"pieces","#10b981"],["Keyword Discovery","🔍",kwData,"keywords","#8b5cf6"],["Technical Issues","⚠️",techData,"issues","#ef4444"],["Indexing Actions","🎯",idxData,"actions","#f59e0b"]]
+            .map(([title,ico,data,key,color])=>H("div",{key:title,className:"card",style:{padding:20}},
+              H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},""+ico+" "+title),
+              H(ResponsiveContainer,{width:"100%",height:180},
+                title.includes("Velocity")||title.includes("Discovery")
+                  ? H(AreaChart,{data},H("defs",null,H("linearGradient",{id:`g${key}`,x1:"0",y1:"0",x2:"0",y2:"1"},H("stop",{offset:"5%",stopColor:color,stopOpacity:0.3}),H("stop",{offset:"95%",stopColor:color,stopOpacity:0}))),H(CartesianGrid,{strokeDasharray:"3 3",stroke:"#1e293b"}),H(XAxis,{dataKey:"date",...xProps}),H(YAxis,{...yProps}),H(Tooltip,{content:H(TT,null)}),H(Area,{type:"monotone",dataKey:key,stroke:color,strokeWidth:2,fill:`url(#g${key})`,name:key}))
+                  : H(BarChart,{data,barSize:18},H(CartesianGrid,{strokeDasharray:"3 3",stroke:"#1e293b"}),H(XAxis,{dataKey:"date",...xProps}),H(YAxis,{...yProps}),H(Tooltip,{content:H(TT,null)}),H(Bar,{dataKey:key,fill:color,radius:[4,4,0,0],name:key}))
+              )
+            ))
+        ),
+
+        // Activity
+        tab==="activity"&&H("div",{className:"card"},
+          H("div",{style:{padding:"16px 20px",borderBottom:"1px solid #1e293b"}},
+            H("p",{style:{margin:0,fontSize:13,fontWeight:600,color:"#94a3b8"}},`⚡ Activity Log — ${activity.length} entries`)
+          ),
+          H("div",{style:{maxHeight:560,overflowY:"auto"}},
+            activity.slice(0,60).map(e=>H("div",{key:e.id,style:{padding:"12px 20px",borderBottom:"1px solid #0f172a",display:"flex",alignItems:"flex-start",gap:12}},
+              H("div",{style:{width:8,height:8,borderRadius:4,background:CAT_COLORS[e.category]||"#94a3b8",marginTop:5,flexShrink:0}}),
+              H("div",{style:{flex:1,minWidth:0}},
+                H("div",{style:{display:"flex",gap:6,marginBottom:4,flexWrap:"wrap"}},
+                  H(Badge,{text:e.category,color:CAT_COLORS[e.category]||"#94a3b8"}),
+                  H(Badge,{text:e.priority,color:PRI_COLORS[e.priority]||"#94a3b8"}),
+                  H(Badge,{text:e.status==="requires_review"?"dev review":e.status,color:STA_COLORS[e.status]||"#94a3b8"}),
+                  e.requires_dev&&H(Badge,{text:"DEV",color:"#f59e0b"})
+                ),
+                H("p",{style:{margin:"0 0 2px",fontSize:13,fontWeight:500,color:"white"}},e.title),
+                e.page_url&&H("p",{style:{margin:0,fontSize:11,color:"#3b82f6",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},e.page_url)
+              ),
+              H("div",{style:{textAlign:"right",flexShrink:0}},
+                H("p",{style:{margin:"0 0 2px",fontSize:13,fontWeight:"bold",color:"white"}},e.impact_score+"/10"),
+                H("p",{style:{margin:0,fontSize:10,color:"#334155"}},new Date(e.timestamp).toLocaleDateString())
+              )
+            ))
+          )
+        ),
+
+        // Keywords
+        tab==="keywords"&&H("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
+          H("div",{className:"card",style:{padding:20}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"🎯 Keyword Clusters"),
+            H("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+              [["Alternative / Comparison","#ef4444","91%","42",6],["Solution Evaluation","#f59e0b","85%","46",6],["Problem / Pain","#10b981","62%","28",5],["How-To","#3b82f6","58%","32",6]]
+                .map(([name,col,conv,diff,count])=>H("div",{key:name,className:"card",style:{padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+                  H("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                    H("span",{style:{width:8,height:8,borderRadius:4,background:col,display:"inline-block"}}),
+                    H("div",null,H("p",{style:{margin:0,fontSize:13,fontWeight:500,color:"white"}},name),H("p",{style:{margin:0,fontSize:11,color:"#475569"}},count+" keywords"))
+                  ),
+                  H("div",{style:{textAlign:"right"}},H("p",{style:{margin:0,fontSize:12,fontWeight:600,color:"white"}},conv+" conv."),H("p",{style:{margin:0,fontSize:11,color:"#475569"}},"diff "+diff))
+                ))
+            )
+          ),
+          H("div",{className:"card",style:{padding:20}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"🔍 Latest Keywords"),
+            H("div",{style:{maxHeight:280,overflowY:"auto",display:"flex",flexDirection:"column",gap:6}},
+              activity.filter(e=>e.category==="keywords").slice(0,20).map(kw=>H("div",{key:kw.id,className:"card",style:{padding:"8px 12px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+                H("p",{style:{margin:0,fontSize:12,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1}},kw.title.replace("Keyword: ","")),
+                H("div",{style:{display:"flex",gap:6,alignItems:"center",marginLeft:8}},H(Badge,{text:kw.priority,color:PRI_COLORS[kw.priority]||"#94a3b8"}),H("span",{style:{fontSize:11,color:"#334155"}},kw.impact_score+"/10"))
+              ))
+            )
+          )
+        ),
+
+        // Next Steps
+        tab==="plan"&&H("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+          H("div",{className:"card",style:{padding:20}},
+            H("p",{style:{margin:"0 0 16px",fontSize:13,fontWeight:600,color:"#94a3b8"}},"🗓 Tomorrow's Plan"),
+            H("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+              summary.next_day_plan.map((item,i)=>H("div",{key:i,className:"card",style:{padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:12}},
+                H("span",{style:{width:20,height:20,borderRadius:10,background:"rgba(59,130,246,0.2)",color:"#60a5fa",fontSize:11,fontWeight:"bold",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},i+1),
+                H("p",{style:{margin:0,fontSize:13,color:"#cbd5e1"}},item)
+              ))
+            )
+          ),
+          alerts.active_alerts.filter(a=>a.dev_note).length>0&&H("div",{style:{background:"rgba(120,53,15,0.15)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:12,padding:20}},
+            H("p",{style:{margin:"0 0 12px",fontSize:13,fontWeight:600,color:"#fde68a"}},"⚠️ REQUIRES DEV REVIEW"),
+            H("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+              alerts.active_alerts.filter(a=>a.dev_note).map(a=>H("div",{key:a.id,className:"card",style:{padding:"12px 16px"}},
+                H("p",{style:{margin:"0 0 4px",fontSize:13,fontWeight:500,color:"white"}},a.title),
+                H("p",{style:{margin:"0 0 4px",fontSize:11,color:"#64748b"}},a.description),
+                H("p",{style:{margin:0,fontSize:11,color:"#fbbf24",fontWeight:500}},a.dev_note)
+              ))
+            )
+          )
+        )
+      ),
+
+      // Footer
+      H("div",{style:{textAlign:"center",fontSize:11,color:"#1e293b",paddingTop:24}},
+        "Pipeleap SEO Command Centre · Powered by SEO OS Agent · ",
+        H("a",{href:"https://github.com/manikanakathala-droid/pipeleap-seo-agents",target:"_blank",style:{color:"#3b82f6"}},"GitHub")
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>

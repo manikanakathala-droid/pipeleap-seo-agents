@@ -1,0 +1,37 @@
+{
+  "last_updated": "",
+  "current_score": 0,
+  "current_run_id": "",
+  "current_score_breakdown": {
+    "technical": 0,
+    "content": 0,
+    "indexing": 0,
+    "authority": 0
+  },
+  "today": {
+    "date": "",
+    "total_actions": 0,
+    "safe_actions": 0,
+    "dev_review_items": 0,
+    "content_pieces": 0,
+    "keywords_found": 0,
+    "indexing_actions": 0,
+    "active_alerts": 0,
+    "mode": "",
+    "pages_total": 0,
+    "pages_new": 0,
+    "pages_updated": 0,
+    "broken_pages": 0,
+    "orphan_pages": 0,
+    "categories": {}
+  },
+  "category_totals": {},
+  "score_history": [],
+  "daily_metrics": [],
+  "content_velocity": [],
+  "keyword_growth": [],
+  "technical_trend": [],
+  "indexing_trend": [],
+  "next_day_plan": [],
+  "errors": []
+}
