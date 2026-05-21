@@ -442,6 +442,52 @@ class AuditEngine:
                 )
             )
 
+        if page.links_with_hash_routing > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="url_structure",
+                    url=page.url,
+                    title=f"Hash-routing links detected ({page.links_with_hash_routing} links use #/ fragments)",
+                    description=(
+                        f"{page.links_with_hash_routing} link(s) on this page use hash-fragment routing "
+                        "(e.g. href='#/route'). Google Search does not follow URL fragments, so these destinations "
+                        "are invisible to Googlebot — they cannot be crawled, indexed, or ranked."
+                    ),
+                    fix_instructions=(
+                        "Replace hash-based routing with the History API (pushState/replaceState) so each view "
+                        "has a real, crawlable URL path. Update internal links to reference these real paths."
+                    ),
+                    impact_score=65.0,
+                )
+            )
+
+        url_path_segments = urlparse(page.url).path.strip("/").split("/")
+        non_descriptive_segments = [
+            s for s in url_path_segments
+            if s.isdigit() and len(s) >= 4 or (len(s) >= 32 and all(c in "0123456789abcdefABCDEF-" for c in s))
+        ]
+        if non_descriptive_segments:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="url_structure",
+                    url=page.url,
+                    title="URL path contains non-descriptive ID segments",
+                    description=(
+                        f"The URL path contains segment(s) that look like database IDs or UUIDs "
+                        f"({', '.join(non_descriptive_segments[:3])}). ID-only URLs provide no keyword signal "
+                        "and are harder for users and Google to understand than descriptive slugs."
+                    ),
+                    fix_instructions=(
+                        "Replace numeric or UUID path segments with descriptive, hyphen-separated slugs "
+                        "(e.g. /posts/12345 → /posts/how-to-close-deals-faster). "
+                        "Set up 301 redirects from old ID URLs to new slug URLs."
+                    ),
+                    impact_score=40.0,
+                )
+            )
+
         if len(page.internal_links) == 0 and page.url.rstrip("/") != self.config.get("site", {}).get("site_url", "").rstrip("/"):
             issues.append(
                 AuditIssue(

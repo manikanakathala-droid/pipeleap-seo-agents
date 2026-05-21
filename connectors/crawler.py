@@ -45,6 +45,7 @@ class SEOHTMLParser(HTMLParser):
         self.links_without_anchor_text = 0
         self.external_links_without_rel = 0
         self.non_indexable_file_links = 0
+        self.links_with_hash_routing = 0
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
@@ -95,6 +96,8 @@ class SEOHTMLParser(HTMLParser):
             ext = "." + href.rsplit(".", 1)[-1].lower().split("?")[0] if "." in href.rsplit("/", 1)[-1] else ""
             if ext in _NON_INDEXABLE_EXTENSIONS:
                 self.non_indexable_file_links += 1
+            if href.startswith("#/") or ("/#/" in href):
+                self.links_with_hash_routing += 1
         elif tag_lower == "img":
             self.image_count += 1
             if not attr_map.get("alt", "").strip():
@@ -257,6 +260,7 @@ class SiteCrawler:
                     links_without_anchor_text=parser.links_without_anchor_text,
                     external_links_without_rel=parser.external_links_without_rel,
                     non_indexable_file_links=parser.non_indexable_file_links,
+                    links_with_hash_routing=parser.links_with_hash_routing,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,
