@@ -31,6 +31,7 @@ class SEOHTMLParser(HTMLParser):
         self.schema_types: list[str] = []
         self.image_count = 0
         self.images_without_alt = 0
+        self.links_without_anchor_text = 0
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
@@ -41,6 +42,8 @@ class SEOHTMLParser(HTMLParser):
         self._capture_json_ld = False
         self._json_ld_buffer: list[str] = []
         self._skip_text_depth = 0
+        self._pending_anchor_href: str = ""
+        self._anchor_has_text: bool = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr_map = {key.lower(): value or "" for key, value in attrs}
@@ -69,6 +72,8 @@ class SEOHTMLParser(HTMLParser):
             href = attr_map.get("href", "").strip()
             if href:
                 self.links.append(href)
+                self._pending_anchor_href = href
+                self._anchor_has_text = bool(attr_map.get("aria-label", "").strip())
         elif tag_lower == "img":
             self.image_count += 1
             if not attr_map.get("alt", "").strip():
@@ -85,7 +90,12 @@ class SEOHTMLParser(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         tag_lower = tag.lower()
-        if tag_lower == "title":
+        if tag_lower == "a":
+            if self._pending_anchor_href and not self._anchor_has_text:
+                self.links_without_anchor_text += 1
+            self._pending_anchor_href = ""
+            self._anchor_has_text = False
+        elif tag_lower == "title":
             self._capture_title = False
             self.title = self.title.strip()
         elif tag_lower == self._capture_heading:
@@ -110,6 +120,8 @@ class SEOHTMLParser(HTMLParser):
         if not stripped:
             return
 
+        if self._pending_anchor_href and not self._anchor_has_text:
+            self._anchor_has_text = True
         if self._capture_title:
             self.title += f" {stripped}"
         elif self._capture_heading:
@@ -221,6 +233,7 @@ class SiteCrawler:
                     schema_types=sorted(set(parser.schema_types)),
                     image_count=parser.image_count,
                     images_without_alt=parser.images_without_alt,
+                    links_without_anchor_text=parser.links_without_anchor_text,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,

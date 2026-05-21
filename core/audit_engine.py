@@ -303,6 +303,64 @@ class AuditEngine:
                 )
             )
 
+        if not page.schema_types:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="structured_data",
+                    url=page.url,
+                    title="No structured data (JSON-LD) detected",
+                    description=(
+                        "The page has no JSON-LD schema markup. Structured data is required for rich results "
+                        "(FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews."
+                    ),
+                    fix_instructions=(
+                        "Add a relevant JSON-LD block in the <head>. For blog posts use Article or BlogPosting; "
+                        "for product/landing pages use SoftwareApplication or Product; for FAQ sections use FAQPage."
+                    ),
+                    impact_score=53.0,
+                )
+            )
+
+        if page.script_count > 10:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="javascript",
+                    url=page.url,
+                    title=f"High script count ({page.script_count} scripts) — JavaScript rendering risk",
+                    description=(
+                        f"The page loads {page.script_count} <script> tags. Pages that depend heavily on JavaScript "
+                        "risk content being invisible to Googlebot if any script is unsupported or fails to execute. "
+                        "Googlebot renders JavaScript in a second wave, which delays indexing."
+                    ),
+                    fix_instructions=(
+                        "Ensure critical content (headings, body text, links) is present in the initial HTML response. "
+                        "Audit scripts with the URL Inspection tool in Search Console to verify Googlebot renders the full page."
+                    ),
+                    impact_score=59.0,
+                )
+            )
+
+        if page.links_without_anchor_text > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="internal_linking",
+                    url=page.url,
+                    title=f"Links missing anchor text ({page.links_without_anchor_text} links)",
+                    description=(
+                        f"{page.links_without_anchor_text} links on this page have no visible anchor text or aria-label. "
+                        "Googlebot uses anchor text to understand what the linked page is about — empty anchors pass no ranking signal."
+                    ),
+                    fix_instructions=(
+                        "Add descriptive anchor text to every link. For image links, ensure the <img> has a relevant alt attribute. "
+                        "For icon-only links (e.g. social icons), add aria-label describing the destination."
+                    ),
+                    impact_score=41.0,
+                )
+            )
+
         if len(page.internal_links) == 0 and page.url.rstrip("/") != self.config.get("site", {}).get("site_url", "").rstrip("/"):
             issues.append(
                 AuditIssue(
