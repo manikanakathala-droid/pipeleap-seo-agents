@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -292,15 +292,17 @@ class SiteCrawler:
             robots_txt_present=robots_present,
             robots_rules=robots_rules,
             sitemap_urls=sitemap_urls,
+            sitemap_relative_url_count=sitemap_relative_url_count,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str]]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
         robots_present = False
+        sitemap_relative_url_count = 0
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -329,11 +331,18 @@ class SiteCrawler:
                 locs = root.findall(".//sm:loc", namespace)
                 if not locs:
                     locs = root.findall(".//loc")
-                discovered_urls.extend([loc.text.strip() for loc in locs if loc.text])
+                for loc in locs:
+                    if not loc.text:
+                        continue
+                    url_text = loc.text.strip()
+                    if url_text.startswith(("http://", "https://")):
+                        discovered_urls.append(url_text)
+                    else:
+                        sitemap_relative_url_count += 1
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls))
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count
 
     @staticmethod
     def _normalize_url(url: str) -> str:

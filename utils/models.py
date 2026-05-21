@@ -83,6 +83,7 @@ class CrawlerReport(SerializableMixin):
     robots_txt_present: bool = False
     robots_rules: list[str] = field(default_factory=list)
     sitemap_urls: list[str] = field(default_factory=list)
+    sitemap_relative_url_count: int = 0
     crawl_errors: list[str] = field(default_factory=list)
     discovered_at: str = ""
 

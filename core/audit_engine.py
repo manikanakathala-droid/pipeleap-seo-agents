@@ -61,6 +61,69 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.robots_txt_present and not any(
+            line.lower().startswith("sitemap:") for line in crawl_report.robots_rules
+        ):
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/robots.txt",
+                    title="robots.txt does not reference a sitemap",
+                    description=(
+                        "robots.txt is present but contains no Sitemap: directive. "
+                        "Referencing the sitemap in robots.txt is a reliable passive discovery path — "
+                        "Google reads it on every robots.txt fetch without requiring a manual Search Console submission."
+                    ),
+                    fix_instructions=(
+                        "Add a Sitemap: line to robots.txt pointing to the absolute sitemap URL, e.g.:\n"
+                        "Sitemap: https://pipeleap.com/sitemap.xml"
+                    ),
+                    impact_score=52.0,
+                )
+            )
+
+        if len(crawl_report.sitemap_urls) > 50_000:
+            issues.append(
+                AuditIssue(
+                    severity="High",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Sitemap exceeds 50,000 URL limit ({len(crawl_report.sitemap_urls):,} URLs)",
+                    description=(
+                        f"The sitemap contains {len(crawl_report.sitemap_urls):,} URLs, exceeding the "
+                        "50,000 URL per-file limit defined by the sitemaps protocol. "
+                        "Google will stop processing the sitemap at the limit, leaving excess URLs undiscovered."
+                    ),
+                    fix_instructions=(
+                        "Split the sitemap into multiple files (each ≤ 50,000 URLs, ≤ 50 MB uncompressed) "
+                        "and create a sitemap index file that references them. "
+                        "Submit the index file to Search Console."
+                    ),
+                    impact_score=75.0,
+                )
+            )
+
+        if crawl_report.sitemap_relative_url_count > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Sitemap contains relative URLs ({crawl_report.sitemap_relative_url_count} entries)",
+                    description=(
+                        f"{crawl_report.sitemap_relative_url_count} URL(s) in the sitemap are relative paths "
+                        "rather than fully-qualified absolute URLs. "
+                        "Google's sitemaps protocol requires absolute URLs — relative entries may be ignored entirely."
+                    ),
+                    fix_instructions=(
+                        "Replace all relative sitemap entries with fully-qualified absolute URLs, "
+                        "e.g. change /blog/post to https://pipeleap.com/blog/post."
+                    ),
+                    impact_score=60.0,
+                )
+            )
+
         if not self.pagespeed_config.get("api_key"):
             issues.append(
                 AuditIssue(
