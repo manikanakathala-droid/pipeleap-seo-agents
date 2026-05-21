@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -297,11 +297,14 @@ class SiteCrawler:
             sitemap_cross_host_child_count=sitemap_cross_host_child_count,
             sitemap_image_count=sitemap_image_count,
             sitemap_deprecated_image_tag_count=sitemap_deprecated_image_tag_count,
+            sitemap_news_article_count=sitemap_news_article_count,
+            sitemap_news_stale_article_count=sitemap_news_stale_article_count,
+            sitemap_news_missing_required_tags=sitemap_news_missing_required_tags,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
@@ -311,9 +314,13 @@ class SiteCrawler:
         sitemap_cross_host_child_count = 0
         sitemap_image_count = 0
         sitemap_deprecated_image_tag_count = 0
+        sitemap_news_article_count = 0
+        sitemap_news_stale_article_count = 0
+        sitemap_news_missing_required_tags = 0
 
         _IMAGE_NS = "http://www.google.com/schemas/sitemap-image/1.1"
         _DEPRECATED_IMAGE_TAGS = {"caption", "geo_location", "title", "license"}
+        _NEWS_NS = "http://www.google.com/schemas/sitemap-news/0.9"
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -384,10 +391,30 @@ class SiteCrawler:
                                 sitemap_image_count += 1
                             elif local in _DEPRECATED_IMAGE_TAGS:
                                 sitemap_deprecated_image_tag_count += 1
+                    news_news_tag = f"{{{_NEWS_NS}}}news"
+                    news_pub_date_tag = f"{{{_NEWS_NS}}}publication_date"
+                    news_title_tag = f"{{{_NEWS_NS}}}title"
+                    url_elems = root.findall("sm:url", namespace) or root.findall("url")
+                    for url_elem in url_elems:
+                        news_elem = url_elem.find(news_news_tag)
+                        if news_elem is None:
+                            continue
+                        sitemap_news_article_count += 1
+                        pub_date_elem = news_elem.find(news_pub_date_tag)
+                        title_elem = news_elem.find(news_title_tag)
+                        if pub_date_elem is None or title_elem is None:
+                            sitemap_news_missing_required_tags += 1
+                        elif pub_date_elem.text:
+                            try:
+                                pub_date = datetime.strptime(pub_date_elem.text.strip()[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                                if (datetime.now(timezone.utc) - pub_date).days > 2:
+                                    sitemap_news_stale_article_count += 1
+                            except Exception:
+                                pass
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags
 
     @staticmethod
     def _normalize_url(url: str) -> str:

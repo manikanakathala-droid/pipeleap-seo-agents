@@ -189,6 +189,69 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.sitemap_news_missing_required_tags > 0:
+            issues.append(
+                AuditIssue(
+                    severity="High",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"News sitemap entries missing required tags ({crawl_report.sitemap_news_missing_required_tags} entries)",
+                    description=(
+                        f"{crawl_report.sitemap_news_missing_required_tags} <news:news> entry/entries are missing "
+                        "a required <news:publication_date> or <news:title> tag. "
+                        "Google requires both tags on every news entry — incomplete entries may be rejected by Google News."
+                    ),
+                    fix_instructions=(
+                        "Ensure every <news:news> element contains <news:publication>, <news:publication_date> "
+                        "(in W3C format, e.g. 2024-01-15T09:00:00Z), and <news:title> (exact article title as it appears on the page). "
+                        "Do not include author name or publication name inside <news:title>."
+                    ),
+                    impact_score=76.0,
+                )
+            )
+
+        if crawl_report.sitemap_news_article_count > 1000:
+            issues.append(
+                AuditIssue(
+                    severity="High",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"News sitemap exceeds 1,000 article limit ({crawl_report.sitemap_news_article_count} entries)",
+                    description=(
+                        f"The news sitemap contains {crawl_report.sitemap_news_article_count} <news:news> entries, "
+                        "exceeding Google's hard limit of 1,000 per news sitemap file. "
+                        "Entries beyond the limit are ignored by Google News."
+                    ),
+                    fix_instructions=(
+                        "Split the news sitemap into multiple files, each containing ≤ 1,000 <news:news> entries. "
+                        "Reference all split files from a sitemap index and submit the index to Search Console. "
+                        "Also remove any entries older than two days — news sitemaps should only contain recent articles."
+                    ),
+                    impact_score=72.0,
+                )
+            )
+
+        if crawl_report.sitemap_news_stale_article_count > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"News sitemap contains stale articles ({crawl_report.sitemap_news_stale_article_count} entries older than 2 days)",
+                    description=(
+                        f"{crawl_report.sitemap_news_stale_article_count} article(s) in the news sitemap have a "
+                        "<news:publication_date> more than 2 days old. "
+                        "Google's news sitemap spec requires only articles published within the last two days — "
+                        "stale entries are ignored and bloat the sitemap unnecessarily."
+                    ),
+                    fix_instructions=(
+                        "Remove <url> entries (or their <news:news> metadata blocks) for articles older than 48 hours. "
+                        "Automate this with a daily job that regenerates the news sitemap from only the most recent articles."
+                    ),
+                    impact_score=57.0,
+                )
+            )
+
         if not self.pagespeed_config.get("api_key"):
             issues.append(
                 AuditIssue(

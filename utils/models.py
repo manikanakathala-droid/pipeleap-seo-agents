@@ -88,6 +88,9 @@ class CrawlerReport(SerializableMixin):
     sitemap_cross_host_child_count: int = 0
     sitemap_image_count: int = 0
     sitemap_deprecated_image_tag_count: int = 0
+    sitemap_news_article_count: int = 0
+    sitemap_news_stale_article_count: int = 0
+    sitemap_news_missing_required_tags: int = 0
     crawl_errors: list[str] = field(default_factory=list)
     discovered_at: str = ""
 
