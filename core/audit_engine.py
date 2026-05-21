@@ -146,6 +146,49 @@ class AuditEngine:
                 )
             )
 
+        total_page_images = sum(p.image_count for p in pages)
+        if total_page_images > 0 and crawl_report.sitemap_image_count == 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"No image sitemap detected ({total_page_images} images found on crawled pages)",
+                    description=(
+                        f"The crawled pages contain {total_page_images} images but the sitemap declares no "
+                        "<image:image> entries. Google relies on image sitemaps to discover images loaded via "
+                        "JavaScript or rendered after page load, which Googlebot may not see in the initial HTML pass."
+                    ),
+                    fix_instructions=(
+                        "Add image sitemap extensions to the existing sitemap using the "
+                        "xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\" namespace. "
+                        "For each <url> entry, nest <image:image><image:loc>https://...</image:loc></image:image> "
+                        "for every key image on that page."
+                    ),
+                    impact_score=44.0,
+                )
+            )
+
+        if crawl_report.sitemap_deprecated_image_tag_count > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Deprecated image sitemap tags in use ({crawl_report.sitemap_deprecated_image_tag_count} occurrences)",
+                    description=(
+                        f"The sitemap uses {crawl_report.sitemap_deprecated_image_tag_count} deprecated image tag(s) "
+                        "(<image:caption>, <image:geo_location>, <image:title>, or <image:license>). "
+                        "Google removed these tags in May 2022 — they are ignored and add unnecessary sitemap weight."
+                    ),
+                    fix_instructions=(
+                        "Remove all <image:caption>, <image:geo_location>, <image:title>, and <image:license> tags "
+                        "from the sitemap. Only <image:image> and <image:loc> are currently supported."
+                    ),
+                    impact_score=30.0,
+                )
+            )
+
         if not self.pagespeed_config.get("api_key"):
             issues.append(
                 AuditIssue(

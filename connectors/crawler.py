@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -295,11 +295,13 @@ class SiteCrawler:
             sitemap_relative_url_count=sitemap_relative_url_count,
             sitemap_index_detected=sitemap_index_detected,
             sitemap_cross_host_child_count=sitemap_cross_host_child_count,
+            sitemap_image_count=sitemap_image_count,
+            sitemap_deprecated_image_tag_count=sitemap_deprecated_image_tag_count,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
@@ -307,6 +309,11 @@ class SiteCrawler:
         sitemap_relative_url_count = 0
         sitemap_index_detected = False
         sitemap_cross_host_child_count = 0
+        sitemap_image_count = 0
+        sitemap_deprecated_image_tag_count = 0
+
+        _IMAGE_NS = "http://www.google.com/schemas/sitemap-image/1.1"
+        _DEPRECATED_IMAGE_TAGS = {"caption", "geo_location", "title", "license"}
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -369,10 +376,18 @@ class SiteCrawler:
                             discovered_urls.append(url_text)
                         else:
                             sitemap_relative_url_count += 1
+                    image_ns_prefix = f"{{{_IMAGE_NS}}}"
+                    for elem in root.iter():
+                        local = elem.tag.split("}")[-1] if "}" in elem.tag else elem.tag
+                        if elem.tag.startswith(image_ns_prefix):
+                            if local == "loc":
+                                sitemap_image_count += 1
+                            elif local in _DEPRECATED_IMAGE_TAGS:
+                                sitemap_deprecated_image_tag_count += 1
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count
 
     @staticmethod
     def _normalize_url(url: str) -> str:
