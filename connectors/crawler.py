@@ -15,6 +15,17 @@ import time
 from utils.models import CrawlerReport, PageSnapshot
 
 
+_NON_INDEXABLE_EXTENSIONS = {
+    # Archives / installers
+    ".zip", ".gz", ".tar", ".rar", ".7z", ".bz2", ".xz", ".iso",
+    ".exe", ".dmg", ".pkg", ".deb", ".rpm", ".msi", ".bin", ".apk",
+    # Audio (not in Google's indexable file-type list)
+    ".mp3", ".wav", ".aac", ".flac", ".ogg", ".m4a", ".wma",
+    # Raw data / misc binary
+    ".dat", ".db", ".sqlite",
+}
+
+
 class SEOHTMLParser(HTMLParser):
     """Extracts SEO-relevant HTML features without external parser dependencies."""
 
@@ -33,6 +44,7 @@ class SEOHTMLParser(HTMLParser):
         self.images_without_alt = 0
         self.links_without_anchor_text = 0
         self.external_links_without_rel = 0
+        self.non_indexable_file_links = 0
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
@@ -80,6 +92,9 @@ class SEOHTMLParser(HTMLParser):
                     rel_vals = {v.strip() for v in attr_map.get("rel", "").lower().split()}
                     if not rel_vals & {"nofollow", "sponsored", "ugc"}:
                         self.external_links_without_rel += 1
+            ext = "." + href.rsplit(".", 1)[-1].lower().split("?")[0] if "." in href.rsplit("/", 1)[-1] else ""
+            if ext in _NON_INDEXABLE_EXTENSIONS:
+                self.non_indexable_file_links += 1
         elif tag_lower == "img":
             self.image_count += 1
             if not attr_map.get("alt", "").strip():
@@ -241,6 +256,7 @@ class SiteCrawler:
                     images_without_alt=parser.images_without_alt,
                     links_without_anchor_text=parser.links_without_anchor_text,
                     external_links_without_rel=parser.external_links_without_rel,
+                    non_indexable_file_links=parser.non_indexable_file_links,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,

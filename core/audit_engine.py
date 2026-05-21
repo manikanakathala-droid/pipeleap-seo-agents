@@ -421,6 +421,27 @@ class AuditEngine:
                 )
             )
 
+        if page.non_indexable_file_links > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="file_types",
+                    url=page.url,
+                    title=f"Links to non-indexable file types ({page.non_indexable_file_links} links)",
+                    description=(
+                        f"{page.non_indexable_file_links} link(s) on this page point to file types Google cannot index "
+                        "(e.g. .zip, .exe, .mp3, .dmg). Google will follow these links but cannot extract or rank content "
+                        "from them, so any link equity spent on them returns no search visibility."
+                    ),
+                    fix_instructions=(
+                        "Replace direct file links with descriptive landing pages (e.g. a download page for a .zip, "
+                        "or a podcast page for an .mp3). The landing page is indexable and can rank; "
+                        "link the actual file from there."
+                    ),
+                    impact_score=33.0,
+                )
+            )
+
         if len(page.internal_links) == 0 and page.url.rstrip("/") != self.config.get("site", {}).get("site_url", "").rstrip("/"):
             issues.append(
                 AuditIssue(
