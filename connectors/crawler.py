@@ -32,6 +32,7 @@ class SEOHTMLParser(HTMLParser):
         self.image_count = 0
         self.script_count = 0
         self.stylesheet_count = 0
+        self.has_viewport_meta = False
 
         self._capture_title = False
         self._capture_heading = ""
@@ -55,6 +56,8 @@ class SEOHTMLParser(HTMLParser):
                 self.meta_description = attr_map.get("content", "").strip()
             if meta_name == "robots":
                 self.meta_robots = attr_map.get("content", "").strip()
+            if meta_name == "viewport":
+                self.has_viewport_meta = True
         elif tag_lower == "link":
             rel = attr_map.get("rel", "").lower()
             if "canonical" in rel:
@@ -216,6 +219,7 @@ class SiteCrawler:
                     image_count=parser.image_count,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
+                    has_viewport_meta=parser.has_viewport_meta,
                 )
             )
 

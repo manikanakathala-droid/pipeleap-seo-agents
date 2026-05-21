@@ -50,12 +50,15 @@ class PageSpeedConnector:
         audits = data.get("lighthouseResult", {}).get("audits", {})
         metrics = self._extract_cwv(audits)
         issues = self._flag_issues(metrics, perf_score, seo_score)
+        mobile = self._check_mobile_friendliness(audits)
+        issues.extend(mobile["issues"])
         return {
             "url": url,
             "status": "ok",
             "performance_score": perf_score,
             "seo_score": seo_score,
             "metrics": metrics,
+            "mobile_friendly": mobile["score"],
             "issues": issues,
         }
 
@@ -71,6 +74,39 @@ class PageSpeedConnector:
             "inp": numeric("interaction-to-next-paint"),
             "fcp": numeric("first-contentful-paint"),
             "ttfb": numeric("server-response-time"),
+        }
+
+    @staticmethod
+    def _check_mobile_friendliness(audits: dict) -> dict:
+        """
+        Extracts mobile-friendliness signals from Lighthouse audit keys:
+          viewport            — page has a proper <meta name="viewport"> tag
+          uses-responsive-images — images are sized for the viewport
+          tap-targets         — interactive elements are large enough to tap
+        Returns a score (0.0–1.0) and a list of warning strings.
+        """
+        checks = {
+            "viewport": "Missing or invalid viewport meta tag — page will render at desktop width on mobile",
+            "uses-responsive-images": "Images not optimised for mobile viewport — wastes bandwidth and slows LCP",
+            "tap-targets": "Tap targets too small or too close — hurts mobile usability signal",
+        }
+        failed: list[str] = []
+        passed = 0
+        for key, message in checks.items():
+            audit = audits.get(key, {})
+            score = audit.get("score")
+            if score is None:
+                passed += 1
+                continue
+            if score >= 0.9:
+                passed += 1
+            else:
+                failed.append(f"WARNING (mobile): {message} [score={score}]")
+
+        total = len(checks)
+        return {
+            "score": round(passed / total, 2),
+            "issues": failed,
         }
 
     @staticmethod

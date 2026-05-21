@@ -160,6 +160,19 @@ class AuditEngine:
                 )
             )
 
+        if not page.has_viewport_meta:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="mobile",
+                    url=page.url,
+                    title="Missing viewport meta tag",
+                    description='The page has no <meta name="viewport"> tag. Mobile browsers render it at desktop width, harming Core Web Vitals and mobile UX.',
+                    fix_instructions='Add <meta name="viewport" content="width=device-width, initial-scale=1"> in the <head> of every page.',
+                    impact_score=68.0,
+                )
+            )
+
         if page.meta_robots and "noindex" in page.meta_robots.lower():
             issues.append(
                 AuditIssue(

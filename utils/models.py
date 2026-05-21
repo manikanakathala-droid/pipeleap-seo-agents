@@ -67,6 +67,7 @@ class PageSnapshot(SerializableMixin):
     image_count: int = 0
     script_count: int = 0
     stylesheet_count: int = 0
+    has_viewport_meta: bool = False
 
 
 @dataclass
