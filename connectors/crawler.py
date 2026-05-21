@@ -15,6 +15,11 @@ import time
 from utils.models import CrawlerReport, PageSnapshot
 
 
+_GENERIC_ANCHOR_TEXTS = {
+    "click here", "here", "read more", "learn more", "more", "click", "link",
+    "this", "page", "website", "article", "continue", "go", "visit", "view",
+}
+
 _NON_INDEXABLE_EXTENSIONS = {
     # Archives / installers
     ".zip", ".gz", ".tar", ".rar", ".7z", ".bz2", ".xz", ".iso",
@@ -43,6 +48,7 @@ class SEOHTMLParser(HTMLParser):
         self.image_count = 0
         self.images_without_alt = 0
         self.links_without_anchor_text = 0
+        self.links_with_generic_anchor = 0
         self.external_links_without_rel = 0
         self.non_indexable_file_links = 0
         self.links_with_hash_routing = 0
@@ -58,6 +64,7 @@ class SEOHTMLParser(HTMLParser):
         self._skip_text_depth = 0
         self._pending_anchor_href: str = ""
         self._anchor_has_text: bool = False
+        self._anchor_text_buffer: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr_map = {key.lower(): value or "" for key, value in attrs}
@@ -87,7 +94,8 @@ class SEOHTMLParser(HTMLParser):
             if href:
                 self.links.append(href)
                 self._pending_anchor_href = href
-                self._anchor_has_text = bool(attr_map.get("aria-label", "").strip())
+                self._anchor_text_buffer = []
+                self._anchor_has_text = bool(attr_map.get("aria-label", "").strip()) or bool(attr_map.get("title", "").strip())
                 parsed_href = urlparse(href)
                 if parsed_href.scheme in {"http", "https"} and parsed_href.netloc:
                     rel_vals = {v.strip() for v in attr_map.get("rel", "").lower().split()}
@@ -100,8 +108,11 @@ class SEOHTMLParser(HTMLParser):
                 self.links_with_hash_routing += 1
         elif tag_lower == "img":
             self.image_count += 1
-            if not attr_map.get("alt", "").strip():
+            alt = attr_map.get("alt", "").strip()
+            if not alt:
                 self.images_without_alt += 1
+            if self._pending_anchor_href and alt:
+                self._anchor_has_text = True
         elif tag_lower == "script":
             self.script_count += 1
             script_type = attr_map.get("type", "").lower()
@@ -117,8 +128,13 @@ class SEOHTMLParser(HTMLParser):
         if tag_lower == "a":
             if self._pending_anchor_href and not self._anchor_has_text:
                 self.links_without_anchor_text += 1
+            elif self._pending_anchor_href and self._anchor_has_text:
+                anchor_text = " ".join(self._anchor_text_buffer).strip().lower()
+                if anchor_text in _GENERIC_ANCHOR_TEXTS:
+                    self.links_with_generic_anchor += 1
             self._pending_anchor_href = ""
             self._anchor_has_text = False
+            self._anchor_text_buffer = []
         elif tag_lower == "title":
             self._capture_title = False
             self.title = self.title.strip()
@@ -144,8 +160,10 @@ class SEOHTMLParser(HTMLParser):
         if not stripped:
             return
 
-        if self._pending_anchor_href and not self._anchor_has_text:
-            self._anchor_has_text = True
+        if self._pending_anchor_href:
+            if not self._anchor_has_text:
+                self._anchor_has_text = True
+            self._anchor_text_buffer.append(stripped)
         if self._capture_title:
             self.title += f" {stripped}"
         elif self._capture_heading:
@@ -258,6 +276,7 @@ class SiteCrawler:
                     image_count=parser.image_count,
                     images_without_alt=parser.images_without_alt,
                     links_without_anchor_text=parser.links_without_anchor_text,
+                    links_with_generic_anchor=parser.links_with_generic_anchor,
                     external_links_without_rel=parser.external_links_without_rel,
                     non_indexable_file_links=parser.non_indexable_file_links,
                     links_with_hash_routing=parser.links_with_hash_routing,

@@ -362,6 +362,27 @@ class AuditEngine:
                 )
             )
 
+        if page.links_with_generic_anchor > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="internal_linking",
+                    url=page.url,
+                    title=f"Generic anchor text detected ({page.links_with_generic_anchor} links)",
+                    description=(
+                        f"{page.links_with_generic_anchor} link(s) on this page use generic anchor text "
+                        "such as 'click here', 'read more', or 'here'. Generic anchors pass no keyword signal "
+                        "to the linked page and give users no context about what they will find."
+                    ),
+                    fix_instructions=(
+                        "Replace generic anchor text with a concise description of the linked page's content "
+                        "(e.g. 'click here' → 'how to close deals faster'). "
+                        "Good anchor text should make sense out of context."
+                    ),
+                    impact_score=48.0,
+                )
+            )
+
         url_path = urlparse(page.url).path
         if "_" in url_path:
             issues.append(
