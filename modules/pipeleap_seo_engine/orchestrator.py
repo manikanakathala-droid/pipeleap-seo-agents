@@ -216,8 +216,17 @@ class GrowthEngineOrchestrator:
         self.content_memory.load()
         accepted_pages: list[GrowthPage] = []
         rejected_pages: list[GrowthPage] = []
+        cluster_volume: dict[str, int] = {}   # L7 scaled-content abuse guard
 
         for page in all_pages:
+            # L7: per-cluster volume cap (Google scaled-content abuse policy)
+            cluster = page.topical_pillar or page.page_type
+            volume_ok, volume_reason = self.uniqueness_engine.cluster_volume_ok(cluster, cluster_volume)
+            if not volume_ok:
+                rejected_pages.append(page)
+                self._log(f"  REJECTED {page.slug} (L7 cluster cap): {volume_reason}")
+                continue
+
             assessment = self.content_memory.assess(page)
             score = assessment.get("page_similarity_score", 1.0)
             page.uniqueness_score = score

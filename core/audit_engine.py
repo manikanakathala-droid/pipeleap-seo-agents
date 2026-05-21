@@ -122,6 +122,30 @@ class AuditEngine:
                     suggestion=f"{page.h1 or 'Pipeleap'} | Pipeleap",
                 )
             )
+        elif len(page.title) < 30:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="metadata",
+                    url=page.url,
+                    title=f"Title too short ({len(page.title)} chars)",
+                    description="AI-generated or auto-populated titles under 30 characters are unlikely to be descriptive enough for search snippets.",
+                    fix_instructions="Expand the title to 50-65 characters with the primary keyword and brand name (e.g., 'Keyword | Pipeleap').",
+                    impact_score=61.0,
+                )
+            )
+        elif len(page.title) > 65:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="metadata",
+                    url=page.url,
+                    title=f"Title too long ({len(page.title)} chars)",
+                    description="Titles over 65 characters are truncated in search results, causing the brand or CTA to be cut off.",
+                    fix_instructions="Shorten the title to under 65 characters while keeping the primary keyword and brand name.",
+                    impact_score=44.0,
+                )
+            )
 
         if not page.meta_description:
             issues.append(
@@ -131,6 +155,30 @@ class AuditEngine:
                     title="Missing meta description",
                     impact_score=73.0,
                     suggestion="Write a 140-160 character description tied to the page keyword and CTA.",
+                )
+            )
+        elif len(page.meta_description) < 70:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="metadata",
+                    url=page.url,
+                    title=f"Meta description too short ({len(page.meta_description)} chars)",
+                    description="Short meta descriptions (under 70 characters) waste the snippet space and reduce click-through rates.",
+                    fix_instructions="Expand to 140-160 characters with a keyword, value proposition, and CTA.",
+                    impact_score=38.0,
+                )
+            )
+        elif len(page.meta_description) > 160:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="metadata",
+                    url=page.url,
+                    title=f"Meta description too long ({len(page.meta_description)} chars)",
+                    description="Meta descriptions over 160 characters are truncated by Google, cutting off the CTA.",
+                    fix_instructions="Trim to under 160 characters. Put the CTA at the end for best snippet performance.",
+                    impact_score=35.0,
                 )
             )
 

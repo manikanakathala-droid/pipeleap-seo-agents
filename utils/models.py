@@ -165,6 +165,13 @@ class ContentAsset(SerializableMixin):
     cta_variants: list[dict[str, Any]] = field(default_factory=list)
     hreflang_hints: list[dict[str, str]] = field(default_factory=list)
     eeat_checklist: list[dict[str, Any]] = field(default_factory=list)
+    # AI content transparency — per Google's guidance on AI-generated content
+    ai_assisted: bool = True
+    generation_disclosure: str = (
+        "This page was written with AI assistance and reviewed for accuracy, "
+        "relevance, and alignment with Pipeleap's product and audience. "
+        "All claims reflect Pipeleap's documented capabilities."
+    )
 
 
 @dataclass

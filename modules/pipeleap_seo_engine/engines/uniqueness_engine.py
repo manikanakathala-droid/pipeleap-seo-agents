@@ -338,6 +338,34 @@ class GrowthUniquenessEngine:
         report["flag_count"] = len(report["flags"])
         return report
 
+    # ── Layer 7: Scaled-content cluster volume guard ──────────────────────────
+
+    # Google's spam policy flags sites that generate many pages targeting the
+    # same topic without adding value. This guard caps new pages per topical
+    # cluster per run so no single cluster is flooded.
+    CLUSTER_PAGE_CAP = 8   # max new pages per cluster per orchestrator run
+
+    def cluster_volume_ok(
+        self,
+        cluster: str,
+        volume_registry: dict[str, int],
+        cap: int | None = None,
+    ) -> tuple[bool, str]:
+        """
+        Returns (ok, reason). Increments the in-memory counter if ok.
+        Pass the same volume_registry dict throughout a single run so counts
+        accumulate across all generator calls.
+        """
+        limit = cap if cap is not None else self.CLUSTER_PAGE_CAP
+        count = volume_registry.get(cluster, 0)
+        if count >= limit:
+            return False, (
+                f"Cluster '{cluster}' already has {count} pages this run "
+                f"(cap={limit}). Skipping to avoid scaled-content abuse signal."
+            )
+        volume_registry[cluster] = count + 1
+        return True, ""
+
     # ── Staleness ─────────────────────────────────────────────────────────────
 
     def needs_refresh(self, created_at_iso: str, staleness_days: int = 90) -> bool:
