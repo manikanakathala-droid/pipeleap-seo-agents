@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -293,16 +293,20 @@ class SiteCrawler:
             robots_rules=robots_rules,
             sitemap_urls=sitemap_urls,
             sitemap_relative_url_count=sitemap_relative_url_count,
+            sitemap_index_detected=sitemap_index_detected,
+            sitemap_cross_host_child_count=sitemap_cross_host_child_count,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
         robots_present = False
         sitemap_relative_url_count = 0
+        sitemap_index_detected = False
+        sitemap_cross_host_child_count = 0
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -321,28 +325,54 @@ class SiteCrawler:
             sitemap_urls.append(urljoin(site_root, "/sitemap.xml"))
 
         discovered_urls: list[str] = []
-        for sitemap_url in sitemap_urls:
+        pending_sitemaps: list[str] = list(sitemap_urls)
+        fetched_sitemaps: set[str] = set()
+
+        while pending_sitemaps:
+            sitemap_url = pending_sitemaps.pop(0)
+            if sitemap_url in fetched_sitemaps:
+                continue
+            fetched_sitemaps.add(sitemap_url)
             try:
                 response = self.session.get(sitemap_url, timeout=10)
                 if not response.ok:
                     continue
                 root = ElementTree.fromstring(response.text)
+                root_tag = root.tag.split("}")[-1] if "}" in root.tag else root.tag
                 namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-                locs = root.findall(".//sm:loc", namespace)
-                if not locs:
-                    locs = root.findall(".//loc")
-                for loc in locs:
-                    if not loc.text:
-                        continue
-                    url_text = loc.text.strip()
-                    if url_text.startswith(("http://", "https://")):
-                        discovered_urls.append(url_text)
-                    else:
-                        sitemap_relative_url_count += 1
+
+                if root_tag == "sitemapindex":
+                    sitemap_index_detected = True
+                    child_locs = root.findall("sm:sitemap/sm:loc", namespace)
+                    if not child_locs:
+                        child_locs = root.findall("sitemap/loc")
+                    index_netloc = urlparse(sitemap_url).netloc
+                    for loc in child_locs:
+                        if not loc.text:
+                            continue
+                        child_url = loc.text.strip()
+                        if not child_url.startswith(("http://", "https://")):
+                            sitemap_relative_url_count += 1
+                            continue
+                        if urlparse(child_url).netloc != index_netloc:
+                            sitemap_cross_host_child_count += 1
+                        pending_sitemaps.append(child_url)
+                else:
+                    locs = root.findall(".//sm:loc", namespace)
+                    if not locs:
+                        locs = root.findall(".//loc")
+                    for loc in locs:
+                        if not loc.text:
+                            continue
+                        url_text = loc.text.strip()
+                        if url_text.startswith(("http://", "https://")):
+                            discovered_urls.append(url_text)
+                        else:
+                            sitemap_relative_url_count += 1
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count
 
     @staticmethod
     def _normalize_url(url: str) -> str:

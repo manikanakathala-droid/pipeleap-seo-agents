@@ -124,6 +124,28 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.sitemap_cross_host_child_count > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Sitemap index references cross-host child sitemaps ({crawl_report.sitemap_cross_host_child_count})",
+                    description=(
+                        f"The sitemap index file references {crawl_report.sitemap_cross_host_child_count} child sitemap(s) "
+                        "hosted on a different domain than the index itself. "
+                        "Per the sitemaps protocol, referenced sitemaps must be on the same host as the index "
+                        "unless cross-site submission is explicitly configured in Search Console."
+                    ),
+                    fix_instructions=(
+                        "Move child sitemaps to the same host as the sitemap index, or set up cross-site sitemap "
+                        "submission in Google Search Console by verifying ownership of each host and submitting "
+                        "the index there."
+                    ),
+                    impact_score=55.0,
+                )
+            )
+
         if not self.pagespeed_config.get("api_key"):
             issues.append(
                 AuditIssue(
