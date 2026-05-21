@@ -30,6 +30,7 @@ class SEOHTMLParser(HTMLParser):
         self.text_chunks: list[str] = []
         self.schema_types: list[str] = []
         self.image_count = 0
+        self.images_without_alt = 0
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
@@ -70,6 +71,8 @@ class SEOHTMLParser(HTMLParser):
                 self.links.append(href)
         elif tag_lower == "img":
             self.image_count += 1
+            if not attr_map.get("alt", "").strip():
+                self.images_without_alt += 1
         elif tag_lower == "script":
             self.script_count += 1
             script_type = attr_map.get("type", "").lower()
@@ -217,6 +220,7 @@ class SiteCrawler:
                     content_hash=content_hash,
                     schema_types=sorted(set(parser.schema_types)),
                     image_count=parser.image_count,
+                    images_without_alt=parser.images_without_alt,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,

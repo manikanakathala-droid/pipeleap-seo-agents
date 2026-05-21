@@ -211,6 +211,50 @@ class AuditEngine:
                 )
             )
 
+        if page.word_count > 0 and page.word_count < 300:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="thin_content",
+                    url=page.url,
+                    title="Thin content — below 300 words",
+                    description=f"Page body contains only {page.word_count} words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+                    fix_instructions="Expand with unique expert insight, first-hand experience, or structured data that goes beyond what any AI model could generate without your input.",
+                    impact_score=71.0,
+                )
+            )
+
+        if page.image_count > 0 and page.images_without_alt > 0:
+            ratio = page.images_without_alt / page.image_count
+            severity = "Medium" if ratio >= 0.5 else "Low"
+            issues.append(
+                AuditIssue(
+                    severity=severity,
+                    category="accessibility",
+                    url=page.url,
+                    title=f"Images missing alt text ({page.images_without_alt}/{page.image_count})",
+                    description=(
+                        f"{page.images_without_alt} of {page.image_count} images lack alt attributes. "
+                        "Alt text is required for screen readers, Google image indexing, and AI agents that parse the accessibility tree."
+                    ),
+                    fix_instructions="Add descriptive alt text to every image. Decorative images should use alt=\"\" to signal they can be skipped.",
+                    impact_score=52.0 if severity == "Low" else 66.0,
+                )
+            )
+
+        if not page.h1 and len(page.headings) > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="heading_structure",
+                    url=page.url,
+                    title="Heading hierarchy starts below H1",
+                    description="The page uses H2–H4 headings but has no H1. AI agents and screen readers rely on a logical heading tree starting at H1.",
+                    fix_instructions="Add a single H1 that declares the primary topic. Subordinate headings should follow as H2 → H3.",
+                    impact_score=58.0,
+                )
+            )
+
         if len(page.internal_links) == 0 and page.url.rstrip("/") != self.config.get("site", {}).get("site_url", "").rstrip("/"):
             issues.append(
                 AuditIssue(

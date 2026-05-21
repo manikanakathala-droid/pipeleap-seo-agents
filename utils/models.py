@@ -65,6 +65,7 @@ class PageSnapshot(SerializableMixin):
     content_hash: str = ""
     schema_types: list[str] = field(default_factory=list)
     image_count: int = 0
+    images_without_alt: int = 0
     script_count: int = 0
     stylesheet_count: int = 0
     has_viewport_meta: bool = False
