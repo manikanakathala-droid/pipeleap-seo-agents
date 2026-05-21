@@ -58,12 +58,7 @@ class AnswerBlockEngine:
         word_count = len(words)
 
         # Word count score (0.25)
-        if ANSWER_MIN_WORDS <= word_count <= ANSWER_MAX_WORDS:
-            score += 0.25
-        elif word_count < ANSWER_MIN_WORDS:
-            score += 0.10
-        else:
-            score += max(0, 0.25 - (word_count - ANSWER_MAX_WORDS) * 0.005)
+        score += 0.25  # Removed length penalty per Google guidelines
 
         # Opens directly (no preamble phrases like "Great question", "Of course") (0.20)
         preambles = ["great question", "of course", "certainly", "absolutely", "sure", "yes,"]

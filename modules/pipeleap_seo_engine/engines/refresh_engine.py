@@ -10,11 +10,10 @@ class ContentRefreshEngine:
     Identifies pages that need refreshing based on:
     - Age (>90 days since last modification)
     - GSC ranking decay (position dropped >3 spots vs previous period)
-    - Word count below threshold
+    NOTE: Does not penalize by word count — Google has no preferred word count.
     """
     STALENESS_DAYS = 90
     POSITION_DECAY_THRESHOLD = 3.0
-    MIN_WORD_COUNT = 1500
 
     def analyze(self, pages: list[dict[str, Any]], gsc_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         gsc_map = {row.get("query", "").lower(): row for row in gsc_rows}
@@ -25,9 +24,6 @@ class ContentRefreshEngine:
             body = page.get("body_markdown", "")
             word_count = len(body.split())
             modified = page.get("modified_date", "")
-
-            if word_count < self.MIN_WORD_COUNT:
-                reasons.append(f"word_count_low: {word_count} words (min {self.MIN_WORD_COUNT})")
 
             if modified and self._is_stale(modified):
                 reasons.append(f"stale: last modified {modified}")
@@ -48,6 +44,36 @@ class ContentRefreshEngine:
                     "priority": "HIGH" if len(reasons) >= 2 else "MEDIUM",
                 })
         return sorted(refresh_queue, key=lambda x: len(x["reasons"]), reverse=True)
+
+    def flag_fake_freshness(
+        self, pages: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """
+        Flag pages whose modified_date was changed but body_markdown content
+        hash has not changed — a practice explicitly warned against by Google:
+        'Are you changing the date of pages to make them seem fresh when the
+        content has not substantially changed?'
+        """
+        import hashlib
+        flagged = []
+        for page in pages:
+            body = page.get("body_markdown", "")
+            prev_hash = page.get("previous_content_hash", "")
+            curr_hash = hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
+            modified = page.get("modified_date", "")
+            prev_modified = page.get("previous_modified_date", "")
+            if prev_hash and prev_hash == curr_hash and modified != prev_modified:
+                flagged.append({
+                    "slug": page.get("slug", ""),
+                    "issue": "fake_freshness",
+                    "description": (
+                        f"modified_date changed from '{prev_modified}' to '{modified}' "
+                        f"but body content is identical. Google warns against changing "
+                        f"dates to appear fresh without real content updates."
+                    ),
+                    "severity": "WARNING",
+                })
+        return flagged
 
     def _is_stale(self, date_str: str) -> bool:
         try:

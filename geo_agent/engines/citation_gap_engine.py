@@ -29,7 +29,6 @@ class CitationGapEngine:
         "answer_block_present": "Page opens with a 40-70 word direct answer",
         "faq_schema":           "FAQPage JSON-LD schema with the query as a question",
         "heading_matches_query":"H1 or H2 contains the exact query phrasing",
-        "word_count_sufficient":"Page has 1,200+ words (topical depth signal)",
         "internal_links_in":    "At least 3 other pages link to this page",
     }
 
@@ -182,8 +181,6 @@ class CitationGapEngine:
         content = content_path.read_text(encoding="utf-8", errors="ignore")
         words = content.split()
 
-        if len(words) < 1200:
-            issues.append(f"word count {len(words)} < 1200")
         # Check for answer block (starts with bold or direct statement in first 80 words)
         first_200 = " ".join(words[:80]).lower()
         if not any(w in first_200 for w in ["is a", "is the", "refers to", "means"]):

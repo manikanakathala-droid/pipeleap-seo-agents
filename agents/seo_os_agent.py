@@ -418,8 +418,6 @@ class SEOOSAgent:
                 issues.append(f"Meta: update to '{meta['meta_description']}'")
             if page and not page.h1:
                 issues.append("H1: missing — add keyword-anchored H1")
-            if page and page.word_count < 400:
-                issues.append(f"Content depth: {page.word_count} words — expand to 600+ for topical authority")
 
             if issues:
                 optimised.append({
@@ -550,13 +548,22 @@ class SEOOSAgent:
                 "urls": [p.url for p in diff.deleted_pages],
             })
 
-        thin_pages = [p for p in snapshot.pages if p.word_count < 200 and p.status_code == 200]
-        if thin_pages:
+        missing_canonical = [p for p in snapshot.pages if not p.canonical and p.status_code == 200]
+        if missing_canonical:
             risks.append({
-                "type": "thin_content",
+                "type": "missing_canonical",
                 "severity": "warning",
-                "description": f"{len(thin_pages)} pages with under 200 words — at risk of de-indexation.",
-                "urls": [p.url for p in thin_pages[:5]],
+                "description": f"{len(missing_canonical)} pages are missing a canonical URL — search engines may cluster incorrectly.",
+                "urls": [p.url for p in missing_canonical[:5]],
+            })
+
+        noindex_pages = [p for p in snapshot.pages if "noindex" in p.meta_robots.lower() and p.status_code == 200]
+        if noindex_pages:
+            risks.append({
+                "type": "noindex_detected",
+                "severity": "info",
+                "description": f"{len(noindex_pages)} pages have a 'noindex' robots meta tag and will not be indexed by search engines.",
+                "urls": [p.url for p in noindex_pages[:5]],
             })
 
         no_schema = [p for p in snapshot.pages if not p.has_schema and p.status_code == 200]

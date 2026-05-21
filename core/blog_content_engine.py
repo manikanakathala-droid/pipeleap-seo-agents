@@ -32,7 +32,6 @@ _DIFFICULTY_WORD_TARGETS: list[tuple[tuple[float, float], int]] = [
 ]
 
 # ── Minimum quality thresholds ────────────────────────────────────────────────
-_MIN_WORD_COUNT_GATE = 700          # hard floor before quality score runs
 _MIN_QUALITY_SCORE = 0.55          # 0–1 composite; below this = skip publish
 
 
@@ -961,21 +960,12 @@ class BlogContentEngine:
         words = body.split()
         word_count = len(words)
 
-        if word_count < _MIN_WORD_COUNT_GATE:
-            flags.append(f"word_count_low ({word_count})")
-            score -= 0.35
-
         body_lower = body.lower()
         kw_lower = keyword.lower()
 
         if kw_lower not in body_lower:
             flags.append("primary_keyword_absent")
             score -= 0.20
-
-        h2_count = body.count("\n## ")
-        if h2_count < 3:
-            flags.append(f"insufficient_h2s ({h2_count})")
-            score -= 0.15
 
         if "## frequently asked questions" not in body_lower:
             flags.append("no_faq_section")

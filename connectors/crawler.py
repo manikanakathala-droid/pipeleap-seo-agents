@@ -11,6 +11,7 @@ from xml.etree import ElementTree
 
 import requests
 
+import time
 from utils.models import CrawlerReport, PageSnapshot
 
 
@@ -167,6 +168,9 @@ class SiteCrawler:
             try:
                 response = self.session.get(url, timeout=10)
                 response_time_ms = int(response.elapsed.total_seconds() * 1000)
+                if response.status_code >= 500:
+                    self.logger.warning("HTTP 5xx error at %s. Slowing down crawl to avoid overloading server.", url)
+                    time.sleep(5)
             except requests.RequestException as exc:
                 crawl_errors.append(f"{url}: {exc}")
                 continue

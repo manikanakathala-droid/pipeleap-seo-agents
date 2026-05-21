@@ -123,8 +123,6 @@ class GrowthPage:
             "Add product screenshots or workflow diagrams to demonstrate first-hand experience.",
             "Include at least one specific, verifiable outcome metric (reply rate, pipeline lift, time saved).",
         ]
-        if self.word_count < 1500:
-            notes.append(f"Word count is {self.word_count} — expand to 1,800+ before publishing for competitive SaaS queries.")
         return notes
 
 

@@ -8,12 +8,6 @@ from utils.models import ContentAsset, ContentBrief, KeywordCluster, LinkSuggest
 from utils.stage_messaging import STAGES, STAGE_CTA, STAGE_BEFORE_AFTER
 from utils.text import slugify, title_case_keyword
 
-_MIN_WORD_COUNTS: dict[str, int] = {
-    "blog_post": 800,
-    "landing_page": 1500,
-    "comparison_page": 600,
-    "use_case_page": 600,
-}
 
 _EXTRA_FAQS: list[tuple[str, str]] = [
     (
@@ -652,31 +646,6 @@ class ContentEngine:
         self._generated_samples.append(sample)
         return False
 
-    # ------------------------------------------------------------------ #
-    # Word-count enforcement                                               #
-    # ------------------------------------------------------------------ #
-
-    def _enforce_min_word_count(self, body: str, page_type: str) -> str:
-        min_words = _MIN_WORD_COUNTS.get(page_type, 600)
-        word_count = len(body.split())
-        if word_count >= min_words:
-            return body
-        gap = min_words - word_count
-        self.logger.debug("Padding %s (%d words) with ~%d extra words", page_type, word_count, gap)
-        return body + "\n\n" + self._pad_with_faqs(gap)
-
-    @staticmethod
-    def _pad_with_faqs(target_word_count: int) -> str:
-        lines = ["\n## Frequently Asked Questions\n"]
-        words_added = 0
-        for question, answer in _EXTRA_FAQS:
-            lines.append(f"### {question}")
-            lines.append(answer)
-            lines.append("")
-            words_added += len((question + " " + answer).split())
-            if words_added >= target_word_count:
-                break
-        return "\n".join(lines)
 
     # ------------------------------------------------------------------ #
     # AI disclosure                                                        #
@@ -686,7 +655,10 @@ class ContentEngine:
     def _ai_disclosure_block() -> str:
         return (
             "\n\n---\n"
-            "*This content was produced with AI assistance and reviewed for factual accuracy. "
+            "*This content was drafted with AI assistance as part of Pipeleap's automated "
+            "content workflow. It was reviewed for factual accuracy by the Pipeleap team. "
+            "AI was used to accelerate the initial draft based on first-hand product knowledge "
+            "and operator experience documented internally. "
             "For verified product details, workflow screenshots, and live examples, "
             "visit the [Pipeleap product page](https://pipeleap.com/) or speak with a workflow specialist.*"
         )
