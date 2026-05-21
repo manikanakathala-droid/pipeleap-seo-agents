@@ -32,6 +32,7 @@ class SEOHTMLParser(HTMLParser):
         self.image_count = 0
         self.images_without_alt = 0
         self.links_without_anchor_text = 0
+        self.external_links_without_rel = 0
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
@@ -74,6 +75,11 @@ class SEOHTMLParser(HTMLParser):
                 self.links.append(href)
                 self._pending_anchor_href = href
                 self._anchor_has_text = bool(attr_map.get("aria-label", "").strip())
+                parsed_href = urlparse(href)
+                if parsed_href.scheme in {"http", "https"} and parsed_href.netloc:
+                    rel_vals = {v.strip() for v in attr_map.get("rel", "").lower().split()}
+                    if not rel_vals & {"nofollow", "sponsored", "ugc"}:
+                        self.external_links_without_rel += 1
         elif tag_lower == "img":
             self.image_count += 1
             if not attr_map.get("alt", "").strip():
@@ -234,6 +240,7 @@ class SiteCrawler:
                     image_count=parser.image_count,
                     images_without_alt=parser.images_without_alt,
                     links_without_anchor_text=parser.links_without_anchor_text,
+                    external_links_without_rel=parser.external_links_without_rel,
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,

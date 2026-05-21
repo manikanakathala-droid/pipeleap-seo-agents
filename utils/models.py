@@ -67,6 +67,7 @@ class PageSnapshot(SerializableMixin):
     image_count: int = 0
     images_without_alt: int = 0
     links_without_anchor_text: int = 0
+    external_links_without_rel: int = 0
     script_count: int = 0
     stylesheet_count: int = 0
     has_viewport_meta: bool = False

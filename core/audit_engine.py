@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from urllib.parse import urlparse
 from typing import Any
 
 from utils.models import AuditIssue, CrawlerReport, PageSnapshot
@@ -358,6 +359,65 @@ class AuditEngine:
                         "For icon-only links (e.g. social icons), add aria-label describing the destination."
                     ),
                     impact_score=41.0,
+                )
+            )
+
+        url_path = urlparse(page.url).path
+        if "_" in url_path:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="url_structure",
+                    url=page.url,
+                    title="URL contains underscores — use hyphens",
+                    description=(
+                        "Google treats hyphens as word separators but underscores join words into one token. "
+                        "A URL like /my_page ranks 'mypage' not 'my page', reducing keyword match surface."
+                    ),
+                    fix_instructions=(
+                        "Rename the URL path to use hyphens instead of underscores (e.g. /my-page). "
+                        "Set up a 301 redirect from the old underscore URL to the new hyphen URL."
+                    ),
+                    impact_score=45.0,
+                )
+            )
+
+        if url_path != url_path.lower():
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="url_structure",
+                    url=page.url,
+                    title="URL contains uppercase letters",
+                    description=(
+                        "Uppercase characters in URLs create duplicate-content risk: /Page and /page are "
+                        "treated as different URLs by servers, splitting crawl budget and link equity."
+                    ),
+                    fix_instructions=(
+                        "Normalize the URL path to lowercase and set up 301 redirects from mixed-case variants. "
+                        "Configure the web server to enforce lowercase URL routing."
+                    ),
+                    impact_score=42.0,
+                )
+            )
+
+        if page.external_links_without_rel > 3:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="outbound_links",
+                    url=page.url,
+                    title=f"Unqualified external links ({page.external_links_without_rel} links missing rel attribute)",
+                    description=(
+                        f"{page.external_links_without_rel} absolute external links on this page have no rel='nofollow', "
+                        "rel='sponsored', or rel='ugc' attribute. Google's guidance requires qualifying outbound links "
+                        "so PageRank is not unintentionally passed to unvetted third-party pages."
+                    ),
+                    fix_instructions=(
+                        "Add rel='nofollow' to external links you have not editorially vouched for. "
+                        "Use rel='sponsored' for paid/affiliate links and rel='ugc' for user-generated content links."
+                    ),
+                    impact_score=37.0,
                 )
             )
 
