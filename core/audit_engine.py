@@ -252,6 +252,29 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.sitemap_urls and crawl_report.sitemap_urls_without_lastmod == len(crawl_report.sitemap_urls):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title="No sitemap URLs have a <lastmod> tag",
+                    description=(
+                        f"The sitemap contains {len(crawl_report.sitemap_urls)} URL(s) but none include a "
+                        "<lastmod> tag. Google uses <lastmod> to detect updated content and prioritize recrawls — "
+                        "without it, Google must discover updates through its own crawl schedule, "
+                        "which can delay indexing of new or changed pages."
+                    ),
+                    fix_instructions=(
+                        "Add a <lastmod> tag to every <url> entry in the sitemap, set to the date the page "
+                        "was last meaningfully updated (e.g. <lastmod>2024-06-15</lastmod>). "
+                        "Use W3C date format (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss+TZD). "
+                        "Automate this so the value reflects real content changes, not the sitemap generation time."
+                    ),
+                    impact_score=43.0,
+                )
+            )
+
         if crawl_report.sitemap_hreflang_missing_self_ref > 0:
             issues.append(
                 AuditIssue(
@@ -720,6 +743,27 @@ class AuditEngine:
                         "link the actual file from there."
                     ),
                     impact_score=33.0,
+                )
+            )
+
+        if page.redirect_hops >= 2:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="crawl_efficiency",
+                    url=page.url,
+                    title=f"Redirect chain detected ({page.redirect_hops} hops to reach this URL)",
+                    description=(
+                        f"Reaching this URL required following {page.redirect_hops} redirect(s). "
+                        "Long redirect chains slow down Googlebot — each hop costs crawl budget and adds latency. "
+                        "Google recommends keeping redirect chains to a single hop wherever possible."
+                    ),
+                    fix_instructions=(
+                        "Collapse the redirect chain to a single 301 pointing directly from the original URL "
+                        "to the final destination. Update any internal links and sitemap entries to point "
+                        "directly to the canonical URL to avoid the chain entirely."
+                    ),
+                    impact_score=56.0,
                 )
             )
 

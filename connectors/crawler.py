@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref, sitemap_urls_without_lastmod = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -228,6 +228,7 @@ class SiteCrawler:
             try:
                 response = self.session.get(url, timeout=10)
                 response_time_ms = int(response.elapsed.total_seconds() * 1000)
+                redirect_hops = len(response.history)
                 if response.status_code >= 500:
                     self.logger.warning("HTTP 5xx error at %s. Slowing down crawl to avoid overloading server.", url)
                     time.sleep(5)
@@ -283,6 +284,7 @@ class SiteCrawler:
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,
+                    redirect_hops=redirect_hops,
                 )
             )
 
@@ -305,11 +307,12 @@ class SiteCrawler:
             sitemap_video_deprecated_tag_count=sitemap_video_deprecated_tag_count,
             sitemap_hreflang_url_count=sitemap_hreflang_url_count,
             sitemap_hreflang_missing_self_ref=sitemap_hreflang_missing_self_ref,
+            sitemap_urls_without_lastmod=sitemap_urls_without_lastmod,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int, int, int, int, int, int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int, int, int, int, int, int, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
@@ -334,6 +337,7 @@ class SiteCrawler:
         _XHTML_NS = "http://www.w3.org/1999/xhtml"
         sitemap_hreflang_url_count = 0
         sitemap_hreflang_missing_self_ref = 0
+        sitemap_urls_without_lastmod = 0
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -424,6 +428,10 @@ class SiteCrawler:
                                     sitemap_news_stale_article_count += 1
                             except Exception:
                                 pass
+                    lastmod_tag_sm = "sm:lastmod"
+                    for url_elem in url_elems:
+                        if url_elem.find(lastmod_tag_sm, namespace) is None and url_elem.find("lastmod") is None:
+                            sitemap_urls_without_lastmod += 1
                     xhtml_link_tag = f"{{{_XHTML_NS}}}link"
                     for url_elem in url_elems:
                         loc_elem = url_elem.find("sm:loc", namespace) or url_elem.find("loc")
@@ -459,7 +467,7 @@ class SiteCrawler:
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref, sitemap_urls_without_lastmod
 
     @staticmethod
     def _normalize_url(url: str) -> str:

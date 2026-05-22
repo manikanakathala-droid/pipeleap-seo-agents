@@ -74,6 +74,7 @@ class PageSnapshot(SerializableMixin):
     script_count: int = 0
     stylesheet_count: int = 0
     has_viewport_meta: bool = False
+    redirect_hops: int = 0
 
 
 @dataclass
@@ -96,6 +97,7 @@ class CrawlerReport(SerializableMixin):
     sitemap_video_deprecated_tag_count: int = 0
     sitemap_hreflang_url_count: int = 0
     sitemap_hreflang_missing_self_ref: int = 0
+    sitemap_urls_without_lastmod: int = 0
     crawl_errors: list[str] = field(default_factory=list)
     discovered_at: str = ""
 
