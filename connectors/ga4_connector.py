@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -13,9 +12,11 @@ try:
         RunReportRequest,
     )
     from google.oauth2 import service_account
+    import google.auth as _google_auth_ga4
     GA4_AVAILABLE = True
 except ImportError:
     GA4_AVAILABLE = False
+    _google_auth_ga4 = None  # type: ignore
 
 
 class GA4Connector:
@@ -42,16 +43,26 @@ class GA4Connector:
         if not self.property_id:
             self.logger.warning("GA4: ga4_property_id not set in config")
             return False
-        if not self.credentials_path or not Path(self.credentials_path).exists():
-            self.logger.warning("GA4: credentials file not found at %s", self.credentials_path)
-            return False
-        return True
+        # Accept either a key file OR ADC (gcloud auth application-default login)
+        if self.credentials_path and Path(self.credentials_path).exists():
+            return True
+        if _google_auth_ga4 is not None:
+            try:
+                _google_auth_ga4.default()
+                return True
+            except Exception:
+                pass
+        self.logger.warning("GA4: no credentials — place key file at %s or run: gcloud auth application-default login", self.credentials_path)
+        return False
 
     def _client(self) -> "BetaAnalyticsDataClient":
-        creds = service_account.Credentials.from_service_account_file(
-            self.credentials_path,
-            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
-        )
+        _scopes = ["https://www.googleapis.com/auth/analytics.readonly"]
+        if self.credentials_path and Path(self.credentials_path).exists():
+            creds = service_account.Credentials.from_service_account_file(
+                self.credentials_path, scopes=_scopes
+            )
+        else:
+            creds, _ = _google_auth_ga4.default(scopes=_scopes)
         return BetaAnalyticsDataClient(credentials=creds)
 
     def fetch_top_pages(

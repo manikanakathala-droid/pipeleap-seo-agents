@@ -8,9 +8,13 @@ from typing import Any
 try:  # pragma: no cover
     from google.oauth2 import service_account  # type: ignore
     from googleapiclient.discovery import build  # type: ignore
+    import google.auth as _google_auth  # type: ignore
+    GOOGLE_LIBS_AVAILABLE = True
 except Exception:  # pragma: no cover
     service_account = None
     build = None
+    _google_auth = None  # type: ignore
+    GOOGLE_LIBS_AVAILABLE = False
 
 # Scope notes:
 #   webmasters.readonly  — analytics queries only
@@ -42,6 +46,36 @@ class GoogleSearchConsoleConnector:
         self.credentials_path = self.config.get("credentials_path", "")
         self.data_export_path = self.config.get("data_export_path", "")
 
+    def _get_credentials(self, scopes: list[str]):
+        """
+        Returns credentials using service account key file if present,
+        otherwise falls back to Application Default Credentials (ADC).
+        ADC works after running: gcloud auth application-default login
+        """
+        if self.credentials_path and Path(self.credentials_path).exists():
+            return service_account.Credentials.from_service_account_file(
+                self.credentials_path, scopes=scopes
+            )
+        if _google_auth is not None:
+            creds, _ = _google_auth.default(scopes=scopes)
+            return creds
+        raise RuntimeError(
+            "No credentials available. Either place a service account JSON at "
+            f"{self.credentials_path!r} or run: gcloud auth application-default login"
+        )
+
+    def _is_auth_available(self) -> bool:
+        if not GOOGLE_LIBS_AVAILABLE:
+            return False
+        if self.credentials_path and Path(self.credentials_path).exists():
+            return True
+        # ADC available if gcloud has been authenticated
+        try:
+            _google_auth.default()
+            return True
+        except Exception:
+            return False
+
     def fetch_query_data(
         self,
         start_date: str,
@@ -52,13 +86,12 @@ class GoogleSearchConsoleConnector:
             rows = self._load_export(Path(self.data_export_path))
             return rows[:row_limit], []
 
-        if self.credentials_path and service_account is not None and build is not None:
-            self.logger.info("Attempting to connect to GSC API using %s", self.credentials_path)
-            if not Path(self.credentials_path).exists():
-                self.logger.warning("Credentials path %s does not exist on disk", self.credentials_path)
+        if self._is_auth_available():
+            self.logger.info("Connecting to GSC API (key file: %s, ADC fallback available)",
+                             bool(self.credentials_path))
             try:
                 return self._fetch_from_api(start_date, end_date, row_limit), []
-            except Exception as exc:  # pragma: no cover
+            except Exception as exc:
                 message = f"GSC API request failed: {exc}"
                 self.logger.warning(message)
                 return [], [message]
@@ -94,19 +127,12 @@ class GoogleSearchConsoleConnector:
     # ── Sitemap submission ────────────────────────────────────────────────────
 
     def submit_sitemap(self, sitemap_url: str | None = None) -> dict[str, Any]:
-        """
-        Submit sitemap to Google Search Console.
-        Returns {"ok": True} on success or {"ok": False, "error": str}.
-        """
-        if not (self.credentials_path and service_account and build):
-            self.logger.info("GSC sitemap submission skipped — credentials not configured.")
-            return {"ok": False, "error": "credentials not configured"}
-
+        """Submit sitemap to GSC. Works with key file or ADC."""
+        if not self._is_auth_available():
+            return {"ok": False, "error": "no credentials — run: gcloud auth application-default login"}
         url = sitemap_url or f"{self.plain_site_url}/sitemap.xml"
         try:
-            credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_path, scopes=_GSC_SCOPES  # write scope required for sitemap submission
-            )
+            credentials = self._get_credentials(_GSC_SCOPES)
             service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
             service.sitemaps().submit(siteUrl=self.site_url, feedpath=url).execute()
             self.logger.info("Sitemap submitted to GSC: %s", url)
@@ -118,15 +144,11 @@ class GoogleSearchConsoleConnector:
     # ── Index coverage ────────────────────────────────────────────────────────
 
     def fetch_coverage(self) -> dict[str, Any]:
-        """
-        Returns index coverage summary: counts of Good, Excluded, Error, Valid with warnings.
-        """
-        if not (self.credentials_path and service_account and build):
-            return {"ok": False, "error": "credentials not configured"}
+        """Returns index coverage via URL Inspection API."""
+        if not self._is_auth_available():
+            return {"ok": False, "error": "no credentials"}
         try:
-            credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_path, scopes=_GSC_SCOPES
-            )
+            credentials = self._get_credentials(_GSC_SCOPES)
             service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
             result = (
                 service.urlInspection()
@@ -142,22 +164,12 @@ class GoogleSearchConsoleConnector:
     # ── Indexing API — request indexing for new / updated pages ──────────────
 
     def request_indexing(self, page_urls: list[str]) -> list[dict[str, Any]]:
-        """
-        Use the Google Indexing API to signal new or updated URLs.
-        Requires the service account to have 'Owner' permission in GSC AND
-        the Indexing API enabled in the linked GCP project.
-
-        Returns a list of per-URL results: {"url": ..., "ok": True/False}.
-        """
-        if not (self.credentials_path and service_account and build):
-            self.logger.info("Indexing API skipped — credentials not configured.")
-            return [{"url": u, "ok": False, "error": "credentials not configured"} for u in page_urls]
-
+        """Signal new/updated URLs via the Google Indexing API. Works with key file or ADC."""
+        if not self._is_auth_available():
+            return [{"url": u, "ok": False, "error": "no credentials"} for u in page_urls]
         results: list[dict[str, Any]] = []
         try:
-            credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_path, scopes=_INDEXING_SCOPES
-            )
+            credentials = self._get_credentials(_INDEXING_SCOPES)
             service = build("indexing", "v3", credentials=credentials, cache_discovery=False)
             for url in page_urls:
                 try:
@@ -177,16 +189,11 @@ class GoogleSearchConsoleConnector:
     # ── URL Inspection ────────────────────────────────────────────────────────
 
     def inspect_url(self, page_url: str) -> dict[str, Any]:
-        """
-        Run URL Inspection for a single page.
-        Returns crawl status, index status, canonical, and coverage verdict.
-        """
-        if not (self.credentials_path and service_account and build):
-            return {"ok": False, "error": "credentials not configured"}
+        """Run URL Inspection for a single page. Works with key file or ADC."""
+        if not self._is_auth_available():
+            return {"ok": False, "error": "no credentials"}
         try:
-            credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_path, scopes=_GSC_SCOPES
-            )
+            credentials = self._get_credentials(_GSC_SCOPES)
             service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
             result = (
                 service.urlInspection()
@@ -212,12 +219,10 @@ class GoogleSearchConsoleConnector:
         self, start_date: str, end_date: str, row_limit: int = 500
     ) -> list[dict[str, Any]]:
         """Fetch page-level performance (impressions, clicks, position) without query dimension."""
-        if not (self.credentials_path and service_account and build):
+        if not self._is_auth_available():
             return []
         try:
-            credentials = service_account.Credentials.from_service_account_file(
-                self.credentials_path, scopes=_GSC_SCOPES
-            )
+            credentials = self._get_credentials(_GSC_SCOPES)
             service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
             response = (
                 service.searchanalytics()
@@ -306,10 +311,7 @@ class GoogleSearchConsoleConnector:
         return {"current_rows": len(current), "previous_rows": len(previous)}
 
     def _fetch_from_api(self, start_date: str, end_date: str, row_limit: int) -> list[dict[str, Any]]:
-        credentials = service_account.Credentials.from_service_account_file(  # type: ignore[union-attr]
-            self.credentials_path,
-            scopes=["https://www.googleapis.com/auth/webmasters.readonly"],
-        )
+        credentials = self._get_credentials(_GSC_READONLY_SCOPES)
         service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)  # type: ignore[misc]
         request = {
             "startDate": start_date,
