@@ -13,10 +13,12 @@ try:
     )
     from google.oauth2 import service_account
     import google.auth as _google_auth_ga4
+    from google.auth import impersonated_credentials as _impersonated
     GA4_AVAILABLE = True
 except ImportError:
     GA4_AVAILABLE = False
     _google_auth_ga4 = None  # type: ignore
+    _impersonated = None  # type: ignore
 
 
 class GA4Connector:
@@ -33,6 +35,7 @@ class GA4Connector:
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.logger = logger
         analytics_cfg = config.get("integrations", {}).get("analytics", {})
+        self._analytics_cfg = analytics_cfg
         self.property_id: str = analytics_cfg.get("ga4_property_id", "").strip()
         self.credentials_path: str = analytics_cfg.get("credentials_path", "").strip()
 
@@ -43,7 +46,6 @@ class GA4Connector:
         if not self.property_id:
             self.logger.warning("GA4: ga4_property_id not set in config")
             return False
-        # Accept either a key file OR ADC (gcloud auth application-default login)
         if self.credentials_path and Path(self.credentials_path).exists():
             return True
         if _google_auth_ga4 is not None:
@@ -52,17 +54,35 @@ class GA4Connector:
                 return True
             except Exception:
                 pass
-        self.logger.warning("GA4: no credentials — place key file at %s or run: gcloud auth application-default login", self.credentials_path)
+        self.logger.warning("GA4: no credentials — run: gcloud auth application-default login")
         return False
 
     def _client(self) -> "BetaAnalyticsDataClient":
         _scopes = ["https://www.googleapis.com/auth/analytics.readonly"]
+
+        # Key file takes priority
         if self.credentials_path and Path(self.credentials_path).exists():
             creds = service_account.Credentials.from_service_account_file(
                 self.credentials_path, scopes=_scopes
             )
-        else:
-            creds, _ = _google_auth_ga4.default(scopes=_scopes)
+            return BetaAnalyticsDataClient(credentials=creds)
+
+        # Service account impersonation — bypasses blocked-scope restrictions
+        # Set analytics.impersonate_sa in config to use this path
+        impersonate_sa = self._analytics_cfg.get("impersonate_sa", "")
+        if impersonate_sa and _impersonated is not None:
+            base_creds, _ = _google_auth_ga4.default()
+            creds = _impersonated.Credentials(
+                source_credentials=base_creds,
+                target_principal=impersonate_sa,
+                target_scopes=_scopes,
+                lifetime=3600,
+            )
+            self.logger.info("GA4: using impersonated credentials for %s", impersonate_sa)
+            return BetaAnalyticsDataClient(credentials=creds)
+
+        # Plain ADC fallback
+        creds, _ = _google_auth_ga4.default(scopes=_scopes)
         return BetaAnalyticsDataClient(credentials=creds)
 
     def fetch_top_pages(
