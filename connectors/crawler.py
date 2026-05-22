@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -303,11 +303,13 @@ class SiteCrawler:
             sitemap_video_count=sitemap_video_count,
             sitemap_video_missing_required_tags=sitemap_video_missing_required_tags,
             sitemap_video_deprecated_tag_count=sitemap_video_deprecated_tag_count,
+            sitemap_hreflang_url_count=sitemap_hreflang_url_count,
+            sitemap_hreflang_missing_self_ref=sitemap_hreflang_missing_self_ref,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int, int, int, int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int, int, int, int, int, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
@@ -329,6 +331,9 @@ class SiteCrawler:
         _NEWS_NS = "http://www.google.com/schemas/sitemap-news/0.9"
         _VIDEO_NS = "http://www.google.com/schemas/sitemap-video/1.1"
         _DEPRECATED_VIDEO_TAGS = {"category", "gallery_loc", "price", "tvshow"}
+        _XHTML_NS = "http://www.w3.org/1999/xhtml"
+        sitemap_hreflang_url_count = 0
+        sitemap_hreflang_missing_self_ref = 0
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -419,6 +424,20 @@ class SiteCrawler:
                                     sitemap_news_stale_article_count += 1
                             except Exception:
                                 pass
+                    xhtml_link_tag = f"{{{_XHTML_NS}}}link"
+                    for url_elem in url_elems:
+                        loc_elem = url_elem.find("sm:loc", namespace) or url_elem.find("loc")
+                        loc_text = loc_elem.text.strip() if loc_elem is not None and loc_elem.text else ""
+                        hreflang_links = [
+                            child for child in url_elem.findall(xhtml_link_tag)
+                            if child.get("rel") == "alternate" and child.get("hreflang")
+                        ]
+                        if not hreflang_links:
+                            continue
+                        sitemap_hreflang_url_count += 1
+                        hrefs = {child.get("href", "").strip() for child in hreflang_links}
+                        if loc_text and loc_text not in hrefs:
+                            sitemap_hreflang_missing_self_ref += 1
                     video_video_tag = f"{{{_VIDEO_NS}}}video"
                     video_required = {
                         f"{{{_VIDEO_NS}}}thumbnail_loc",
@@ -440,7 +459,7 @@ class SiteCrawler:
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count, sitemap_hreflang_url_count, sitemap_hreflang_missing_self_ref
 
     @staticmethod
     def _normalize_url(url: str) -> str:

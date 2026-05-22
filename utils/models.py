@@ -94,6 +94,8 @@ class CrawlerReport(SerializableMixin):
     sitemap_video_count: int = 0
     sitemap_video_missing_required_tags: int = 0
     sitemap_video_deprecated_tag_count: int = 0
+    sitemap_hreflang_url_count: int = 0
+    sitemap_hreflang_missing_self_ref: int = 0
     crawl_errors: list[str] = field(default_factory=list)
     discovered_at: str = ""
 

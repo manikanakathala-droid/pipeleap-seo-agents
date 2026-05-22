@@ -252,6 +252,31 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.sitemap_hreflang_missing_self_ref > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Sitemap hreflang URLs missing self-referencing entry ({crawl_report.sitemap_hreflang_missing_self_ref} URLs)",
+                    description=(
+                        f"{crawl_report.sitemap_hreflang_missing_self_ref} URL(s) in the sitemap declare "
+                        "<xhtml:link rel=\"alternate\" hreflang=\"...\"> annotations but do not include a "
+                        "self-referencing entry pointing back to the URL itself. "
+                        "Google's hreflang spec requires every URL in a localized set to list all alternate "
+                        "versions including itself — without the self-reference, the annotation set is incomplete "
+                        "and Google may ignore the hreflang signals for that URL."
+                    ),
+                    fix_instructions=(
+                        "For every <url> that uses <xhtml:link rel=\"alternate\">, add an entry where href matches "
+                        "the URL's own <loc> value, with the appropriate hreflang language code. "
+                        "Example: <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"https://example.com/page.html\"/> "
+                        "on the URL https://example.com/page.html itself."
+                    ),
+                    impact_score=63.0,
+                )
+            )
+
         if crawl_report.sitemap_video_missing_required_tags > 0:
             issues.append(
                 AuditIssue(
