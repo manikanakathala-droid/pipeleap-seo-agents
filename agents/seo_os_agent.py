@@ -69,6 +69,7 @@ class SEOOSResult:
     linking_suggestions: list[dict] = field(default_factory=list)
     competitor_insights: list[dict] = field(default_factory=list)
     indexing_actions: list[dict] = field(default_factory=list)
+    gsc_insights: list[dict] = field(default_factory=list)
     risks_and_missed: list[dict] = field(default_factory=list)
     seo_score: SEOScore = field(default_factory=SEOScore)
     next_day_plan: list[str] = field(default_factory=list)
@@ -89,6 +90,7 @@ class SEOOSResult:
             "linking_suggestions": self.linking_suggestions,
             "competitor_insights": self.competitor_insights,
             "indexing_actions": self.indexing_actions,
+            "gsc_insights": self.gsc_insights,
             "risks_and_missed": self.risks_and_missed,
             "seo_score": self.seo_score.to_dict(),
             "next_day_plan": self.next_day_plan,
@@ -176,6 +178,15 @@ class SEOOSAgent:
                     result.safe_actions.append(issue)
         except Exception as exc:
             self.logger.warning("Technical audit skipped: %s", exc)
+
+        # ── Step 4b: GSC Performance Audit ───────────────────────────────────
+        self.logger.info("Step 4b: GSC performance audit")
+        try:
+            gsc_insights = self._run_gsc_performance_audit()
+            result.gsc_insights = gsc_insights
+            self._write_json(output_dir / "gsc_insights.json", gsc_insights)
+        except Exception as exc:
+            self.logger.warning("GSC audit skipped: %s", exc)
 
         # ── Step 5: Keyword Engine ────────────────────────────────────────────
         self.logger.info("Step 5: Keyword engine")
@@ -496,17 +507,127 @@ class SEOOSAgent:
 
         return insights
 
+    def _run_gsc_performance_audit(self) -> list[dict]:
+        from connectors.gsc_connector import GoogleSearchConsoleConnector
+        gsc = GoogleSearchConsoleConnector(self.config, self.logger)
+        current_rows, previous_rows = gsc.fetch_two_periods(days_per_period=28, row_limit=500)
+        if not current_rows:
+            return []
+
+        def _aggregate(rows: list[dict]) -> dict[str, dict]:
+            agg: dict[str, dict] = {}
+            for row in rows:
+                page = row.get("page", "")
+                if not page:
+                    continue
+                if page not in agg:
+                    agg[page] = {"clicks": 0, "impressions": 0, "position_sum": 0.0, "position_count": 0}
+                agg[page]["clicks"] += row.get("clicks", 0)
+                agg[page]["impressions"] += row.get("impressions", 0)
+                agg[page]["position_sum"] += row.get("position", 0.0)
+                agg[page]["position_count"] += 1
+            for d in agg.values():
+                d["position"] = d["position_sum"] / d["position_count"] if d["position_count"] else 0.0
+            return agg
+
+        current = _aggregate(current_rows)
+        previous = _aggregate(previous_rows)
+        insights: list[dict] = []
+
+        for page, curr in current.items():
+            prev = previous.get(page, {})
+            prev_imp = prev.get("impressions", 0)
+            curr_imp = curr["impressions"]
+            curr_pos = curr["position"]
+            prev_pos = prev.get("position", 0.0)
+
+            # Position drop — page moved down > 5 spots vs previous period
+            if prev_imp >= 10 and prev_pos > 0 and curr_pos - prev_pos > 5:
+                insights.append({
+                    "type": "position_drop",
+                    "severity": "High" if curr_pos - prev_pos > 10 else "Medium",
+                    "page": page,
+                    "current_position": round(curr_pos, 1),
+                    "previous_position": round(prev_pos, 1),
+                    "drop": round(curr_pos - prev_pos, 1),
+                    "impressions": curr_imp,
+                    "recommendation": (
+                        f"Position dropped {round(curr_pos - prev_pos, 1)} spots "
+                        f"({round(prev_pos,1)} → {round(curr_pos,1)}). "
+                        "Refresh content, strengthen E-E-A-T signals, and audit competing SERP pages."
+                    ),
+                })
+
+            # Low CTR — ≥100 impressions but CTR < 1%
+            if curr_imp >= 100 and curr["clicks"] < curr_imp * 0.01:
+                ctr_pct = round(curr["clicks"] / curr_imp * 100, 2)
+                insights.append({
+                    "type": "low_ctr",
+                    "severity": "Medium",
+                    "page": page,
+                    "impressions": curr_imp,
+                    "clicks": curr["clicks"],
+                    "ctr_percent": ctr_pct,
+                    "avg_position": round(curr_pos, 1),
+                    "recommendation": (
+                        f"CTR is {ctr_pct}% on {curr_imp} impressions at position {round(curr_pos,1)}. "
+                        "Rewrite title and meta description to match search intent and improve click appeal."
+                    ),
+                })
+
+        # Impression decay — page was visible last period, largely gone now
+        for page, prev in previous.items():
+            if prev["impressions"] < 50:
+                continue
+            curr_imp = current.get(page, {}).get("impressions", 0)
+            decay_pct = round((1 - curr_imp / prev["impressions"]) * 100, 1)
+            if decay_pct > 50:
+                insights.append({
+                    "type": "impression_decay",
+                    "severity": "High",
+                    "page": page,
+                    "previous_impressions": prev["impressions"],
+                    "current_impressions": curr_imp,
+                    "decay_percent": decay_pct,
+                    "recommendation": (
+                        f"Impressions dropped {decay_pct}% "
+                        f"({prev['impressions']} → {curr_imp}). "
+                        "Check URL Inspection for de-indexing, crawl errors, or SERP feature cannibalisation."
+                    ),
+                })
+
+        insights.sort(key=lambda x: (0 if x["severity"] == "High" else 1, -x.get("impressions", 0)))
+        return insights[:20]
+
     def _build_indexing_actions(self, diff: SiteDiff, snapshot: SiteSnapshot) -> list[dict]:
+        from connectors.gsc_connector import GoogleSearchConsoleConnector
+        gsc = GoogleSearchConsoleConnector(self.config, self.logger)
         actions: list[dict] = []
 
-        for change in diff.new_pages:
-            actions.append({
-                "action": "submit_url",
-                "url": change.url,
-                "reason": "New page — submit via GSC URL Inspection",
-                "priority": 1,
-            })
+        # Submit new pages to Indexing API immediately
+        if diff.new_pages:
+            urls_to_index = [p.url for p in diff.new_pages[:5]]
+            indexing_results = gsc.request_indexing(urls_to_index)
+            for res in indexing_results:
+                actions.append({
+                    "action": "submit_url",
+                    "url": res["url"],
+                    "reason": "New page detected — submitted via Google Indexing API",
+                    "status": "submitted" if res.get("ok") else f"failed: {res.get('error', '')}",
+                    "priority": 1,
+                })
 
+        # Re-submit sitemap to GSC
+        sitemap_result = gsc.submit_sitemap()
+        actions.append({
+            "action": "resubmit_sitemap",
+            "url": self.site_url + "/sitemap.xml",
+            "reason": "Weekly sitemap submission to GSC",
+            "status": "submitted" if sitemap_result.get("ok") else f"skipped: {sitemap_result.get('error', '')}",
+            "priority": 3,
+        })
+
+        # Pages missing from sitemap — flag for manual addition
         for url in diff.missing_from_sitemap[:5]:
             actions.append({
                 "action": "add_to_sitemap",
@@ -515,21 +636,21 @@ class SEOOSAgent:
                 "priority": 2,
             })
 
-        for change in diff.updated_pages:
-            if any(f in change.fields_changed for f in ["title", "meta_description", "h1"]):
+        # Updated pages with key SEO field changes — request re-crawl
+        updated_urls = [
+            c.url for c in diff.updated_pages
+            if any(f in c.fields_changed for f in ["title", "meta_description", "h1"])
+        ]
+        if updated_urls:
+            reindex_results = gsc.request_indexing(updated_urls[:5])
+            for res in reindex_results:
                 actions.append({
                     "action": "refresh_index",
-                    "url": change.url,
-                    "reason": "Key SEO fields updated — request re-crawl in GSC",
+                    "url": res["url"],
+                    "reason": "Key SEO fields updated — re-crawl requested via Indexing API",
+                    "status": "submitted" if res.get("ok") else f"failed: {res.get('error', '')}",
                     "priority": 2,
                 })
-
-        actions.append({
-            "action": "resubmit_sitemap",
-            "url": self.site_url + "/sitemap.xml",
-            "reason": "Weekly sitemap resubmission to GSC keeps index fresh",
-            "priority": 3,
-        })
 
         return actions
 
@@ -660,6 +781,12 @@ class SEOOSAgent:
         if result.competitor_insights:
             plan.append(f"Begin comparison page for {result.competitor_insights[0]['competitor']} — targets transactional 'alternatives' cluster")
 
+        gsc_high = [i for i in result.gsc_insights if i.get("severity") == "High"]
+        if gsc_high:
+            plan.append(f"Address {len(gsc_high)} High-severity GSC signal(s): position drops and impression decay — see gsc_insights.json")
+        low_ctr = [i for i in result.gsc_insights if i.get("type") == "low_ctr"]
+        if low_ctr:
+            plan.append(f"Rewrite title/meta for {len(low_ctr)} page(s) with CTR < 1% despite high impressions")
         plan.append("Monitor GSC for CTR changes on any updated meta descriptions (48-hour window)")
 
         if result.seo_score.overall < 60:
@@ -745,7 +872,24 @@ class SEOOSAgent:
 
         lines += ["", "---", "", "## 9. Indexing Actions"]
         for action in result.indexing_actions[:6]:
-            lines.append(f"- [{action.get('action','')}] `{action.get('url','')}` — {action.get('reason','')}")
+            status = action.get("status", "")
+            status_str = f" → **{status}**" if status else ""
+            lines.append(f"- [{action.get('action','')}] `{action.get('url','')}` — {action.get('reason','')}{status_str}")
+
+        if result.gsc_insights:
+            lines += ["", "---", "", "## 9b. GSC Performance Signals"]
+            high = [i for i in result.gsc_insights if i.get("severity") == "High"]
+            med  = [i for i in result.gsc_insights if i.get("severity") == "Medium"]
+            if high:
+                lines.append(f"**{len(high)} High-severity signal(s):**")
+                for insight in high[:5]:
+                    lines.append(f"- [{insight['type'].upper()}] `{insight['page']}`")
+                    lines.append(f"  > {insight.get('recommendation', '')}")
+            if med:
+                lines.append(f"\n**{len(med)} Medium-severity signal(s):**")
+                for insight in med[:5]:
+                    lines.append(f"- [{insight['type'].upper()}] `{insight['page']}`")
+                    lines.append(f"  > {insight.get('recommendation', '')}")
 
         if result.risks_and_missed:
             lines += ["", "---", "", "## 10. Risks / Missed Opportunities"]
