@@ -801,6 +801,69 @@ class AuditEngine:
                 )
             )
 
+        if page.hreflang_missing_self_ref:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="international",
+                    url=page.url,
+                    title="hreflang annotations missing self-referencing entry",
+                    description=(
+                        "The page declares hreflang alternate links but does not include a self-referencing "
+                        "entry pointing back to its own URL. Google requires that every URL in a hreflang "
+                        "set references itself — without the self-reference the annotation set may be ignored."
+                    ),
+                    fix_instructions=(
+                        "Add a <link rel='alternate' hreflang='[lang]' href='[this-page-url]'> entry "
+                        "to the hreflang block on this page, where [lang] is the language code for this "
+                        "version and [this-page-url] is the canonical URL of this page."
+                    ),
+                    impact_score=64.0,
+                )
+            )
+
+        if page.hreflang_relative_urls > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="international",
+                    url=page.url,
+                    title=f"hreflang tags use relative URLs ({page.hreflang_relative_urls} links)",
+                    description=(
+                        f"{page.hreflang_relative_urls} hreflang <link> tag(s) on this page use relative "
+                        "href values instead of fully-qualified absolute URLs. Google requires absolute URLs "
+                        "with protocol in hreflang annotations — relative paths may resolve incorrectly "
+                        "across mirrors or staging environments."
+                    ),
+                    fix_instructions=(
+                        "Replace all relative hreflang hrefs with absolute URLs including protocol and host, "
+                        "e.g. change href='/de/page' to href='https://example.com/de/page'."
+                    ),
+                    impact_score=47.0,
+                )
+            )
+
+        if page.geo_meta_tags > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="international",
+                    url=page.url,
+                    title=f"Geotargeting meta tags detected ({page.geo_meta_tags} tags ignored by Google)",
+                    description=(
+                        f"The page contains {page.geo_meta_tags} geotargeting meta tag(s) such as "
+                        "geo.position, geo.region, ICBM, or distribution. "
+                        "Google explicitly ignores these tags — they add HTML weight with no SEO benefit."
+                    ),
+                    fix_instructions=(
+                        "Remove geo.position, geo.region, geo.placename, ICBM, and distribution meta tags. "
+                        "Use hreflang annotations or country-code domains/subdirectories to signal "
+                        "geo-targeting to Google instead."
+                    ),
+                    impact_score=28.0,
+                )
+            )
+
         if page.non_crawlable_href_links > 0:
             issues.append(
                 AuditIssue(

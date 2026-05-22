@@ -81,6 +81,10 @@ class PageSnapshot(SerializableMixin):
     images_with_data_src: int = 0
     schema_has_article_date: bool = False
     schema_parse_errors: int = 0
+    hreflang_link_count: int = 0
+    hreflang_missing_self_ref: bool = False
+    hreflang_relative_urls: int = 0
+    geo_meta_tags: int = 0
 
 
 @dataclass

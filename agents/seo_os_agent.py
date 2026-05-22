@@ -274,7 +274,7 @@ class SEOOSAgent:
         snapshot.audit_issues = audit_issues  # type: ignore[attr-defined]
         _SEVERITY_PRIORITY = {"Critical": 1, "High": 2, "Medium": 3, "Low": 4}
         result: list[dict] = []
-        for issue in audit_issues:
+        for issue in audit_issues[:30]:  # cap at top 30 by impact_score (AuditEngine already sorts)
             requires_dev = issue.severity in ("Critical", "High")
             result.append({
                 "category": issue.category,
@@ -708,6 +708,14 @@ class SEOOSAgent:
             lines += ["", "---", "", "## 3. REQUIRES DEV REVIEW"]
             for item in result.dev_review_items:
                 lines.append(f"- **{item.get('title','')}** — `{item.get('page_url','')}` — {item.get('dev_note','')}")
+
+        critical_high = [i for i in result.dev_review_items if i.get("severity") in ("Critical", "High")]
+        if critical_high:
+            lines += ["", "---", "", "## 3b. Critical / High Technical SEO Issues"]
+            for issue in critical_high[:8]:
+                fix = issue.get("fix_instructions", "")
+                lines.append(f"- [{issue['severity'].upper()}] **{issue.get('title','')}** — `{issue.get('page_url','')}`")
+                lines.append(f"  > {fix[:120]}{'…' if len(fix) > 120 else ''}")
 
         lines += ["", "---", "", "## 4. Keyword Opportunities (Top 10)"]
         for kw in result.keyword_opportunities[:10]:

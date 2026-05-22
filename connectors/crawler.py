@@ -31,11 +31,18 @@ _NON_INDEXABLE_EXTENSIONS = {
 }
 
 
+_GEO_META_NAMES = frozenset({
+    "geo.position", "geo.region", "geo.placename", "icbm",
+    "distribution", "geo.country",
+})
+
+
 class SEOHTMLParser(HTMLParser):
     """Extracts SEO-relevant HTML features without external parser dependencies."""
 
-    def __init__(self) -> None:
+    def __init__(self, page_url: str = "") -> None:
         super().__init__(convert_charrefs=True)
+        self._page_url = page_url.rstrip("/")
         self.title = ""
         self.meta_description = ""
         self.canonical = ""
@@ -60,6 +67,10 @@ class SEOHTMLParser(HTMLParser):
         self.images_with_data_src = 0
         self.schema_has_article_date = False
         self.schema_parse_errors = 0
+        self.hreflang_link_count = 0
+        self.hreflang_relative_urls = 0
+        self.geo_meta_tags = 0
+        self._hreflang_has_self_ref = False
 
         self._capture_title = False
         self._capture_heading = ""
@@ -88,6 +99,8 @@ class SEOHTMLParser(HTMLParser):
                 self.meta_robots = attr_map.get("content", "").strip()
             if meta_name == "viewport":
                 self.has_viewport_meta = True
+            if meta_name in _GEO_META_NAMES:
+                self.geo_meta_tags += 1
         elif tag_lower == "link":
             rel = attr_map.get("rel", "").lower()
             if "canonical" in rel:
@@ -96,6 +109,13 @@ class SEOHTMLParser(HTMLParser):
                 self.stylesheet_count += 1
             if "icon" in rel.split():
                 self.has_favicon = True
+            if "alternate" in rel.split() and attr_map.get("hreflang"):
+                href = attr_map.get("href", "").strip()
+                self.hreflang_link_count += 1
+                if not href.startswith(("http://", "https://")):
+                    self.hreflang_relative_urls += 1
+                if self._page_url and href.rstrip("/") == self._page_url:
+                    self._hreflang_has_self_ref = True
         elif tag_lower == "a":
             href = attr_map.get("href", "").strip()
             if href.lower().startswith(("javascript:", "void(")):
@@ -258,7 +278,7 @@ class SiteCrawler:
             if "html" not in content_type.lower():
                 continue
 
-            parser = SEOHTMLParser()
+            parser = SEOHTMLParser(page_url=url)
             parser.feed(response.text)
 
             internal_links: list[str] = []
@@ -309,6 +329,10 @@ class SiteCrawler:
                     images_with_data_src=parser.images_with_data_src,
                     schema_has_article_date=parser.schema_has_article_date,
                     schema_parse_errors=parser.schema_parse_errors,
+                    hreflang_link_count=parser.hreflang_link_count,
+                    hreflang_missing_self_ref=parser.hreflang_link_count > 0 and not parser._hreflang_has_self_ref,
+                    hreflang_relative_urls=parser.hreflang_relative_urls,
+                    geo_meta_tags=parser.geo_meta_tags,
                 )
             )
 
