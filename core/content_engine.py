@@ -9,6 +9,20 @@ from utils.stage_messaging import STAGES, STAGE_CTA, STAGE_BEFORE_AFTER
 from utils.text import slugify, title_case_keyword
 
 
+import re as _re
+
+
+def _strip_formatting(text: str) -> str:
+    """Remove em-dashes and asterisk bold/italic markup from blog body copy."""
+    # Em-dash → comma or colon depending on context; simple replacement to comma+space
+    text = text.replace("—", ",")   # — (em-dash)
+    text = text.replace(" -- ", ", ")   # double-hyphen em-dash variant
+    # Strip **bold** and *italic* markers (keep the text, remove the asterisks)
+    text = _re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    text = _re.sub(r"\*(.+?)\*", r"\1", text)
+    return text
+
+
 _EXTRA_FAQS: list[tuple[str, str]] = [
     (
         "How long does implementation take?",
@@ -103,10 +117,10 @@ class ContentEngine:
             asset.uniqueness_score = 0.0
             return asset
 
-        # Attach hreflang + CTA variants (cross-cutting concerns managed here)
-        stage = self._detect_stage(cluster.primary_keyword)
-        asset.cta_variants = self._cta_variants("blog_post", stage)
+        # One CTA per blog — cta_variants must be empty so the CMS renders no extra buttons
+        asset.cta_variants = []
         asset.hreflang_hints = self._hreflang_hints(asset.slug)
+        asset.body_markdown = _strip_formatting(asset.body_markdown)
         return asset
 
     def generate_comparison_page(self, cluster: KeywordCluster) -> ContentAsset:
@@ -115,9 +129,9 @@ class ContentEngine:
             self.logger.warning("Near-duplicate detected — suppressing comparison: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
-        stage = self._detect_stage(cluster.primary_keyword)
-        asset.cta_variants = self._cta_variants("comparison_page", stage)
+        asset.cta_variants = []
         asset.hreflang_hints = self._hreflang_hints(asset.slug)
+        asset.body_markdown = _strip_formatting(asset.body_markdown)
         return asset
 
     def generate_use_case_page(self, cluster: KeywordCluster) -> ContentAsset:
@@ -126,9 +140,9 @@ class ContentEngine:
             self.logger.warning("Near-duplicate detected — suppressing use-case: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
-        stage = self._detect_stage(cluster.primary_keyword)
-        asset.cta_variants = self._cta_variants("use_case_page", stage)
+        asset.cta_variants = []
         asset.hreflang_hints = self._hreflang_hints(asset.slug)
+        asset.body_markdown = _strip_formatting(asset.body_markdown)
         return asset
 
     # ── Legacy template renderers — BLOCKED ───────────────────────────────────

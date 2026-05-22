@@ -17,11 +17,21 @@ Design principles
 
 from __future__ import annotations
 
+import re as _re
 from datetime import date as _date
 from typing import Any
 
 from utils.models import ContentAsset, KeywordCluster
 from utils.text import slugify, title_case_keyword
+
+
+def _strip_formatting(text: str) -> str:
+    """Remove em-dashes and asterisk bold/italic markup from blog body copy."""
+    text = text.replace("—", ",")
+    text = text.replace(" -- ", ", ")
+    text = _re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    text = _re.sub(r"\*(.+?)\*", r"\1", text)
+    return text
 
 # ── Word-count targets by difficulty band ─────────────────────────────────────
 _DIFFICULTY_WORD_TARGETS: list[tuple[tuple[float, float], int]] = [
@@ -74,7 +84,7 @@ class BlogContentEngine:
                 strategy["position"] or 0,
             )
 
-        body = self._render_blog_body(keyword, kw_title, cluster, strategy)
+        body = _strip_formatting(self._render_blog_body(keyword, kw_title, cluster, strategy))
         quality_score, quality_flags = self._quality_score(body, keyword, intent)
 
         if quality_score < _MIN_QUALITY_SCORE:
@@ -117,7 +127,7 @@ class BlogContentEngine:
         kw_title = title_case_keyword(keyword)
         slug = slugify(keyword)
         strategy = self._build_strategy(cluster, gsc_row)
-        body = self._render_comparison_body(keyword, kw_title, cluster, strategy)
+        body = _strip_formatting(self._render_comparison_body(keyword, kw_title, cluster, strategy))
         quality_score, _ = self._quality_score(body, keyword, "commercial")
 
         if quality_score < _MIN_QUALITY_SCORE:
@@ -161,7 +171,7 @@ class BlogContentEngine:
         kw_title = title_case_keyword(keyword)
         slug = slugify(keyword)
         strategy = self._build_strategy(cluster, gsc_row)
-        body = self._render_use_case_body(keyword, kw_title, cluster, strategy)
+        body = _strip_formatting(self._render_use_case_body(keyword, kw_title, cluster, strategy))
         quality_score, _ = self._quality_score(body, keyword, "informational")
 
         if quality_score < _MIN_QUALITY_SCORE:
