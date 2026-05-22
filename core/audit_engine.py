@@ -746,6 +746,30 @@ class AuditEngine:
                 )
             )
 
+        if page.page_size_bytes > 100_000:
+            size_kb = page.page_size_bytes // 1024
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="crawl_efficiency",
+                    url=page.url,
+                    title=f"Large HTML page ({size_kb} KB) — crawl budget drain",
+                    description=(
+                        f"The HTML response for this page is {size_kb} KB. "
+                        "Google's crawlers are limited by bandwidth and time per crawl session — "
+                        "oversized HTML consumes disproportionate crawl budget per URL and slows "
+                        "Googlebot's ability to discover and index other pages on the site."
+                    ),
+                    fix_instructions=(
+                        "Reduce HTML payload: remove inline scripts and styles (move to external files), "
+                        "avoid embedding large data blobs or base64 images in HTML, "
+                        "enable server-side gzip/Brotli compression, and trim unnecessary markup. "
+                        "Target under 100 KB for the raw HTML response."
+                    ),
+                    impact_score=54.0,
+                )
+            )
+
         if page.redirect_hops >= 2:
             issues.append(
                 AuditIssue(

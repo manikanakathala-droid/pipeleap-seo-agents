@@ -75,6 +75,7 @@ class PageSnapshot(SerializableMixin):
     stylesheet_count: int = 0
     has_viewport_meta: bool = False
     redirect_hops: int = 0
+    page_size_bytes: int = 0
 
 
 @dataclass

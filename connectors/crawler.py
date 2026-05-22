@@ -229,6 +229,7 @@ class SiteCrawler:
                 response = self.session.get(url, timeout=10)
                 response_time_ms = int(response.elapsed.total_seconds() * 1000)
                 redirect_hops = len(response.history)
+                page_size_bytes = len(response.content)
                 if response.status_code >= 500:
                     self.logger.warning("HTTP 5xx error at %s. Slowing down crawl to avoid overloading server.", url)
                     time.sleep(5)
@@ -285,6 +286,7 @@ class SiteCrawler:
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,
                     redirect_hops=redirect_hops,
+                    page_size_bytes=page_size_bytes,
                 )
             )
 
