@@ -34,6 +34,34 @@ class AuditEngine:
             )
             return issues
 
+        _current_agents: list[str] = []
+        for _line in crawl_report.robots_rules:
+            _lower = _line.lower().strip()
+            if _lower.startswith("user-agent:"):
+                _agent = _lower.split(":", 1)[1].strip()
+                _current_agents.append(_agent)
+            elif _lower == "disallow: /" and ("*" in _current_agents or "googlebot" in _current_agents):
+                issues.append(
+                    AuditIssue(
+                        severity="Critical",
+                        category="robots",
+                        url=f"{crawl_report.site_url.rstrip('/')}/robots.txt",
+                        title="robots.txt blocks all Googlebot crawling (Disallow: /)",
+                        description=(
+                            "The robots.txt file contains 'Disallow: /' under User-agent: * or User-agent: Googlebot, "
+                            "which prevents Googlebot from crawling any page on the site. "
+                            "This will remove all pages from Google's index over time."
+                        ),
+                        fix_instructions=(
+                            "Remove or narrow the 'Disallow: /' rule. To allow all crawling: "
+                            "'Allow: /'. To block only specific paths: 'Disallow: /admin/' "
+                            "rather than blocking the entire site."
+                        ),
+                        impact_score=91.0,
+                    )
+                )
+                break
+
         if not crawl_report.robots_txt_present:
             issues.append(
                 AuditIssue(
@@ -491,6 +519,63 @@ class AuditEngine:
                     impact_score=55.0,
                 )
             )
+        elif page.canonical and not page.canonical.startswith(("http://", "https://")):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="canonical",
+                    url=page.url,
+                    title="Canonical URL is a relative path",
+                    description=(
+                        f"The canonical tag value '{page.canonical}' is a relative URL. "
+                        "Google supports relative canonicals but they risk resolving incorrectly "
+                        "on staging or mirror domains, potentially canonicalising to the wrong host."
+                    ),
+                    fix_instructions=(
+                        "Replace the relative canonical with a fully-qualified absolute URL, "
+                        f"e.g. <link rel=\"canonical\" href=\"{page.url}\">."
+                    ),
+                    impact_score=46.0,
+                )
+            )
+        elif page.canonical.startswith("http://") and page.url.startswith("https://"):
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="canonical",
+                    url=page.url,
+                    title="Canonical points to HTTP while page is served over HTTPS",
+                    description=(
+                        f"The page is served over HTTPS but its canonical tag points to the HTTP version "
+                        f"('{page.canonical}'). Google prefers HTTPS as canonical — an HTTP canonical "
+                        "overrides that preference and may cause the HTTP version to be indexed instead."
+                    ),
+                    fix_instructions=(
+                        "Update the canonical tag to reference the HTTPS URL: "
+                        f"<link rel=\"canonical\" href=\"{page.url}\">."
+                    ),
+                    impact_score=61.0,
+                )
+            )
+        if page.canonical and "#" in page.canonical:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="canonical",
+                    url=page.url,
+                    title="Canonical URL contains a URL fragment (#)",
+                    description=(
+                        f"The canonical tag value '{page.canonical}' contains a # fragment. "
+                        "Google does not support URL fragments in canonical tags — the fragment is ignored, "
+                        "which may cause the wrong URL to be treated as canonical."
+                    ),
+                    fix_instructions=(
+                        "Remove the fragment from the canonical URL. Canonical tags should reference "
+                        "the base URL without any # anchor, e.g. strip '#section' from the href."
+                    ),
+                    impact_score=44.0,
+                )
+            )
 
         if not page.has_viewport_meta:
             issues.append(
@@ -623,6 +708,54 @@ class AuditEngine:
                         "Audit scripts with the URL Inspection tool in Search Console to verify Googlebot renders the full page."
                     ),
                     impact_score=59.0,
+                )
+            )
+
+        if page.non_crawlable_href_links > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="internal_linking",
+                    url=page.url,
+                    title=f"Non-crawlable navigation links ({page.non_crawlable_href_links} links use javascript: or void())",
+                    description=(
+                        f"{page.non_crawlable_href_links} link(s) on this page use href='javascript:...' or "
+                        "href='void(...)'. Googlebot requires <a href='...'> with a real URL to follow a link — "
+                        "JavaScript-protocol hrefs are never crawled, so any pages reachable only through "
+                        "these links will not be discovered or indexed."
+                    ),
+                    fix_instructions=(
+                        "Replace javascript: and void() hrefs with real URL paths. "
+                        "If the link triggers an action, use a <button> element for the action and a "
+                        "separate <a href='/path'> for any page navigation. "
+                        "For SPA routing, use the History API (pushState) with real URL paths."
+                    ),
+                    impact_score=47.0,
+                )
+            )
+
+        if page.images_with_data_src > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="lazy_loading",
+                    url=page.url,
+                    title=f"Images using custom data-src lazy-loading ({page.images_with_data_src} images)",
+                    description=(
+                        f"{page.images_with_data_src} image(s) on this page have a data-src attribute but no "
+                        "real src attribute. Custom JavaScript lazy-loaders that swap data-src → src on scroll "
+                        "are invisible to Googlebot, which does not interact with pages. "
+                        "These images will not appear in Google Image Search and their alt text "
+                        "won't contribute to page relevance signals."
+                    ),
+                    fix_instructions=(
+                        "Use the browser-native lazy-loading attribute instead: "
+                        "<img src='image.jpg' loading='lazy' alt='...'> — this keeps a real src attribute "
+                        "so Googlebot can discover the image, while modern browsers defer loading until "
+                        "the image enters the viewport. Alternatively use the IntersectionObserver API "
+                        "with a valid src fallback."
+                    ),
+                    impact_score=58.0,
                 )
             )
 

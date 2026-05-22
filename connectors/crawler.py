@@ -55,6 +55,8 @@ class SEOHTMLParser(HTMLParser):
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
+        self.non_crawlable_href_links = 0
+        self.images_with_data_src = 0
 
         self._capture_title = False
         self._capture_heading = ""
@@ -91,7 +93,9 @@ class SEOHTMLParser(HTMLParser):
                 self.stylesheet_count += 1
         elif tag_lower == "a":
             href = attr_map.get("href", "").strip()
-            if href:
+            if href.lower().startswith(("javascript:", "void(")):
+                self.non_crawlable_href_links += 1
+            elif href:
                 self.links.append(href)
                 self._pending_anchor_href = href
                 self._anchor_text_buffer = []
@@ -111,6 +115,9 @@ class SEOHTMLParser(HTMLParser):
             alt = attr_map.get("alt", "").strip()
             if not alt:
                 self.images_without_alt += 1
+            src = attr_map.get("src", "").strip()
+            if "data-src" in attr_map and (not src or src.startswith("data:")):
+                self.images_with_data_src += 1
             if self._pending_anchor_href and alt:
                 self._anchor_has_text = True
         elif tag_lower == "script":
@@ -287,6 +294,8 @@ class SiteCrawler:
                     has_viewport_meta=parser.has_viewport_meta,
                     redirect_hops=redirect_hops,
                     page_size_bytes=page_size_bytes,
+                    non_crawlable_href_links=parser.non_crawlable_href_links,
+                    images_with_data_src=parser.images_with_data_src,
                 )
             )
 
