@@ -55,8 +55,11 @@ class SEOHTMLParser(HTMLParser):
         self.script_count = 0
         self.stylesheet_count = 0
         self.has_viewport_meta = False
+        self.has_favicon = False
         self.non_crawlable_href_links = 0
         self.images_with_data_src = 0
+        self.schema_has_article_date = False
+        self.schema_parse_errors = 0
 
         self._capture_title = False
         self._capture_heading = ""
@@ -91,6 +94,8 @@ class SEOHTMLParser(HTMLParser):
                 self.canonical = attr_map.get("href", "").strip()
             if "stylesheet" in rel:
                 self.stylesheet_count += 1
+            if "icon" in rel.split():
+                self.has_favicon = True
         elif tag_lower == "a":
             href = attr_map.get("href", "").strip()
             if href.lower().startswith(("javascript:", "void(")):
@@ -180,10 +185,13 @@ class SEOHTMLParser(HTMLParser):
         elif self._skip_text_depth == 0:
             self.text_chunks.append(stripped)
 
+    _ARTICLE_DATE_KEYS = frozenset({"datePublished", "dateModified"})
+
     def _extract_schema_types(self, raw_json: str) -> None:
         try:
             payload = json.loads(raw_json)
         except Exception:
+            self.schema_parse_errors += 1
             return
 
         def collect_types(node: Any) -> None:
@@ -193,6 +201,8 @@ class SEOHTMLParser(HTMLParser):
                     self.schema_types.append(schema_type)
                 elif isinstance(schema_type, list):
                     self.schema_types.extend(item for item in schema_type if isinstance(item, str))
+                if self._ARTICLE_DATE_KEYS & node.keys():
+                    self.schema_has_article_date = True
                 for value in node.values():
                     collect_types(value)
             elif isinstance(node, list):
@@ -292,10 +302,13 @@ class SiteCrawler:
                     script_count=parser.script_count,
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,
+                    has_favicon=parser.has_favicon,
                     redirect_hops=redirect_hops,
                     page_size_bytes=page_size_bytes,
                     non_crawlable_href_links=parser.non_crawlable_href_links,
                     images_with_data_src=parser.images_with_data_src,
+                    schema_has_article_date=parser.schema_has_article_date,
+                    schema_parse_errors=parser.schema_parse_errors,
                 )
             )
 

@@ -74,10 +74,13 @@ class PageSnapshot(SerializableMixin):
     script_count: int = 0
     stylesheet_count: int = 0
     has_viewport_meta: bool = False
+    has_favicon: bool = False
     redirect_hops: int = 0
     page_size_bytes: int = 0
     non_crawlable_href_links: int = 0
     images_with_data_src: int = 0
+    schema_has_article_date: bool = False
+    schema_parse_errors: int = 0
 
 
 @dataclass

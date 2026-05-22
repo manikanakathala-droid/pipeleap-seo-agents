@@ -280,6 +280,50 @@ class AuditEngine:
                 )
             )
 
+        if not any(p.has_favicon for p in pages):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="branding",
+                    url=crawl_report.site_url,
+                    title="No favicon detected on any crawled page",
+                    description=(
+                        "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. "
+                        "Google displays the site favicon next to search results — a missing favicon "
+                        "means Google falls back to a generic globe icon, reducing brand recognition in SERPs."
+                    ),
+                    fix_instructions=(
+                        "Add <link rel='icon' href='/favicon.ico'> in the <head> of every page. "
+                        "Use a square image at least 48x48px. Ensure the favicon file is not blocked by robots.txt "
+                        "so Googlebot-Image can crawl it."
+                    ),
+                    impact_score=38.0,
+                )
+            )
+
+        if not any("WebSite" in p.schema_types for p in pages):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="structured_data",
+                    url=crawl_report.site_url,
+                    title="No WebSite structured data detected",
+                    description=(
+                        "No WebSite JSON-LD schema was found across crawled pages. "
+                        "Google uses WebSite structured data (with name and url properties) to determine "
+                        "the preferred site name shown in search results. Without it, Google may display "
+                        "an inaccurate or sub-optimal site name."
+                    ),
+                    fix_instructions=(
+                        "Add WebSite JSON-LD to the homepage only:\n"
+                        '{"@context":"https://schema.org","@type":"WebSite",'
+                        '"name":"Pipeleap","url":"https://pipeleap.com"}\n'
+                        "Only one WebSite schema per domain is supported."
+                    ),
+                    impact_score=36.0,
+                )
+            )
+
         if crawl_report.sitemap_urls and crawl_report.sitemap_urls_without_lastmod == len(crawl_report.sitemap_urls):
             issues.append(
                 AuditIssue(
@@ -669,6 +713,52 @@ class AuditEngine:
                     description="The page uses H2–H4 headings but has no H1. AI agents and screen readers rely on a logical heading tree starting at H1.",
                     fix_instructions="Add a single H1 that declares the primary topic. Subordinate headings should follow as H2 → H3.",
                     impact_score=58.0,
+                )
+            )
+
+        _ARTICLE_SCHEMA_TYPES = {"Article", "NewsArticle", "BlogPosting", "TechArticle", "ScholarlyArticle", "Report"}
+        if any(t in _ARTICLE_SCHEMA_TYPES for t in page.schema_types) and not page.schema_has_article_date:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="structured_data",
+                    url=page.url,
+                    title="Article schema missing datePublished / dateModified",
+                    description=(
+                        "The page declares an Article (or NewsArticle/BlogPosting) schema type but the JSON-LD "
+                        "contains no datePublished or dateModified property. "
+                        "Google uses these dates to display byline dates in search results and to determine "
+                        "content freshness — missing dates may cause Google to infer an incorrect publication date."
+                    ),
+                    fix_instructions=(
+                        "Add datePublished and dateModified to the Article JSON-LD in ISO 8601 format with timezone: "
+                        '"datePublished": "2024-06-01T09:00:00+00:00", '
+                        '"dateModified": "2024-06-15T12:00:00+00:00". '
+                        "Ensure the dates match the visible date shown on the page."
+                    ),
+                    impact_score=62.0,
+                )
+            )
+
+        if page.schema_parse_errors > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="structured_data",
+                    url=page.url,
+                    title=f"Malformed JSON-LD detected ({page.schema_parse_errors} block(s) failed to parse)",
+                    description=(
+                        f"{page.schema_parse_errors} <script type='application/ld+json'> block(s) on this page "
+                        "contain invalid JSON that could not be parsed. Google cannot process malformed structured "
+                        "data — the page loses any rich result eligibility those blocks were intended to provide."
+                    ),
+                    fix_instructions=(
+                        "Validate all JSON-LD blocks using the Schema Markup Validator at "
+                        "https://validator.schema.org or the Rich Results Test. "
+                        "Common errors: unescaped quotes inside string values, trailing commas, "
+                        "or invalid Unicode characters. Fix syntax errors and retest."
+                    ),
+                    impact_score=45.0,
                 )
             )
 
