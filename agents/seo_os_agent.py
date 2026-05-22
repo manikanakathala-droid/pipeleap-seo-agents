@@ -188,6 +188,15 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("GSC audit skipped: %s", exc)
 
+        # ── Step 4c: GA4 Analytics Audit ─────────────────────────────────────
+        self.logger.info("Step 4c: GA4 analytics audit")
+        try:
+            ga4_insights = self._run_ga4_audit()
+            result.gsc_insights.extend(ga4_insights)
+            self._write_json(output_dir / "ga4_insights.json", ga4_insights)
+        except Exception as exc:
+            self.logger.warning("GA4 audit skipped: %s", exc)
+
         # ── Step 5: Keyword Engine ────────────────────────────────────────────
         self.logger.info("Step 5: Keyword engine")
         try:
@@ -526,6 +535,59 @@ class SEOOSAgent:
             })
 
         return insights
+
+    def _run_ga4_audit(self) -> list[dict]:
+        from connectors.ga4_connector import GA4Connector
+        ga4 = GA4Connector(self.config, self.logger)
+        if not ga4.is_connected():
+            return []
+
+        insights: list[dict] = []
+
+        # High-bounce pages — engaged session rate < 20% and >= 100 sessions
+        pages = ga4.fetch_top_pages(start_date="28daysAgo", end_date="today", limit=50)
+        for page in pages:
+            sessions = page.get("sessions", 0)
+            bounce   = page.get("bounce_rate", 0.0)
+            if sessions >= 100 and bounce > 0.80:
+                insights.append({
+                    "source": "GA4",
+                    "type": "high_bounce_rate",
+                    "severity": "High" if bounce > 0.90 else "Medium",
+                    "page": page["page_path"],
+                    "sessions": sessions,
+                    "bounce_rate_pct": round(bounce * 100, 1),
+                    "recommendation": (
+                        f"Bounce rate is {round(bounce*100,1)}% on {sessions} sessions. "
+                        "Users are leaving without engaging. Audit page intent match, "
+                        "CTA placement, and load speed."
+                    ),
+                })
+
+        # Channel summary — flag if Organic Search < 20% of total sessions
+        channels = ga4.fetch_channel_summary(start_date="28daysAgo", end_date="today")
+        total_sessions = sum(c.get("sessions", 0) for c in channels)
+        organic = next((c for c in channels if "organic" in c.get("channel", "").lower()), {})
+        organic_sessions = organic.get("sessions", 0)
+        if total_sessions > 0:
+            organic_pct = round(organic_sessions / total_sessions * 100, 1)
+            if organic_pct < 20:
+                insights.append({
+                    "source": "GA4",
+                    "type": "low_organic_share",
+                    "severity": "High" if organic_pct < 10 else "Medium",
+                    "organic_sessions": organic_sessions,
+                    "total_sessions": total_sessions,
+                    "organic_pct": organic_pct,
+                    "recommendation": (
+                        f"Organic Search is only {organic_pct}% of traffic ({organic_sessions}/{total_sessions} sessions). "
+                        "SEO investment is under-delivering. Prioritise content velocity and technical fixes."
+                    ),
+                })
+
+        insights.sort(key=lambda x: 0 if x.get("severity") == "High" else 1)
+        self.logger.info("GA4 audit: %d insights", len(insights))
+        return insights[:15]
 
     def _run_gsc_performance_audit(self) -> list[dict]:
         from connectors.gsc_connector import GoogleSearchConsoleConnector

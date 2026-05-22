@@ -1,0 +1,53 @@
+site:
+  brand: Pipeleap
+  site_url: https://pipeleap.com
+  domain: pipeleap.com
+  cta:
+    primary_label: Book a demo
+    secondary_label: See how it works
+    primary_url: https://pipeleap.com/
+    secondary_url: https://pipeleap.com/
+
+execution:
+  crawl_enabled: true
+  max_pages: 40
+  max_depth: 3
+  output_dir: outputs
+  log_level: INFO
+  use_renderer: true          # Playwright soft-404 + interstitial detection
+
+integrations:
+  gsc:
+    # GSC property — use sc-domain: format for domain-level property
+    site_url: sc-domain:pipeleap.com
+    # Path to your GCP service account JSON key file
+    credentials_path: credentials/gsc_service_account.json
+    # OR paste the full JSON as an env var: GSC_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+    data_export_path: ""
+
+  analytics:
+    # GA4 property ID — find it in GA4 Admin > Property Settings (format: "properties/XXXXXXXXX")
+    ga4_property_id: ""
+    # Same service account works if it has Viewer access on GA4 property
+    credentials_path: credentials/gsc_service_account.json
+
+  pagespeed:
+    # Free API key: https://developers.google.com/speed/docs/insights/v5/get-started
+    api_key: ""
+
+  cms:
+    mode: filesystem
+    publish_dir: published
+    webhook_url: ""
+
+seo:
+  allow_estimated_keyword_metrics: true
+  seed_keywords: {}
+  topic_map: {}
+  semantic_expansions: {}
+  conversion_pages: []
+  competitors: []
+
+schedule:
+  continuous: false
+  interval_minutes: 1440
