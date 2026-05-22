@@ -252,6 +252,50 @@ class AuditEngine:
                 )
             )
 
+        if crawl_report.sitemap_video_missing_required_tags > 0:
+            issues.append(
+                AuditIssue(
+                    severity="High",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Video sitemap entries missing required tags ({crawl_report.sitemap_video_missing_required_tags} entries)",
+                    description=(
+                        f"{crawl_report.sitemap_video_missing_required_tags} <video:video> entry/entries are missing "
+                        "one or more required tags. Google requires <video:thumbnail_loc>, <video:title>, "
+                        "<video:description>, and at least one of <video:content_loc> or <video:player_loc> on "
+                        "every video entry — incomplete entries may be rejected from video search results."
+                    ),
+                    fix_instructions=(
+                        "Ensure every <video:video> element contains: <video:thumbnail_loc> (absolute URL to thumbnail), "
+                        "<video:title> (video title, HTML-escaped), <video:description> (max 2048 chars), and either "
+                        "<video:content_loc> (direct video file URL) or <video:player_loc> (embed player URL). "
+                        "For YouTube/Vimeo embeds use <video:player_loc> with the embed URL."
+                    ),
+                    impact_score=74.0,
+                )
+            )
+
+        if crawl_report.sitemap_video_deprecated_tag_count > 0:
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="sitemap",
+                    url=f"{crawl_report.site_url.rstrip('/')}/sitemap.xml",
+                    title=f"Deprecated video sitemap tags in use ({crawl_report.sitemap_video_deprecated_tag_count} occurrences)",
+                    description=(
+                        f"The sitemap uses {crawl_report.sitemap_video_deprecated_tag_count} deprecated video tag(s) "
+                        "(<video:category>, <video:gallery_loc>, <video:price>, or <video:tvshow>). "
+                        "Google removed these tags in May 2022 — they are ignored and add unnecessary sitemap weight."
+                    ),
+                    fix_instructions=(
+                        "Remove all <video:category>, <video:gallery_loc>, <video:price>, and <video:tvshow> tags "
+                        "from the video sitemap. Also remove the autoplay and allow_embed attributes from "
+                        "<video:player_loc> if present."
+                    ),
+                    impact_score=31.0,
+                )
+            )
+
         if not self.pagespeed_config.get("api_key"):
             issues.append(
                 AuditIssue(

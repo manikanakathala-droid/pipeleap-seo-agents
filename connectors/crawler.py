@@ -217,7 +217,7 @@ class SiteCrawler:
         visited: set[str] = set()
         queue: deque[tuple[str, int]] = deque([(self._normalize_url(site_url), 0)])
 
-        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags = self._fetch_site_controls(site_root)
+        robots_present, robots_rules, sitemap_urls, sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count = self._fetch_site_controls(site_root)
 
         while queue and len(pages) < max_pages:
             url, depth = queue.popleft()
@@ -300,11 +300,14 @@ class SiteCrawler:
             sitemap_news_article_count=sitemap_news_article_count,
             sitemap_news_stale_article_count=sitemap_news_stale_article_count,
             sitemap_news_missing_required_tags=sitemap_news_missing_required_tags,
+            sitemap_video_count=sitemap_video_count,
+            sitemap_video_missing_required_tags=sitemap_video_missing_required_tags,
+            sitemap_video_deprecated_tag_count=sitemap_video_deprecated_tag_count,
             crawl_errors=crawl_errors,
             discovered_at=datetime.now(timezone.utc).isoformat(),
         )
 
-    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int]:
+    def _fetch_site_controls(self, site_root: str) -> tuple[bool, list[str], list[str], int, bool, int, int, int, int, int, int, int, int, int]:
         robots_url = urljoin(site_root, "/robots.txt")
         robots_rules: list[str] = []
         sitemap_urls: list[str] = []
@@ -317,10 +320,15 @@ class SiteCrawler:
         sitemap_news_article_count = 0
         sitemap_news_stale_article_count = 0
         sitemap_news_missing_required_tags = 0
+        sitemap_video_count = 0
+        sitemap_video_missing_required_tags = 0
+        sitemap_video_deprecated_tag_count = 0
 
         _IMAGE_NS = "http://www.google.com/schemas/sitemap-image/1.1"
         _DEPRECATED_IMAGE_TAGS = {"caption", "geo_location", "title", "license"}
         _NEWS_NS = "http://www.google.com/schemas/sitemap-news/0.9"
+        _VIDEO_NS = "http://www.google.com/schemas/sitemap-video/1.1"
+        _DEPRECATED_VIDEO_TAGS = {"category", "gallery_loc", "price", "tvshow"}
 
         try:
             response = self.session.get(robots_url, timeout=10)
@@ -411,10 +419,28 @@ class SiteCrawler:
                                     sitemap_news_stale_article_count += 1
                             except Exception:
                                 pass
+                    video_video_tag = f"{{{_VIDEO_NS}}}video"
+                    video_required = {
+                        f"{{{_VIDEO_NS}}}thumbnail_loc",
+                        f"{{{_VIDEO_NS}}}title",
+                        f"{{{_VIDEO_NS}}}description",
+                    }
+                    video_loc_tags = {f"{{{_VIDEO_NS}}}content_loc", f"{{{_VIDEO_NS}}}player_loc"}
+                    for url_elem in url_elems:
+                        for video_elem in url_elem.findall(video_video_tag):
+                            sitemap_video_count += 1
+                            child_tags = {child.tag for child in video_elem}
+                            missing = not video_required.issubset(child_tags) or not child_tags & video_loc_tags
+                            if missing:
+                                sitemap_video_missing_required_tags += 1
+                            for child in video_elem:
+                                local = child.tag.split("}")[-1] if "}" in child.tag else child.tag
+                                if child.tag.startswith(f"{{{_VIDEO_NS}}}") and local in _DEPRECATED_VIDEO_TAGS:
+                                    sitemap_video_deprecated_tag_count += 1
             except Exception:
                 continue
 
-        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags
+        return robots_present, robots_rules, sorted(set(discovered_urls)), sitemap_relative_url_count, sitemap_index_detected, sitemap_cross_host_child_count, sitemap_image_count, sitemap_deprecated_image_tag_count, sitemap_news_article_count, sitemap_news_stale_article_count, sitemap_news_missing_required_tags, sitemap_video_count, sitemap_video_missing_required_tags, sitemap_video_deprecated_tag_count
 
     @staticmethod
     def _normalize_url(url: str) -> str:
