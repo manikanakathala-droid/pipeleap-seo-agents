@@ -27,10 +27,10 @@ integrations:
 
   analytics:
     # GA4 property ID — find it in GA4 Admin > Property Settings (format: "properties/XXXXXXXXX")
-    ga4_property_id: ""
+    ga4_property_id: "properties/533951518"
     # Service account impersonation — bypasses Google's blocked-scope restriction on ADC default client
     # The SA must be added as a Viewer in GA4 Admin > Property Access Management
-    impersonate_sa: "pipeleap-seo-agent@pipeleap-seo-497103.iam.gserviceaccount.com"
+    impersonate_sa: "pipeleap-seo@n8n-xamplify.iam.gserviceaccount.com"
     credentials_path: ""
 
   pagespeed:
