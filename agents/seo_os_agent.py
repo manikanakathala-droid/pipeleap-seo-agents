@@ -278,6 +278,26 @@ class SEOOSAgent:
         crawl_report = getattr(snapshot, "crawl_report", None)
         if crawl_report is None:
             return []
+
+        # Optional Playwright rendering — enriches PageSnapshot before AuditEngine runs
+        if self.config.get("execution", {}).get("use_renderer", False):
+            try:
+                from connectors.renderer import PlaywrightRenderer
+                renderer = PlaywrightRenderer()
+                if renderer.available:
+                    urls = [p.url for p in crawl_report.pages[:10]]
+                    render_map = {r.url: r for r in renderer.render_pages(urls)}
+                    for page in crawl_report.pages:
+                        rr = render_map.get(page.url)
+                        if rr and not rr.error:
+                            page.is_soft_404 = rr.is_soft_404
+                            page.has_fullscreen_overlay = rr.has_fullscreen_overlay
+                    self.logger.info("Playwright renderer completed for %d pages", len(urls))
+                else:
+                    self.logger.info("Playwright not installed — skipping render scan")
+            except Exception as exc:
+                self.logger.warning("Renderer skipped: %s", exc)
+
         from core.audit_engine import AuditEngine
         engine = AuditEngine(self.config, self.logger)
         audit_issues = engine.run(crawl_report)

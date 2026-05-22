@@ -85,6 +85,9 @@ class PageSnapshot(SerializableMixin):
     hreflang_missing_self_ref: bool = False
     hreflang_relative_urls: int = 0
     geo_meta_tags: int = 0
+    vary_accept_language: bool = False
+    is_soft_404: bool = False
+    has_fullscreen_overlay: bool = False
 
 
 @dataclass

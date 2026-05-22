@@ -324,6 +324,37 @@ class AuditEngine:
                 )
             )
 
+        from urllib.parse import urlparse as _urlparse
+        _GENERIC_TLDS = {
+            ".com", ".net", ".org", ".io", ".co", ".app", ".dev", ".ai",
+            ".tech", ".online", ".site", ".store", ".shop", ".info", ".biz",
+        }
+        site_host = _urlparse(crawl_report.site_url).netloc.lower().lstrip("www.")
+        site_tld = "." + site_host.rsplit(".", 1)[-1] if "." in site_host else ""
+        site_is_cctld = site_tld not in _GENERIC_TLDS and len(site_tld) <= 3
+        if site_is_cctld and not any(p.hreflang_link_count > 0 for p in pages):
+            issues.append(
+                AuditIssue(
+                    severity="Low",
+                    category="international",
+                    url=crawl_report.site_url,
+                    title=f"ccTLD domain ({site_tld}) without hreflang annotations",
+                    description=(
+                        f"The site uses a country-code TLD ({site_tld}), which signals geo-targeting to Google. "
+                        "However, no hreflang annotations were detected on any crawled page. "
+                        "If the site has language or regional variants, hreflang is required to prevent "
+                        "duplicate content penalties and ensure the correct version appears in each market."
+                    ),
+                    fix_instructions=(
+                        "If the site targets only one country/language, no action needed — the ccTLD is sufficient. "
+                        "If you have language variants (e.g. English + local language), add "
+                        "<link rel='alternate' hreflang='[lang]' href='[url]'> to every page variant "
+                        "and ensure each page includes a self-referencing hreflang entry."
+                    ),
+                    impact_score=42.0,
+                )
+            )
+
         if crawl_report.sitemap_urls and crawl_report.sitemap_urls_without_lastmod == len(crawl_report.sitemap_urls):
             issues.append(
                 AuditIssue(
@@ -1029,6 +1060,74 @@ class AuditEngine:
                         "link the actual file from there."
                     ),
                     impact_score=33.0,
+                )
+            )
+
+        if page.is_soft_404:
+            issues.append(
+                AuditIssue(
+                    severity="High",
+                    category="indexing",
+                    url=page.url,
+                    title="Soft 404 — page returns 200 but renders error content",
+                    description=(
+                        "The page returns HTTP 200 (success) but the rendered content signals that the page "
+                        "does not exist or has an error. Google's algorithms detect this and exclude the page "
+                        "from search results. Users arriving from search see a broken experience."
+                    ),
+                    fix_instructions=(
+                        "If the content is genuinely gone: return a real 404 or 410 status code. "
+                        "If the page should exist: fix the server error causing the empty/error render. "
+                        "If the page moved: return a 301 redirect to the new URL. "
+                        "Use the URL Inspection tool in Search Console to verify the fix."
+                    ),
+                    impact_score=82.0,
+                )
+            )
+
+        if page.has_fullscreen_overlay:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="page_experience",
+                    url=page.url,
+                    title="Fullscreen overlay / interstitial detected",
+                    description=(
+                        "A large fixed or absolute-positioned element was detected covering most of the viewport "
+                        "on page load. Google penalises intrusive interstitials that obstruct content — "
+                        "they also make it harder for Googlebot to understand the page's main content."
+                    ),
+                    fix_instructions=(
+                        "Replace fullscreen overlays with smaller banners that take up a fraction of the screen. "
+                        "Age gates and legally required interstitials are exempt — use overlay-on-page rather than "
+                        "a separate gate page. Cookie consent banners should be slim and dismissible. "
+                        "Verify with the URL Inspection tool that Googlebot can see the main content."
+                    ),
+                    impact_score=67.0,
+                )
+            )
+
+        if page.vary_accept_language and page.hreflang_link_count == 0:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="international",
+                    url=page.url,
+                    title="Page serves different content by Accept-Language but has no hreflang annotations",
+                    description=(
+                        "The server sends a Vary: Accept-Language response header, indicating the page "
+                        "content changes based on the visitor's language preference. However, no hreflang "
+                        "alternate links are declared. Googlebot crawls without an Accept-Language header "
+                        "(originating from the US), so it may only ever see one language version — "
+                        "other language variants will be invisible to Google."
+                    ),
+                    fix_instructions=(
+                        "Either (a) switch to separate URLs per language and annotate with hreflang, or "
+                        "(b) ensure Googlebot can access all language versions by using geo-distributed "
+                        "crawling hints. The recommended approach is separate locale URLs: "
+                        "example.com/en/, example.com/de/, each with hreflang self-references and alternates."
+                    ),
+                    impact_score=61.0,
                 )
             )
 

@@ -267,6 +267,7 @@ class SiteCrawler:
                 response_time_ms = int(response.elapsed.total_seconds() * 1000)
                 redirect_hops = len(response.history)
                 page_size_bytes = len(response.content)
+                vary_accept_language = "accept-language" in response.headers.get("Vary", "").lower()
                 if response.status_code >= 500:
                     self.logger.warning("HTTP 5xx error at %s. Slowing down crawl to avoid overloading server.", url)
                     time.sleep(5)
@@ -323,6 +324,7 @@ class SiteCrawler:
                     stylesheet_count=parser.stylesheet_count,
                     has_viewport_meta=parser.has_viewport_meta,
                     has_favicon=parser.has_favicon,
+                    vary_accept_language=vary_accept_language,
                     redirect_hops=redirect_hops,
                     page_size_bytes=page_size_bytes,
                     non_crawlable_href_links=parser.non_crawlable_href_links,
