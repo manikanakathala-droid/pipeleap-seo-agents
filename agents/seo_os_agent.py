@@ -23,11 +23,8 @@ Runs in SAFE MODE: never modifies core website code.
 Output: structured JSON report + human-readable daily briefing
 """
 
-from __future__ import annotations
-
 import json
 import logging
-import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -267,17 +264,32 @@ class SEOOSAgent:
     # ── Step implementations ───────────────────────────────────────────────────
 
     def _run_technical_audit(self, snapshot: SiteSnapshot, diff: SiteDiff) -> list[dict]:
-        issues: list[dict] = []
-        for page in snapshot.pages:
-            if not page.title:
-                issues.append({"category": "metadata", "page_url": page.url, "title": "Missing title tag", "requires_dev": False, "priority": 1, "safe_mode": True})
-            if not page.meta_description:
-                issues.append({"category": "metadata", "page_url": page.url, "title": "Missing meta description", "requires_dev": False, "priority": 1, "safe_mode": True})
-            if not page.canonical:
-                issues.append({"category": "canonical", "page_url": page.url, "title": "Missing canonical tag", "requires_dev": True, "dev_note": "REQUIRES DEV REVIEW — add self-referencing canonical.", "priority": 2, "safe_mode": False})
-        if not snapshot.robots_present:
-            issues.append({"category": "robots", "page_url": self.site_url + "/robots.txt", "title": "Missing robots.txt", "requires_dev": True, "dev_note": "REQUIRES DEV REVIEW — add robots.txt with sitemap reference.", "priority": 2, "safe_mode": False})
-        return issues
+        crawl_report = getattr(snapshot, "crawl_report", None)
+        if crawl_report is None:
+            return []
+        from core.audit_engine import AuditEngine
+        engine = AuditEngine(self.config, self.logger)
+        audit_issues = engine.run(crawl_report)
+        # cache on snapshot so _compute_seo_score can use it without re-running
+        snapshot.audit_issues = audit_issues  # type: ignore[attr-defined]
+        _SEVERITY_PRIORITY = {"Critical": 1, "High": 2, "Medium": 3, "Low": 4}
+        result: list[dict] = []
+        for issue in audit_issues:
+            requires_dev = issue.severity in ("Critical", "High")
+            result.append({
+                "category": issue.category,
+                "page_url": issue.url,
+                "title": issue.title,
+                "description": issue.description,
+                "fix_instructions": issue.fix_instructions,
+                "impact_score": issue.impact_score,
+                "severity": issue.severity,
+                "requires_dev": requires_dev,
+                "dev_note": f"REQUIRES DEV REVIEW — {issue.fix_instructions}" if requires_dev else "",
+                "priority": _SEVERITY_PRIORITY.get(issue.severity, 4),
+                "safe_mode": not requires_dev,
+            })
+        return result
 
     def _run_keyword_engine(self, diff: SiteDiff) -> list[dict]:
         from modules.pipeleap_seo_engine.data.serp_strategy import SERP_KEYWORD_CLUSTERS
@@ -580,14 +592,21 @@ class SEOOSAgent:
     def _compute_seo_score(self, diff: SiteDiff, snapshot: SiteSnapshot, result: SEOOSResult) -> SEOScore:
         score = SEOScore()
 
-        # Technical: deduct for broken pages, missing robots, missing canonical
+        # Technical: start from audit engine results when available, else use heuristics
+        audit_issues = getattr(snapshot, "audit_issues", [])
+        critical_count = sum(1 for i in audit_issues if i.severity == "Critical")
+        high_count = sum(1 for i in audit_issues if i.severity == "High")
+        medium_count = sum(1 for i in audit_issues if i.severity == "Medium")
         tech = 100
-        tech -= len(diff.broken_links) * 10
+        tech -= critical_count * 12
+        tech -= high_count * 5
+        tech -= medium_count * 2
+        tech -= len(diff.broken_links) * 8
         tech -= 10 if not snapshot.robots_present else 0
-        tech -= len(diff.deleted_pages) * 5
+        tech -= len(diff.deleted_pages) * 4
         tech = max(0, min(100, tech))
 
-        # Content: based on pages with title + meta + h1 + sufficient word count
+        # Content: pages with title + meta + h1
         pages_with_meta = sum(1 for p in snapshot.pages if p.title and p.meta_description and p.h1)
         content = int((pages_with_meta / max(len(snapshot.pages), 1)) * 100)
 
@@ -595,7 +614,7 @@ class SEOOSAgent:
         in_sitemap = sum(1 for p in snapshot.pages if p.in_sitemap and p.status_code == 200)
         indexing = int((in_sitemap / max(len(snapshot.pages), 1)) * 100)
 
-        # Authority: proxy — schema coverage
+        # Authority: schema coverage proxy
         with_schema = sum(1 for p in snapshot.pages if p.has_schema)
         authority = int((with_schema / max(len(snapshot.pages), 1)) * 100)
 
@@ -613,6 +632,10 @@ class SEOOSAgent:
             "pages_with_schema": with_schema,
             "broken_pages": len(diff.broken_links),
             "orphan_pages": len(diff.orphan_pages),
+            "audit_critical": critical_count,
+            "audit_high": high_count,
+            "audit_medium": medium_count,
+            "audit_total": len(audit_issues),
         }
         return score
 
@@ -722,7 +745,7 @@ class SEOOSAgent:
                 sev = risk.get("severity","").upper()
                 lines.append(f"- [{sev}] **{risk.get('type','')}** — {risk.get('description','')}")
 
-        lines += ["", "---", "", "## 12. Tomorrow's Plan"]
+        lines += ["", "---", "", "## 11. Tomorrow's Plan"]
         for i, item in enumerate(result.next_day_plan, 1):
             lines.append(f"{i}. {item}")
 

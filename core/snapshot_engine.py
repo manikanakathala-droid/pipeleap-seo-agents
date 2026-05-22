@@ -94,18 +94,18 @@ class SnapshotEngine:
             sitemap_urls = crawl_report.sitemap_urls or []
             snapshot.robots_present = crawl_report.robots_txt_present
             snapshot.sitemap_urls = sitemap_urls
+            snapshot.crawl_report = crawl_report  # type: ignore[attr-defined]
             sitemap_set = set(sitemap_urls)
 
             for page in crawl_report.pages[: self.max_pages]:
-                word_count = len((page.body_text or "").split()) if hasattr(page, "body_text") else 0
-                schema_types = self._extract_schema_types(page)
+                schema_types = page.schema_types or []
                 state = PageSEOState(
                     url=page.url,
                     title=page.title or "",
                     meta_description=page.meta_description or "",
                     h1=page.h1 or "",
                     h2s=getattr(page, "h2s", []),
-                    word_count=word_count,
+                    word_count=page.word_count,
                     internal_links=page.internal_links or [],
                     external_links=getattr(page, "external_links", []),
                     canonical=page.canonical or "",
@@ -127,19 +127,6 @@ class SnapshotEngine:
         snapshot.total_pages = len(snapshot.pages)
         self.logger.info("Snapshot captured: %d pages, %d sitemap URLs", snapshot.total_pages, len(snapshot.sitemap_urls))
         return snapshot
-
-    def _extract_schema_types(self, page) -> list[str]:
-        types: list[str] = []
-        schema_data = getattr(page, "schema_markup", None)
-        if not schema_data:
-            return types
-        if isinstance(schema_data, list):
-            for item in schema_data:
-                if isinstance(item, dict) and "@type" in item:
-                    types.append(item["@type"])
-        elif isinstance(schema_data, dict) and "@type" in schema_data:
-            types.append(schema_data["@type"])
-        return types
 
     def _synthetic_snapshot(self, run_id: str, now: str) -> SiteSnapshot:
         """Fallback: build snapshot from known Pipeleap page structure."""
