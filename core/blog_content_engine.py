@@ -948,12 +948,22 @@ class BlogContentEngine:
 
     # ── Quality gate ──────────────────────────────────────────────────────────
 
-    @staticmethod
-    def _quality_score(body: str, keyword: str, intent: str) -> tuple[float, list[str]]:
+    # Phrases that signal AI-generated / robotic writing — penalised in quality gate
+    _AI_PHRASES: frozenset[str] = frozenset({
+        "in today's fast-paced", "in the ever-evolving", "it is important to note",
+        "it is worth noting", "in conclusion,", "to summarise,", "to summarize,",
+        "as mentioned earlier", "as previously mentioned", "needless to say",
+        "at the end of the day", "in today's digital age", "in today's competitive landscape",
+        "leverage the power of", "unlock the potential", "revolutionize your",
+        "game-changer", "dive deep into", "delve into", "it goes without saying",
+        "not only that, but", "last but not least",
+    })
+
+    def _quality_score(self, body: str, keyword: str, intent: str) -> tuple[float, list[str]]:
         """
         Returns (score 0–1, flags list).
         Evaluates: word count, keyword presence, section depth, FAQ presence,
-        disclosure presence, and keyword density.
+        disclosure presence, keyword density, and AI-phrase detection.
         """
         flags: list[str] = []
         score = 1.0
@@ -985,6 +995,16 @@ class BlogContentEngine:
         if density > 0.04:
             flags.append(f"keyword_overstuffed ({density:.2%})")
             score -= 0.15
+
+        # AI-phrase detection — robotic transitions and filler patterns
+        detected = [p for p in self._AI_PHRASES if p in body_lower]
+        if detected:
+            flags.append(f"ai_phrases_detected: {detected[:3]}")
+            score -= min(0.20, len(detected) * 0.05)
+            self.logger.warning(
+                "AI-sounding phrases found in blog body for '%s': %s — rewrite before publishing.",
+                keyword, detected[:5],
+            )
 
         return round(max(0.0, score), 2), flags
 
@@ -1082,12 +1102,11 @@ class BlogContentEngine:
         return "revenue operations teams"
 
     def _cta(self, funnel_stage: str) -> str:
+        # ONE CTA per post — no secondary link, no alternatives, no repeated variants.
         rule = self.funnel_cta_rules.get(funnel_stage, {})
-        primary_label = rule.get("primary") or self.cta_cfg.get("primary_label", "Book a demo")
-        primary_url = self.cta_cfg.get("primary_url", self.site_url)
-        secondary_label = rule.get("secondary") or self.cta_cfg.get("secondary_label", "See how it works")
-        secondary_url = self.cta_cfg.get("secondary_url", self.site_url)
-        return f"[{primary_label}]({primary_url}) or [{secondary_label}]({secondary_url})."
+        label = rule.get("primary") or self.cta_cfg.get("primary_label", "Book a demo")
+        url   = self.cta_cfg.get("primary_url", self.site_url)
+        return f"[{label}]({url})"
 
     def _disclosure(self) -> str:
         return (

@@ -417,19 +417,14 @@ class ContentEngine:
         return schema
 
     def _cta_block(self, stage: str = "") -> str:
+        # ONE CTA per post — no secondary link, no alternatives.
         stage_cta = STAGE_CTA.get(stage, {})
         primary_label = stage_cta.get("primary_label") or self.cta.get("primary_label", "Book a demo")
         primary_url = self.cta.get("primary_url", self.site.get("site_url", "https://pipeleap.com"))
-        secondary_label = self.cta.get("secondary_label", "See how it works")
-        secondary_url = self.cta.get("secondary_url", self.site.get("site_url", "https://pipeleap.com"))
-        urgency = stage_cta.get("urgency", "")
         subtext = stage_cta.get("primary_subtext", "")
         cta = f"[{primary_label}]({primary_url})"
         if subtext:
             cta += f" — {subtext}"
-        cta += f" or [{secondary_label}]({secondary_url}) if you already know the workflow you want to launch."
-        if urgency:
-            cta += f"\n\n_{urgency}_"
         return cta
 
     def _persona_for_cluster(self, cluster_name: str) -> str:
