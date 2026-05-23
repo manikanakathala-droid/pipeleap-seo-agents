@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -48,10 +49,15 @@ class GoogleSearchConsoleConnector:
 
     def _get_credentials(self, scopes: list[str]):
         """
-        Returns credentials using service account key file if present,
-        otherwise falls back to Application Default Credentials (ADC).
-        ADC works after running: gcloud auth application-default login
+        Credential resolution order:
+        1. GSC_SERVICE_ACCOUNT_JSON env var (JSON string — used in CI/CD via GitHub Actions secret)
+        2. Service account key file at credentials_path
+        3. Application Default Credentials (ADC) — after: gcloud auth application-default login
         """
+        sa_json = os.getenv("GSC_SERVICE_ACCOUNT_JSON", "")
+        if sa_json:
+            info = json.loads(sa_json)
+            return service_account.Credentials.from_service_account_info(info, scopes=scopes)
         if self.credentials_path and Path(self.credentials_path).exists():
             return service_account.Credentials.from_service_account_file(
                 self.credentials_path, scopes=scopes
@@ -60,16 +66,17 @@ class GoogleSearchConsoleConnector:
             creds, _ = _google_auth.default(scopes=scopes)
             return creds
         raise RuntimeError(
-            "No credentials available. Either place a service account JSON at "
-            f"{self.credentials_path!r} or run: gcloud auth application-default login"
+            "No credentials available. Set GSC_SERVICE_ACCOUNT_JSON, place a key file at "
+            f"{self.credentials_path!r}, or run: gcloud auth application-default login"
         )
 
     def _is_auth_available(self) -> bool:
         if not GOOGLE_LIBS_AVAILABLE:
             return False
+        if os.getenv("GSC_SERVICE_ACCOUNT_JSON"):
+            return True
         if self.credentials_path and Path(self.credentials_path).exists():
             return True
-        # ADC available if gcloud has been authenticated
         try:
             _google_auth.default()
             return True
