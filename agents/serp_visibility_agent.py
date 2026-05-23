@@ -195,9 +195,12 @@ class SerpVisibilityAgent:
 
     def _fetch_gsc_data(self) -> list[dict]:
         try:
-            from connectors.gsc_connector import GSCConnector
-            gsc = GSCConnector(self.config, self.logger)
-            return gsc.fetch_page_level_data(site_url=self.site_url, days=28) or []
+            from connectors.gsc_connector import GoogleSearchConsoleConnector
+            from datetime import date, timedelta
+            gsc = GoogleSearchConsoleConnector(self.config, self.logger)
+            end = date.today().isoformat()
+            start = (date.today() - timedelta(days=28)).isoformat()
+            return gsc.fetch_page_performance(start_date=start, end_date=end) or []
         except Exception as exc:
             self.logger.warning("GSC fetch skipped: %s", exc)
             return []
