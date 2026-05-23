@@ -39,10 +39,10 @@ INDEXNOW_ENDPOINTS = [
     "https://yandex.com/indexnow",
 ]
 
-# Pipeleap's IndexNow key — must match the key file at https://pipeleap.com/{key}.txt
+# Pipeleap's IndexNow key — must match the key file at https://www.pipeleap.com/{key}.txt
 INDEXNOW_KEY = "pipeleap-indexnow-2026"
-KEY_LOCATION  = f"https://pipeleap.com/{INDEXNOW_KEY}.txt"
-SITE_URL      = "https://pipeleap.com"
+KEY_LOCATION  = f"https://www.pipeleap.com/{INDEXNOW_KEY}.txt"
+SITE_URL      = "https://www.pipeleap.com"
 
 
 class IndexNowConnector:
