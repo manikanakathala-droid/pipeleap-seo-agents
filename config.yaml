@@ -1,12 +1,12 @@
 site:
   brand: Pipeleap
-  site_url: https://pipeleap.com
+  site_url: https://www.pipeleap.com
   domain: pipeleap.com
   cta:
     primary_label: Book a demo
     secondary_label: See how it works
-    primary_url: https://pipeleap.com/
-    secondary_url: https://pipeleap.com/
+    primary_url: https://www.pipeleap.com/
+    secondary_url: https://www.pipeleap.com/
 
 execution:
   crawl_enabled: true
@@ -28,10 +28,9 @@ integrations:
   analytics:
     # GA4 property ID — find it in GA4 Admin > Property Settings (format: "properties/XXXXXXXXX")
     ga4_property_id: "properties/533951518"
-    # Service account impersonation — bypasses Google's blocked-scope restriction on ADC default client
-    # The SA must be added as a Viewer in GA4 Admin > Property Access Management
+    # Service account — project n8n-xamplify (873204905433)
+    credentials_path: credentials/gsc_service_account.json
     impersonate_sa: "pipeleap-seo@n8n-xamplify.iam.gserviceaccount.com"
-    credentials_path: ""
 
   pagespeed:
     # Free API key: https://developers.google.com/speed/docs/insights/v5/get-started
@@ -41,6 +40,13 @@ integrations:
     mode: filesystem
     publish_dir: published
     webhook_url: ""
+
+  github:
+    token: ""                              # set GITHUB_TOKEN env var — do not paste token here
+    repo: "manikanakathala-droid/pipeleap-launchpad-040053e5"
+    branch: "main"
+    blog_data_path: "src/data/blog-articles.ts"
+    tools_data_path: "src/data/tools-data.ts"
 
 seo:
   allow_estimated_keyword_metrics: true

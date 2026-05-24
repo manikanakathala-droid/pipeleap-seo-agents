@@ -32,14 +32,15 @@ from modules.pipeleap_seo_engine.generators.integration_page import IntegrationP
 from modules.pipeleap_seo_engine.generators.multi_competitor_page import MultiCompetitorPageGenerator
 from modules.pipeleap_seo_engine.generators.role_page import RolePageGenerator
 from modules.pipeleap_seo_engine.generators.use_case_page import UseCasePageGenerator, ProblemPageGenerator
+from modules.pipeleap_seo_engine.generators.tools_page import ToolsPageGenerator
 from modules.pipeleap_seo_engine.generators.workflow_recipe import WorkflowRecipeGenerator
 from modules.pipeleap_seo_engine.generators.bofu_page import BOFUPageGenerator
 from modules.pipeleap_seo_engine.generators.objection_page import ObjectionPageGenerator
 from modules.pipeleap_seo_engine.generators.market_page import MarketPageGenerator
 from modules.pipeleap_seo_engine.models import GrowthPage, GrowthEngineReport
-from modules.pipeleap_seo_engine.connectors.dataforseo import DataForSEOConnector
 from modules.pipeleap_seo_engine.connectors.pagespeed import PageSpeedConnector
 from modules.pipeleap_seo_engine.connectors.backlink_gap import BacklinkGapConnector
+from connectors.free_keyword_connector import FreeKeywordConnector
 
 
 class GrowthEngineOrchestrator:
@@ -68,6 +69,7 @@ class GrowthEngineOrchestrator:
         self.glossary_gen = GlossaryPageGenerator(content_engine)
         self.integration_gen = IntegrationPageGenerator(content_engine)
         self.workflow_gen = WorkflowRecipeGenerator(content_engine)
+        self.tools_gen = ToolsPageGenerator(content_engine)
         self.multi_comp_gen = MultiCompetitorPageGenerator(content_engine)
         # BOFU, objection, and global market generators
         self.bofu_gen = BOFUPageGenerator(content_engine)
@@ -107,15 +109,14 @@ class GrowthEngineOrchestrator:
             seo_db_path=self._resolve_output_dir().parent / Path(seo_db_path).name,
             cms_publish_dir=cms_dir,
         )
-        # GlossaryUpdater disabled — glossary-terms.ts is managed as static
-        # frontend code in the Loveable repo, not by the Python agent.
-        self.glossary_updater = None
+        self.glossary_updater = self._make_glossary_updater()
 
-        # Connectors
         growth_cfg = self.module_config
+        self.keyword_connector = FreeKeywordConnector()
+        from modules.pipeleap_seo_engine.connectors.dataforseo import DataForSEOConnector
         self.dataforseo = DataForSEOConnector(
-            growth_cfg.get("dataforseo_login", ""),
-            growth_cfg.get("dataforseo_password", ""),
+            login=growth_cfg.get("dataforseo_login", ""),
+            password=growth_cfg.get("dataforseo_password", ""),
         )
         self.pagespeed = PageSpeedConnector(
             config.get("integrations", {}).get("pagespeed", {}).get("api_key", "")
@@ -166,6 +167,12 @@ class GrowthEngineOrchestrator:
             wf_pages = self.workflow_gen.generate_all(existing_slugs)[:mc.get("workflow_pages_per_run", 5)]
             all_pages.extend(wf_pages)
             self._log(f"  Workflow recipes: {len(wf_pages)}")
+
+        # ── 5a. Tools pages — differentiated operator guides, one per category ─
+        if mc.get("generate_tools_pages", True):
+            tools_pages = self.tools_gen.generate_all(existing_slugs)[:mc.get("tools_pages_per_run", 8)]
+            all_pages.extend(tools_pages)
+            self._log(f"  Tools pages:      {len(tools_pages)}")
 
         # ── 5b. BOFU pages (demo, ROI, pricing comparison) ───────────────────
         if mc.get("generate_bofu", True):
@@ -285,6 +292,7 @@ class GrowthEngineOrchestrator:
 
         # GSC decay detection: compare current vs previous period (if GSC data available)
         decay_signals = []
+        gsc_current: list[dict] = []
         try:
             gsc_current = self._load_gsc_period("current")
             gsc_previous = self._load_gsc_period("previous")
@@ -295,6 +303,28 @@ class GrowthEngineOrchestrator:
                     self._log(f"  Decay signals:    {len(decay_signals)} pages with declining performance")
         except Exception as exc:
             self._log(f"  Decay detection skipped: {exc}")
+
+        # ── 12a. Refresh stale / decayed pages ───────────────────────────────
+        refreshed_pages = []
+        if refresh_queue:
+            from core.blog_content_engine import BlogContentEngine
+            blog_engine = BlogContentEngine(self.config, self.logger or __import__("logging").getLogger(__name__))
+            gsc_map = {row["query"].lower(): row for row in (gsc_current or []) if row.get("query")}
+            for entry in refresh_queue[:mc.get("refresh_per_run", 3)]:
+                primary_kw = entry.get("primary_keyword", "")
+                if not primary_kw:
+                    continue
+                cluster = self._make_refresh_cluster(primary_kw, entry.get("page_type", "blog_post"))
+                gsc_row = gsc_map.get(primary_kw.lower())
+                try:
+                    from datetime import date as _rdate
+                    asset = blog_engine.generate_blog(cluster, gsc_row)
+                    if asset.body_markdown:
+                        asset.date_modified = _rdate.today().isoformat()
+                        refreshed_pages.append(asset)
+                except Exception as exc:
+                    self._log(f"  Refresh failed for '{primary_kw}': {exc}")
+            self._log(f"  Refreshed:        {len(refreshed_pages)} pages regenerated")
 
         # ── 12b. CTR enrichment — inject title variants + PAA + snippet type ─
         ctr_enrichments: dict[str, dict] = {}
@@ -312,62 +342,53 @@ class GrowthEngineOrchestrator:
         if ctr_enrichments:
             self._log(f"  CTR enrichments:  {len(ctr_enrichments)} pages enriched with title variants + PAA")
 
-        # ── 13. Keyword matrix + DataForSEO enrichment ───────────────────────
+        # ── 13. Keyword matrix enrichment (Google Trends + Autocomplete) ─────
         keyword_matrix = self.keyword_engine.build_matrix()
 
-        if self.dataforseo.is_configured:
-            # 13a. Enrich top-200 keywords with real volume, CPC, competition
-            top_kws = [e["keyword"] for e in keyword_matrix[:200]]
-            enriched = self.dataforseo.get_keyword_metrics(top_kws)
-            kw_lookup = {r["keyword"]: r for r in enriched}
-            for entry in keyword_matrix[:200]:
-                real = kw_lookup.get(entry["keyword"], {})
-                entry["search_volume"]    = real.get("search_volume")
-                entry["real_cpc"]         = real.get("cpc")
-                entry["competition"]      = real.get("competition")
-                entry["competition_level"]= real.get("competition_level", "")
-                entry["monthly_searches"] = real.get("monthly_searches", [])
-                entry["data_source"]      = real.get("source", "heuristic")
-            self._log(f"  DataForSEO volume: enriched {len(enriched)} keywords with real data")
+        # 13a. Enrich top-200 keywords with Trends-based volume tiers
+        top_kws = [e["keyword"] for e in keyword_matrix[:200]]
+        enriched = self.dataforseo.get_keyword_metrics(top_kws)
+        kw_lookup = {r["keyword"]: r for r in enriched}
+        for entry in keyword_matrix[:200]:
+            real = kw_lookup.get(entry["keyword"], {})
+            entry["search_volume"] = real.get("search_volume")
+            entry["volume_tier"]   = real.get("volume_tier", "medium")
+            entry["trend_score"]   = real.get("trend_score", 0)
+            entry["data_source"]   = real.get("source", "google_trends")
+        self._log(f"  Keyword volume:   {len(enriched)} keywords enriched via Google Trends")
 
-            # 13b. Discover NEW keywords from top seed terms (keyword suggestions)
-            mc_seeds = mc.get("dataforseo_discovery_seeds", [])
-            if not mc_seeds:
-                # Use top-5 high-volume entries from current matrix as seeds
-                mc_seeds = [e["keyword"] for e in keyword_matrix[:5]]
-            discovered = self.dataforseo.get_keyword_suggestions(mc_seeds, limit_per_seed=30)
-            if discovered:
-                # Add discovered keywords to matrix if not already present
-                existing_kws = {e["keyword"] for e in keyword_matrix}
-                new_entries = [
-                    {
-                        "keyword":       d["keyword"],
-                        "intent":        "commercial",
-                        "source":        "dataforseo_discovery",
-                        "page_type":     "blog_post",
-                        "funnel_stage":  "solution-aware",
-                        "search_volume": d["search_volume"],
-                        "real_cpc":      d["cpc"],
-                        "data_source":   "dataforseo",
-                    }
-                    for d in discovered
-                    if d["keyword"] not in existing_kws
-                ]
-                keyword_matrix.extend(new_entries)
-                self._log(f"  DataForSEO discovery: {len(new_entries)} new keywords found from {len(mc_seeds)} seeds")
+        # 13b. Discover NEW keywords from top seed terms via autocomplete
+        mc_seeds = mc.get("keyword_discovery_seeds", []) or [e["keyword"] for e in keyword_matrix[:5]]
+        discovered = self.keyword_connector.get_keyword_suggestions(mc_seeds, limit_per_seed=30)
+        if discovered:
+            existing_kws = {e["keyword"] for e in keyword_matrix}
+            new_entries = [
+                {
+                    "keyword":       d["keyword"],
+                    "intent":        d.get("intent", "informational"),
+                    "source":        "autocomplete_discovery",
+                    "page_type":     "blog_post",
+                    "funnel_stage":  "solution-aware",
+                    "search_volume": d["search_volume"],
+                    "data_source":   "google_autocomplete",
+                }
+                for d in discovered
+                if d["keyword"] not in existing_kws
+            ]
+            keyword_matrix.extend(new_entries)
+            self._log(f"  Keyword discovery: {len(new_entries)} new keywords from autocomplete")
 
-            # 13c. SERP feature check on top-20 keywords for snippet targeting
-            snippet_kws = [e["keyword"] for e in keyword_matrix[:20]]
-            snippet_opps = self.dataforseo.check_snippet_opportunities(snippet_kws, limit=20)
-            if snippet_opps:
-                # Write to output for CTR engine reference
-                snippet_lookup = {s["keyword"]: s for s in snippet_opps}
-                for entry in keyword_matrix[:20]:
-                    serp = snippet_lookup.get(entry["keyword"], {})
-                    entry["has_featured_snippet"] = serp.get("has_featured_snippet", False)
-                    entry["has_paa"]              = serp.get("has_paa", False)
-                    entry["has_ai_overview"]      = serp.get("has_ai_overview", False)
-                self._log(f"  SERP features:    {len(snippet_opps)} keywords checked; {sum(1 for s in snippet_opps if s.get('has_featured_snippet'))} have featured snippets")
+        # 13c. SERP feature check on top-20 keywords for snippet targeting
+        snippet_kws = [e["keyword"] for e in keyword_matrix[:20]]
+        snippet_opps = self.keyword_connector.check_snippet_opportunities(snippet_kws, limit=20)
+        if snippet_opps:
+            snippet_lookup = {s["keyword"]: s for s in snippet_opps}
+            for entry in keyword_matrix[:20]:
+                serp = snippet_lookup.get(entry["keyword"], {})
+                entry["has_featured_snippet"] = serp.get("opportunity_score", 0) >= 50
+                entry["has_paa"]              = any(kw.lower().startswith(("what", "how", "why")) for kw in [entry["keyword"]])
+                entry["has_ai_overview"]      = False
+            self._log(f"  Snippet opps:     {len(snippet_opps)} keywords checked; {sum(1 for s in snippet_opps if s.get('opportunity_score', 0) >= 50)} high-opportunity")
 
         self._log(f"  Keyword matrix:   {len(keyword_matrix)} total entries")
 
@@ -450,6 +471,26 @@ class GrowthEngineOrchestrator:
             connector.publish_assets(str(run_dir), content_assets)
         except Exception as exc:
             self._log(f"  CMS publish skipped: {exc}")
+
+        try:
+            import os
+            from connectors.github_publisher import GitHubPublisher
+            gh_cfg = self.config.get("integrations", {}).get("github", {})
+            gh = GitHubPublisher(
+                token=gh_cfg.get("token", ""),
+                repo=gh_cfg.get("repo", ""),
+                branch=gh_cfg.get("branch", "main"),
+                blog_data_path=gh_cfg.get("blog_data_path", "src/data/blog-articles.ts"),
+                tools_data_path=gh_cfg.get("tools_data_path", "src/data/tools-data.ts"),
+            )
+            if gh.is_configured():
+                for page in pages:
+                    if page.page_type == "tools_page":
+                        gh.publish_tool_page(page)
+                    elif page.page_type == "blog_post":
+                        gh.publish_blog_post(page)
+        except Exception as exc:
+            self._log(f"  GitHub publish skipped: {exc}")
 
     @staticmethod
     def _render_markdown(page: GrowthPage) -> str:
@@ -566,7 +607,7 @@ class GrowthEngineOrchestrator:
             notes.append(f"{len(cannibalization)} keyword cannibalization issues detected — see cannibalization_issues.json.")
         if refresh:
             notes.append(f"{len(refresh)} pages flagged for refresh — see refresh_queue.json.")
-        notes.append("Set DATAFORSEO_LOGIN/PASSWORD in env for real keyword volume data.")
+        notes.append("Keyword volume powered by Google Trends + Autocomplete (free, no API key needed).")
         notes.append("Set PAGESPEED_API_KEY in config for Core Web Vitals monitoring.")
         notes.append("Set AHREFS_API_KEY in config for live backlink gap analysis.")
         return notes
@@ -582,3 +623,35 @@ class GrowthEngineOrchestrator:
         if self.logger:
             return self.logger.info
         return print
+
+    def _make_glossary_updater(self) -> "GlossaryUpdater | None":
+        import os
+        env = os.getenv("PIPELEAP_LAUNCHPAD_DIR")
+        if env and (Path(env) / "src" / "data" / "glossary-terms.ts").exists():
+            return GlossaryUpdater(env)
+        pub = self.config.get("integrations", {}).get("cms", {}).get("publish_dir", "")
+        if pub:
+            root = Path(pub).parent.parent.parent
+            if (root / "src" / "data" / "glossary-terms.ts").exists():
+                return GlossaryUpdater(root)
+        sibling = Path(__file__).resolve().parent.parent.parent.parent / "pipeleap-launchpad"
+        if (sibling / "src" / "data" / "glossary-terms.ts").exists():
+            return GlossaryUpdater(sibling)
+        return None
+
+    def _make_refresh_cluster(self, keyword: str, page_type: str):
+        from utils.models import KeywordCluster
+        intent_map = {
+            "blog_post": "informational",
+            "comparison_page": "commercial",
+            "use_case_page": "informational",
+            "landing_page": "commercial",
+        }
+        intent = intent_map.get(page_type, "informational")
+        return KeywordCluster(
+            cluster_name=keyword,
+            primary_keyword=keyword,
+            intent=intent,
+            recommended_asset_type=page_type,
+            conversion_goal="demo_booking",
+        )

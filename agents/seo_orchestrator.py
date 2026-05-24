@@ -9,6 +9,7 @@ from typing import Any
 from agents.content_agent import ContentAgent
 from agents.growth_agent import GrowthAgent
 from connectors.cms_connector import CMSConnector
+from connectors.github_publisher import GitHubPublisher
 from connectors.crawler import SiteCrawler
 from connectors.gsc_connector import GoogleSearchConsoleConnector
 from core.analytics_engine import AnalyticsEngine
@@ -49,6 +50,14 @@ class SEOOrchestrator:
         self.content_agent = ContentAgent(config, self.content_engine, self.logger)
         self.growth_agent = GrowthAgent(config, self.logger)
         self.telemetry = Telemetry(config)
+        gh_cfg = config.get("integrations", {}).get("github", {})
+        self.github_publisher = GitHubPublisher(
+            token=gh_cfg.get("token", ""),
+            repo=gh_cfg.get("repo", ""),
+            branch=gh_cfg.get("branch", "main"),
+            blog_data_path=gh_cfg.get("blog_data_path", "src/data/blog-articles.ts"),
+            tools_data_path=gh_cfg.get("tools_data_path", "src/data/tools-data.ts"),
+        )
 
     def run_once(self) -> dict[str, Any]:
         generated_at = datetime.now(timezone.utc).isoformat()
@@ -207,6 +216,12 @@ class SEOOrchestrator:
             self.logger.error("CMS publish failed: %s", exc)
             publish_result = {"error": str(exc)}
 
+        # ── Stage 10b: GitHub publish ─────────────────────────────────────
+        if self.github_publisher.is_configured():
+            for asset in assets:
+                if getattr(asset, "page_type", "") == "blog_post":
+                    self.github_publisher.publish_blog_post(asset)
+
         # ── Stage 11: Post-publish URL validation ─────────────────────────
         publish_validation: list[dict[str, Any]] = []
         try:
@@ -360,8 +375,9 @@ class SEOOrchestrator:
             if gsc.get(key):
                 gsc[key] = self._resolve_path(gsc[key])
         analytics = config.get("integrations", {}).get("analytics", {})
-        if analytics.get("conversion_export_path"):
-            analytics["conversion_export_path"] = self._resolve_path(analytics["conversion_export_path"])
+        for key in ("credentials_path", "conversion_export_path"):
+            if analytics.get(key):
+                analytics[key] = self._resolve_path(analytics[key])
 
     def _resolve_path(self, path_value: str) -> str:
         path = Path(path_value)
