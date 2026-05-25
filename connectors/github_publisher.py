@@ -35,7 +35,7 @@ class GitHubPublisher:
         blog_data_path: str = "src/data/blog-articles.ts",
         tools_data_path: str = "src/data/tools/index.ts",
     ) -> None:
-        self.token = token or os.getenv("GITHUB_TOKEN", "")
+        self.token = token or os.getenv("GITHUB_TOKEN") or os.getenv("LAUNCHPAD_DEPLOY_TOKEN") or ""
         self.repo = repo or os.getenv("GITHUB_REPO", "")
         self.branch = branch
         self.blog_data_path = blog_data_path
@@ -148,7 +148,7 @@ class GitHubPublisher:
 
     def _reapply_diff(self, latest_content: str, our_content: str, path: str) -> str:
         """Merge our new entry into the latest content fetched after a 409 conflict."""
-        if path.endswith("sitemap.xml"):
+        if path.endswith(".xml") and "sitemap" in path:
             existing_urls = set(re.findall(r"<loc>(https://[^<]+)</loc>", latest_content))
             our_urls = re.findall(r"(<url>\s*<loc>https://[^<]+</loc>.*?</url>)", our_content, re.DOTALL)
             
@@ -173,34 +173,54 @@ class GitHubPublisher:
             return our_content
         return our_content
 
+    def _sitemap_path_for_url(self, url: str) -> str:
+        if "/blog/" in url:
+            return "public/sitemap-blog.xml"
+        if "/tools/" in url:
+            return "public/sitemap-tools.xml"
+        if "/glossary/" in url:
+            return "public/sitemap-glossary.xml"
+        return "public/sitemap-pages.xml"
+
     def update_sitemap(self, urls_with_dates: list[tuple[str, str]]) -> bool:
-        """Append new URLs to public/sitemap.xml in the Lovable repo.
+        """Append new URLs to the appropriate sub-sitemap in the Lovable repo.
         urls_with_dates: list of (url, lastmod_iso_date) tuples.
         """
         if not self.is_configured():
             return False
-        try:
-            content, sha = self._get_file("public/sitemap.xml")
-            existing = set(re.findall(r"<loc>(https://[^<]+)</loc>", content))
 
-            new_entries = []
-            for url, lastmod in urls_with_dates:
-                if url not in existing:
-                    new_entries.append(
-                        f"  <url>\n    <loc>{url}</loc>\n"
-                        f"    <lastmod>{lastmod}</lastmod>\n"
-                        f"    <changefreq>weekly</changefreq>\n"
-                        f"    <priority>0.7</priority>\n  </url>"
-                    )
+        by_path: dict[str, list[tuple[str, str]]] = {}
+        for url, lastmod in urls_with_dates:
+            sp = self._sitemap_path_for_url(url)
+            by_path.setdefault(sp, []).append((url, lastmod))
 
-            if not new_entries:
-                return False
+        all_ok = True
+        for sitemap_path, entries in by_path.items():
+            try:
+                content, sha = self._get_file(sitemap_path)
+                existing = set(re.findall(r"<loc>(https://[^<]+)</loc>", content))
 
-            updated = content.replace("</urlset>", "\n".join(new_entries) + "\n</urlset>")
-            return self._update_file("public/sitemap.xml", updated, sha, f"feat(seo): add {len(new_entries)} URLs to sitemap")
-        except Exception as exc:
-            log.warning("GitHub update sitemap failed: %s", exc)
-            return False
+                new_entries = []
+                for url, lastmod in entries:
+                    if url not in existing:
+                        new_entries.append(
+                            f"  <url>\n    <loc>{url}</loc>\n"
+                            f"    <lastmod>{lastmod}</lastmod>\n"
+                            f"    <changefreq>weekly</changefreq>\n"
+                            f"    <priority>0.7</priority>\n  </url>"
+                        )
+
+                if not new_entries:
+                    continue
+
+                updated = content.replace("</urlset>", "\n".join(new_entries) + "\n</urlset>")
+                ok = self._update_file(sitemap_path, updated, sha, f"feat(seo): add {len(new_entries)} URLs to sitemap")
+                if not ok:
+                    all_ok = False
+            except Exception as exc:
+                log.warning("GitHub update sitemap %s failed: %s", sitemap_path, exc)
+                all_ok = False
+        return all_ok
 
     def _headers(self) -> dict[str, str]:
         return {

@@ -198,7 +198,7 @@ class GitHubPublisher:
     API = "https://api.github.com"
 
     def __init__(self, token: str = "") -> None:
-        self.token = token or os.environ.get("GITHUB_TOKEN", "")
+        self.token = token or os.environ.get("GITHUB_TOKEN") or os.environ.get("LAUNCHPAD_DEPLOY_TOKEN") or ""
         self.headers = {
             "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",

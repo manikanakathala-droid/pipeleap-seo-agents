@@ -124,7 +124,7 @@ jobs:
           }
           JSON
 
-          git add src/data/seo/ src/data/_seo_run_meta.json public/sitemap.xml public/robots.txt
+          git add src/data/seo/ src/data/_seo_run_meta.json public/sitemap*.xml public/robots.txt
           git add src/data/glossary-terms.ts 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No generated launchpad changes to commit."

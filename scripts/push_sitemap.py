@@ -1,7 +1,7 @@
 """
-Rebuilds and commits public/sitemap.xml with:
+Rebuilds and commits sub-sitemaps (public/sitemap-{pages,blog,tools,glossary}.xml) with:
 - lastmod dates on all 11 core pages (updated today)
-- All 73 glossary term URLs
+- All glossary term URLs
 - All existing blog, tools, and category URLs preserved
 """
 import base64, os, re, requests
