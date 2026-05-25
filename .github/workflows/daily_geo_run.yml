@@ -108,7 +108,7 @@ jobs:
           }
           JSON
 
-          git add src/data/seo/ src/data/_geo_run_meta.json
+          git add -f src/data/seo/ src/data/_geo_run_meta.json
           if git diff --staged --quiet; then
             echo "No new GEO content to commit."
           else
