@@ -1,67 +1,598 @@
-site:
-  brand: Pipeleap
-  site_url: https://www.pipeleap.com
-  domain: pipeleap.com
-  cta:
-    primary_label: Book a demo
-    secondary_label: See how it works
-    primary_url: https://www.pipeleap.com/
-    secondary_url: https://www.pipeleap.com/
-
-execution:
-  crawl_enabled: true
-  max_pages: 40
-  max_depth: 3
-  output_dir: outputs
-  log_level: INFO
-  use_renderer: true          # Playwright soft-404 + interstitial detection
-
-integrations:
-  gsc:
-    # GSC property — use sc-domain: format for domain-level property
-    site_url: sc-domain:pipeleap.com
-    # Path to your GCP service account JSON key file
-    credentials_path: credentials/gsc_service_account.json
-    # OR paste the full JSON as an env var: GSC_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
-    data_export_path: ""
-
-  analytics:
-    # GA4 property ID — find it in GA4 Admin > Property Settings (format: "properties/XXXXXXXXX")
-    ga4_property_id: "properties/533951518"
-    # Service account — project n8n-xamplify (873204905433)
-    credentials_path: credentials/gsc_service_account.json
-    impersonate_sa: "pipeleap-seo@n8n-xamplify.iam.gserviceaccount.com"
-
-  pagespeed:
-    # Free API key: https://developers.google.com/speed/docs/insights/v5/get-started
-    api_key: ""
-
-  cms:
-    mode: filesystem
-    publish_dir: published
-    webhook_url: ""
-
-  github:
-    token: ""                              # set GITHUB_TOKEN env var — do not paste token here
-    repo: "manikanakathala-droid/pipeleap-launchpad-040053e5"
-    branch: "main"
-    blog_data_path: "src/data/blog-articles.ts"
-    tools_data_path: "src/data/tools-data.ts"
-
-seo:
-  allow_estimated_keyword_metrics: true
-  seed_keywords: {}
-  topic_map: {}
-  semantic_expansions: {}
-  conversion_pages: []
-  competitors: []
-
-schedule:
-  continuous: false
-  interval_minutes: 1440
-
-alerts:
-  webhook_url: ""
-  alert_on_circuit_break: true
-  alert_on_github_conflict: true
-  alert_on_quota_exhaustion: true
+{
+  "site": {
+    "brand": "Pipeleap",
+    "site_url": "https://www.pipeleap.com",
+    "domain": "pipeleap.com",
+    "product_summary": "Pipeleap is the workflow orchestration system for SaaS organizations that increases revenue through predictable pipeline generation using structured, signal-based outbound sales automation. It automates signal capture, lead enrichment, multi-channel sequencing, reply routing, and CRM sync — eliminating manual SDR execution without replacing your existing CRM or sequencer.",
+    "cta": {
+      "primary_label": "Book a demo",
+      "secondary_label": "See how it works",
+      "primary_url": "https://www.pipeleap.com/",
+      "secondary_url": "https://www.pipeleap.com/"
+    },
+    "target_personas": [
+      "Founders",
+      "RevOps teams",
+      "Growth marketers",
+      "SaaS companies",
+      "Agencies building outbound systems"
+    ],
+    "core_features": [
+      "n8n-based workflow automation",
+      "outbound engines",
+      "lead enrichment automation",
+      "CRM automation workflows",
+      "revenue automation systems",
+      "AI SDR workflow orchestration"
+    ]
+  },
+  "goals": {
+    "target_monthly_traffic": 2000,
+    "target_mql_conversion_rate": 0.10,
+    "priority_focus": "conversion_first"
+  },
+  "execution": {
+    "crawl_enabled": true,
+    "max_pages": 100,
+    "max_depth": 3,
+    "use_renderer": true,
+    "landing_pages_per_run": 10,
+    "blog_posts_per_run": 10,
+    "comparison_pages_per_run": 5,
+    "use_case_pages_per_run": 5,
+    "output_dir": "outputs",
+    "memory_db": "outputs/pipeleap_seo_memory.sqlite",
+    "log_level": "INFO",
+    "role_pages_per_run": 3,
+    "competitor_pages_per_run": 4
+  },
+  "schedule": {
+    "continuous": false,
+    "interval_minutes": 1440
+  },
+  "saas_stages": {
+    "enabled": ["early", "growth", "scale"],
+    "pages_per_stage_per_run": 2,
+    "early": {
+      "arr_range": "0\u20131M ARR",
+      "slug_suffix": "early-stage-saas",
+      "priority_roles": ["founder", "vp_sales"]
+    },
+    "growth": {
+      "arr_range": "1\u201310M ARR",
+      "slug_suffix": "growth-stage-saas",
+      "priority_roles": ["vp_sales", "sales_manager", "cso"]
+    },
+    "scale": {
+      "arr_range": "10M+ ARR",
+      "slug_suffix": "enterprise-saas",
+      "priority_roles": ["cro", "cso", "vp_sales"]
+    }
+  },
+  "integrations": {
+    "gsc": {
+      "site_url": "sc-domain:pipeleap.com",
+      "credentials_path": "credentials/gsc_service_account.json",
+      "data_export_path": ""
+    },
+    "analytics": {
+      "ga4_property_id": "properties/533951518",
+      "credentials_path": "credentials/gsc_service_account.json",
+      "impersonate_sa": "pipeleap-seo@n8n-xamplify.iam.gserviceaccount.com",
+      "conversion_export_path": "outputs/conversions.csv"
+    },
+    "pagespeed": {
+      "api_key": ""
+    },
+    "cms": {
+      "mode": "filesystem",
+      "publish_dir": "published",
+      "webhook_url": ""
+    },
+    "github": {
+      "token": "",
+      "repo": "manikanakathala-droid/pipeleap-launchpad-040053e5",
+      "branch": "main",
+      "blog_data_path": "src/data/blog-articles.ts",
+      "tools_data_path": "src/data/tools-data.ts"
+    }
+  },
+  "seo": {
+    "allow_estimated_keyword_metrics": true,
+    "seed_keywords": {
+      "high_intent": [
+        "outbound automation platform",
+        "ai sales automation system",
+        "n8n sales automation",
+        "lead enrichment workflows",
+        "ai sdr workflows",
+        "revenue automation platform",
+        "automated sales pipeline management",
+        "b2b outbound automation stack",
+        "intelligent lead routing system",
+        "autonomous revenue orchestration",
+        "automated outbound reply routing",
+        "signal based account prioritization",
+        "automated lead list cleaning",
+        "revops workflow governance",
+        "automated demo follow up sequence",
+        "how to build automated outbound reply routing",
+        "best signal based account prioritization tool",
+        "guide to revops workflow governance"
+      ],
+      "problem_based": [
+        "how to automate outbound emails",
+        "how to build lead enrichment pipeline",
+        "how to scale cold outreach",
+        "how to integrate crm with workflows",
+        "how to automate sales follow up",
+        "why is my outbound reply rate low",
+        "how to clean crm data automatically",
+        "how to enrich b2b leads at scale",
+        "reducing sales manual data entry",
+        "how to automate demo booking from signal",
+        "how to prevent sdr burnout with ai",
+        "how to automate outbound territory management"
+      ],
+      "competitor": [
+        "zapier alternatives for outbound",
+        "clay alternative",
+        "make.com automation for sales",
+        "pipeleap vs clay",
+        "hubspot workflows alternative",
+        "smartlead alternative for outbound automation",
+        "outreach.io vs pipeleap",
+        "instantly vs smartlead vs pipeleap",
+        "salesloft alternatives for revops",
+        "best outbound sales tools directory",
+        "best sales tools 2026",
+        "b2b sales software directory"
+      ],
+      "use_case": [
+        "crm automation workflows for revops",
+        "automated lead scoring for founders",
+        "b2b outbound for agencies",
+        "n8n for sales teams",
+        "automated prospecting for saas"
+      ],
+      "global": [
+        "outbound automation uk saas",
+        "b2b outbound automation australia",
+        "saas pipeline generation india",
+        "outbound automation canada saas",
+        "workflow orchestration europe saas",
+        "b2b sales automation singapore",
+        "outbound automation germany saas",
+        "revops automation uk",
+        "sdr automation india saas",
+        "pipeline generation uk b2b",
+        "outbound workflow automation australia",
+        "crm automation european saas",
+        "signal based outbound uk",
+        "saas outbound tools india",
+        "pipeleap vs cognism",
+        "cognism alternative for saas",
+        "dealfront alternative outbound",
+        "best outbound automation europe"
+      ]
+    },
+    "topic_map": {
+      "outbound automation": [
+        "outbound automation",
+        "cold outreach",
+        "outbound emails",
+        "ai outbound",
+        "sales automation"
+      ],
+      "ai sdr systems": [
+        "ai sdr",
+        "ai sales automation",
+        "sales automation system"
+      ],
+      "crm automation workflows": [
+        "crm automation",
+        "crm workflows",
+        "hubspot workflows",
+        "crm integration"
+      ],
+      "n8n automation templates": [
+        "n8n",
+        "workflow templates",
+        "workflow automation"
+      ],
+      "lead enrichment": [
+        "lead enrichment",
+        "enrichment pipeline",
+        "data enrichment"
+      ],
+      "revenue automation": [
+        "revenue automation",
+        "revops",
+        "pipeline automation"
+      ]
+    },
+    "semantic_expansions": {
+      "outbound automation": [
+        "multistep outbound workflows",
+        "sales sequencing automation",
+        "reply routing automation"
+      ],
+      "ai sdr systems": [
+        "ai prospecting workflows",
+        "automated sales qualification",
+        "sdr workflow orchestration"
+      ],
+      "crm automation workflows": [
+        "crm lifecycle automation",
+        "lead routing workflows",
+        "crm hygiene automation"
+      ],
+      "n8n automation templates": [
+        "n8n revenue workflows",
+        "n8n outbound template",
+        "n8n crm automation"
+      ],
+      "lead enrichment": [
+        "contact enrichment workflows",
+        "account enrichment automation",
+        "data validation pipeline"
+      ],
+      "revenue automation": [
+        "revenue operations automation",
+        "pipeline workflow system",
+        "go to market automation"
+      ]
+    },
+    "conversion_pages": [
+      {
+        "label": "Homepage",
+        "url": "https://pipeleap.com/"
+      }
+    ],
+    "competitors": [
+      "Zapier",
+      "Make",
+      "Clay",
+      "HubSpot",
+      "Apollo",
+      "Outreach",
+      "SalesLoft",
+      "Instantly",
+      "Smartlead",
+      "Phantombuster",
+      "Findymail",
+      "Uplead",
+      "Sales Navigator",
+      "Instant Data Scraper",
+      "Leadfeeder",
+      "BuiltWith",
+      "Ocean.io",
+      "LaGrowthMachine",
+      "SolidInbox",
+      "Orum",
+      "HippoVideo",
+      "Potion",
+      "Sendoso",
+      "Handwrytten",
+      "Mailreach",
+      "Warmbox",
+      "ZeroBounce",
+      "Warmer",
+      "GetCargo",
+      "Lavender",
+      "Regie",
+      "Signum",
+      "CrystalKnows",
+      "Freshsales",
+      "Nektar",
+      "Bitskout",
+      "n8n",
+      "Saile AI",
+      "Attio",
+      "Lemlist",
+      "Prospeo",
+      "FullEnrich",
+      "Expandi",
+      "Common Room",
+      "Relevance AI",
+      "Artisan",
+      "CompanyEnrich",
+      "Hyperline",
+      "LeadMagic",
+      "Reply",
+      "Wiza",
+      "Enrow",
+      "BetterContact",
+      "ZoomInfo",
+      "Findthatlead",
+      "PersistIQ",
+      "Telescope",
+      "Tomba",
+      "LeadLoft",
+      "LeadIQ",
+      "Interseller",
+      "Derrick",
+      "Zia",
+      "D7 Lead Finder",
+      "Outplay",
+      "Kaspr",
+      "Scalelist",
+      "Longlist",
+      "GetEmail.io",
+      "Scrupp",
+      "Finder.Expert",
+      "HeyReach",
+      "MirrorProfiles",
+      "Waalaxy",
+      "Amplemarket",
+      "Overloop.ai",
+      "Dux-Soup",
+      "Dripify",
+      "OctopusCRM",
+      "Salesloop",
+      "Meet Alfred",
+      "AIA",
+      "SelfDisrpt",
+      "Linked Helper",
+      "LeadBring",
+      "Icereach",
+      "CoPilot AI",
+      "Salee AI",
+      "Outreachly",
+      "LinkedFusion",
+      "Closely",
+      "Valley",
+      "LeadConnect",
+      "LIA",
+      "LinkedCamp",
+      "Humanlinker",
+      "Evaboot",
+      "Mailmo",
+      "Scout",
+      "Lusha",
+      "Prospectoo",
+      "Scrab.in",
+      "InboxAlly",
+      "Mailgenius",
+      "GlockApps",
+      "Mail-Tester",
+      "Email on Acid",
+      "Litmus",
+      "Mailmeteor",
+      "SalesBlink",
+      "Lightmeter",
+      "Gmass",
+      "Mailgun",
+      "MailMonitor",
+      "Mailtrap",
+      "Browse",
+      "WebscrapeAI",
+      "ZenRows",
+      "Lead Scrape",
+      "Scrapingdog",
+      "ScrapingBee",
+      "Captain Data",
+      "Apify",
+      "Local Scraper",
+      "Octoparse",
+      "Hexomatic",
+      "Scrape.do",
+      "ScraperAPI",
+      "Nimble",
+      "WebScrapingAPI",
+      "ScrapingAnt",
+      "Oxylabs",
+      "Scrapybird",
+      "ScrapeStorm",
+      "Bright Data",
+      "Piloterr",
+      "Diffbot",
+      "Web Scraper",
+      "Import.io",
+      "Browserflow",
+      "WebAutomation",
+      "Automatr",
+      "ScrapeJoy",
+      "Data Miner",
+      "Mozenda",
+      "Puzzle",
+      "Funnelytics",
+      "Lucidchart",
+      "FigJam",
+      "Whimsical",
+      "Balsamiq",
+      "CAKE",
+      "LeadsRx",
+      "Miro",
+      "Twenty",
+      "Axify",
+      "Jenkins",
+      "Debounce",
+      "Bouncer",
+      "Emailable",
+      "EmailListVerify",
+      "MyEmailVerifier",
+      "MailerCheck",
+      "QuickEmailVerification",
+      "Mailfloss",
+      "Neverbounce",
+      "Kickbox",
+      "Verifybee",
+      "Scrubby",
+      "Rift",
+      "DataDoctor",
+      "BriteVerify",
+      "BounceBan",
+      "EmailMarker",
+      "EmailListValidation",
+      "RemoveBounce",
+      "MailboxValidator",
+      "Valid8"
+    ],
+    "keyword_overrides": {
+      "best outbound sales tools directory": {
+        "difficulty": 10
+      }
+    }
+  },
+  "backlinks": {
+    "prospect_seeds": [
+      {
+        "name": "G2",
+        "url": "https://www.g2.com/",
+        "category": "directory",
+        "relevance_reason": "High-buying-intent software discovery traffic for automation and RevOps categories.",
+        "authority_hint": 90
+      },
+      {
+        "name": "Capterra",
+        "url": "https://www.capterra.com/",
+        "category": "directory",
+        "relevance_reason": "SaaS buyers compare workflow and sales automation platforms here.",
+        "authority_hint": 88
+      },
+      {
+        "name": "RevOps Co-op",
+        "url": "https://www.revopscoop.com/",
+        "category": "community",
+        "relevance_reason": "RevOps practitioners care about CRM automation and revenue systems.",
+        "authority_hint": 61
+      },
+      {
+        "name": "Predictable Revenue Blog",
+        "url": "https://predictablerevenue.com/blog/",
+        "category": "directory",
+        "relevance_reason": "High-buying-intent software discovery traffic for automation and RevOps categories.",
+        "authority_hint": 90
+      },
+      {
+        "name": "Predictable Revenue Blog",
+        "url": "https://predictablerevenue.com/blog/",
+        "category": "guest_post",
+        "relevance_reason": "Audience overlap with outbound automation and scalable sales systems.",
+        "authority_hint": 72
+      },
+      {
+        "name": "Product Hunt",
+        "url": "https://www.producthunt.com/",
+        "category": "community",
+        "relevance_reason": "Good fit for launches and workflow automation visibility.",
+        "authority_hint": 91
+      },
+      {
+        "name": "HubSpot Blog",
+        "url": "https://blog.hubspot.com/",
+        "category": "guest_post",
+        "relevance_reason": "Ultimate authority in CRM and sales automation content.",
+        "authority_hint": 93
+      },
+      {
+        "name": "RevOps.io",
+        "url": "https://www.revops.io/blog",
+        "category": "guest_post",
+        "relevance_reason": "Highly targeted audience for revenue orchestration and workflow systems.",
+        "authority_hint": 78
+      },
+      {
+        "name": "Sales Hacker",
+        "url": "https://www.saleshacker.com/",
+        "category": "guest_post",
+        "relevance_reason": "Major community for sales technology and automated outbound tactics.",
+        "authority_hint": 84
+      }
+    ]
+  },
+  "growth_engine": {
+    "enabled": true,
+    "publish_via_cms": true,
+    "role_pages_per_run": 5,
+    "use_case_pages_per_run": 5,
+    "problem_pages_per_run": 2,
+    "competitor_vs_pages_per_run": 5,
+    "competitor_alt_pages_per_run": 5,
+    "multi_competitor_pages_per_run": 4,
+    "integration_pages_per_run": 10,
+    "workflow_pages_per_run": 5,
+    "generate_glossary": true,
+    "generate_integrations": true,
+    "generate_workflows": true,
+    "generate_bofu": true,
+    "bofu_pages_per_run": 8,
+    "generate_objection_pages": true,
+    "objection_pages_per_run": 4,
+    "run_cwv_audit": true,
+    "run_backlink_gap": true,
+    "run_decay_detection": true,
+    "decay_period_days": 28,
+    "priority_competitors": [
+      "Clay", "Zapier", "Make", "HubSpot", "Outreach",
+      "SalesLoft", "Instantly", "Smartlead", "Apollo", "Lemlist"
+    ],
+    "dataforseo_login": "${DATAFORSEO_LOGIN}",
+    "dataforseo_password": "${DATAFORSEO_PASSWORD}",
+    "dataforseo_location_code": 2840,
+    "dataforseo_global_location_codes": [2840, 2826, 2036, 2124, 2356, 2702, 2276],
+    "dataforseo_discovery_seeds": [
+      "outbound sales automation",
+      "signal-based outbound",
+      "pipeline generation saas",
+      "sales workflow automation",
+      "outbound automation platform"
+    ],
+    "ahrefs_api_key": "",
+    "default_author": "pipeleap_team",
+    "decay_thresholds": {
+      "position_drop_min_impressions": 50,
+      "position_regression_delta": 5.0,
+      "position_critical_from": 10.0,
+      "position_critical_to": 15.0,
+      "impression_drop_pct": 30.0,
+      "impression_min_absolute": 100,
+      "ctr_collapse_pct": 25.0,
+      "ctr_min_impressions": 200,
+      "click_decay_pct": 25.0,
+      "click_min_absolute": 10
+    }
+  },
+  "funnel_config": {
+    "tofu_page_types": ["blog_post", "glossary_page", "problem_page"],
+    "mofu_page_types": ["use_case_page", "role_page", "integration_page", "workflow_page"],
+    "bofu_page_types": ["comparison_page", "alternative_page", "multi_competitor_page", "bofu_page", "objection_page", "landing_page"],
+    "sql_page_types": ["demo_page", "roi_page"],
+    "cta_rules": {
+      "TOFU": {
+        "primary": "See how SaaS teams build predictable pipeline",
+        "secondary": "Download the outbound workflow framework",
+        "avoid": ["See how it works", "Book a demo", "Sign up now"]
+      },
+      "MOFU": {
+        "primary": "See how Pipeleap works for your team",
+        "secondary": "Compare Pipeleap to your current stack",
+        "avoid": ["See how it works", "Sign up now"]
+      },
+      "BOFU": {
+        "primary": "Get a free GTM audit",
+        "secondary": "Book a 30-minute strategy call",
+        "avoid": []
+      },
+      "SQL": {
+        "primary": "Book your personalised Pipeleap demo",
+        "secondary": "Talk to a workflow automation specialist",
+        "avoid": []
+      }
+    }
+  },
+  "telemetry": {
+    "posthog_api_key": "${POSTHOG_API_KEY}",
+    "posthog_host": "https://us.i.posthog.com",
+    "sentry_dsn": "${SENTRY_DSN}",
+    "environment": "production",
+    "release": ""
+  },
+  "alerts": {
+    "webhook_url": "",
+    "alert_on_circuit_break": true,
+    "alert_on_github_conflict": true,
+    "alert_on_quota_exhaustion": true
+  }
+}

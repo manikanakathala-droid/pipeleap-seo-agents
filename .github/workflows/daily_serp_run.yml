@@ -1,0 +1,91 @@
+name: Daily SERP Visibility Run
+
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 14:00 UTC / 7:30 PM IST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (write outputs, skip commit)"
+        required: false
+        default: "false"
+  workflow_run:
+    workflows: ["Daily SEO Run"]
+    types:
+      - completed
+
+concurrency:
+  group: serp-visibility-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  serp-visibility:
+    name: SERP Visibility Agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Checkout launchpad (read-only reference)
+        uses: actions/checkout@v4
+        with:
+          repository: manikanakathala-droid/pipeleap-launchpad-040053e5
+          token: ${{ secrets.GH_PAT }}
+          path: pipeleap-launchpad
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write GSC credentials
+        env:
+          GSC_CREDENTIALS: ${{ secrets.GSC_CREDENTIALS }}
+        run: |
+          mkdir -p credentials
+          echo "$GSC_CREDENTIALS" > credentials/gsc_service_account.json
+
+      - name: Run SERP Visibility Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+        run: |
+          DRY_RUN_FLAG=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+          python run_serp_visibility.py $DRY_RUN_FLAG
+
+      - name: Commit and push outputs
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name  "pipeleap-seo-bot"
+          git config user.email "bot@pipeleap.com"
+          git add outputs/
+          if git diff --cached --quiet; then
+            echo "No new outputs to commit."
+          else
+            git commit -m "chore: SERP visibility agent outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Upload SERP visibility artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: serp-visibility-${{ github.run_id }}
+          path: outputs/
+          retention-days: 14

@@ -1,0 +1,66 @@
+{
+  "site": {
+    "brand": "Pipeleap",
+    "site_url": "https://pipeleap.com",
+    "domain": "pipeleap.com",
+    "product_summary": "Pipeleap is the workflow orchestration system for SaaS organizations that increases revenue through predictable pipeline generation using structured, signal-based outbound sales automation."
+  },
+
+  "execution": {
+    "output_dir": "outputs",
+    "log_level": "INFO"
+  },
+
+  "integrations": {
+    "cms": {
+      "publish_dir": "pipeleap-launchpad/src/data/seo"
+    }
+  },
+
+  "geo_engine": {
+    "enabled": true,
+    "publish_pages": true,
+
+    "dataforseo_login":    "${DATAFORSEO_LOGIN}",
+    "dataforseo_password": "${DATAFORSEO_PASSWORD}",
+
+    "serp_check_limit": 30,
+    "serp_delay_seconds": 0.3,
+
+    "generate_global_market_pages": true,
+    "global_market_pages_per_run": 12,
+    "global_dataforseo_codes": [2840, 2826, 2036, 2124, 2356, 2702],
+
+    "target_ai_engines": [
+      "google_ai_overview",
+      "perplexity",
+      "chatgpt",
+      "gemini",
+      "claude"
+    ],
+
+    "query_categories": [
+      "definition",
+      "comparison",
+      "how_to",
+      "recommendation",
+      "problem_solution"
+    ],
+
+    "answer_block_config": {
+      "min_words": 40,
+      "max_words": 75,
+      "quality_threshold": 0.65
+    },
+
+    "citation_gap_config": {
+      "priority_threshold": 0.5,
+      "max_gaps_per_run": 20
+    },
+
+    "entity_config": {
+      "target_same_as_count": 8,
+      "target_citation_score": 70
+    }
+  }
+}

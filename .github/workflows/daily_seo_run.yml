@@ -1,0 +1,153 @@
+name: Daily SEO Agent Run
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    # 5:30 PM IST = 12:00 UTC daily
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      disable_crawl:
+        description: "Skip live site crawl"
+        required: false
+        default: false
+        type: boolean
+      run_growth_engine:
+        description: "Also run the growth engine module"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pipeleap-launchpad-publish
+  cancel-in-progress: false
+
+jobs:
+  run-seo-growth:
+    name: Run SEO Agent + Growth Engine
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      DISABLE_CRAWL: ${{ github.event_name == 'workflow_dispatch' && inputs.disable_crawl == true }}
+      RUN_GROWTH_ENGINE: ${{ github.event_name != 'workflow_dispatch' || inputs.run_growth_engine == true }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Checkout launchpad publish target
+        uses: actions/checkout@v4
+        with:
+          repository: manikanakathala-droid/pipeleap-launchpad-040053e5
+          token: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
+          ref: main
+          path: pipeleap-launchpad
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Write GSC credentials
+        run: |
+          mkdir -p credentials
+          cat > credentials/gsc_service_account.json <<'EOF'
+          ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          EOF
+
+      - name: Prepare artifact directories
+        run: |
+          mkdir -p outputs/post_publish
+          python - <<'PY'
+          from pathlib import Path
+          Path("outputs/.heartbeat").write_text("seo-growth workflow started\n", encoding="utf-8")
+          PY
+
+      - name: Run SEO agent
+        run: |
+          ARGS=""
+          if [ "$DISABLE_CRAWL" = "true" ]; then
+            ARGS="--disable-crawl"
+          fi
+          python main.py $ARGS
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+          AHREFS_API_KEY: ${{ secrets.AHREFS_API_KEY }}
+
+      - name: Run growth engine
+        if: ${{ env.RUN_GROWTH_ENGINE == 'true' }}
+        run: python run_growth_engine.py
+        env:
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
+          AHREFS_API_KEY: ${{ secrets.AHREFS_API_KEY }}
+
+      - name: Audit launchpad duplicates before commit
+        run: |
+          if [ -f pipeleap-launchpad/scripts/audit-duplicates.mjs ]; then
+            cd pipeleap-launchpad && node scripts/audit-duplicates.mjs --fix
+          else
+            echo "No audit-duplicates script found, skipping."
+          fi
+
+      - name: Commit and push generated launchpad content
+        run: |
+          cd pipeleap-launchpad
+          git config user.name "pipeleap-seo-bot"
+          git config user.email "seo-bot@pipeleap.com"
+
+          PAGE_COUNT=$(find src/data/seo -name "metadata.json" 2>/dev/null | wc -l | tr -d ' ')
+          TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          cat > src/data/_seo_run_meta.json <<JSON
+          {
+            "last_run": "${TIMESTAMP}",
+            "run_number": "${{ github.run_number }}",
+            "run_id": "${{ github.run_id }}",
+            "triggered_by": "${{ github.event_name }}",
+            "pages_total": ${PAGE_COUNT}
+          }
+          JSON
+
+          git add src/data/seo/ src/data/_seo_run_meta.json public/sitemap.xml public/robots.txt
+          git add src/data/glossary-terms.ts 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No generated launchpad changes to commit."
+          else
+            git commit -m "SEO and growth agent run #${{ github.run_number }}"
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin main; then
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep $((attempt * 10))
+            done
+            echo "Unable to publish launchpad changes after 3 attempts." >&2
+            exit 1
+          fi
+
+      - name: Upload run artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-growth-run-${{ github.run_number }}
+          path: |
+            outputs/
+            !outputs/**/__pycache__/
+          if-no-files-found: warn
+          retention-days: 14

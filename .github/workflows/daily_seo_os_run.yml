@@ -1,0 +1,157 @@
+name: Daily SEO OS Run
+
+on:
+  schedule:
+    - cron: "30 11 * * *"   # 11:30 UTC / 5:00 PM IST
+  workflow_dispatch:
+    inputs:
+      disable_crawl:
+        description: "Skip live crawl (use synthetic snapshot)"
+        required: false
+        default: "false"
+  workflow_run:
+    workflows: ["Daily SEO Run"]
+    types:
+      - completed
+
+concurrency:
+  group: seo-os-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  seo-os:
+    name: "SEO OS - OBSERVE -> DIFF -> DECIDE -> EXECUTE -> LEARN -> DASHBOARD"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout launchpad (read-only reference)
+        uses: actions/checkout@v4
+        with:
+          repository: manikanakathala-droid/pipeleap-launchpad-040053e5
+          token: ${{ secrets.GH_PAT }}
+          path: pipeleap-launchpad
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write GSC credentials
+        env:
+          GSC_CREDENTIALS: ${{ secrets.GSC_CREDENTIALS }}
+        run: |
+          mkdir -p credentials
+          echo "$GSC_CREDENTIALS" > credentials/gsc_service_account.json
+
+      - name: Restore SEO OS state and dashboard cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            outputs/seo_os_state
+            dashboard
+          key: seo-os-cache-${{ github.run_id }}
+          restore-keys: seo-os-cache-
+
+      - name: Run SEO OS Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+        run: |
+          CRAWL_FLAG=""
+          if [ "${{ github.event.inputs.disable_crawl }}" = "true" ]; then
+            CRAWL_FLAG="--disable-crawl"
+          fi
+          python run_seo_os.py $CRAWL_FLAG
+
+      - name: Commit structured SEO repo outputs
+        run: |
+          git config user.name  "pipeleap-seo-os"
+          git config user.email "seo-os@pipeleap.com"
+          git add seo/ content/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No structured SEO changes."
+          else
+            git commit -m "seo(os): structured outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Push dashboard data to live site
+        run: |
+          cd pipeleap-launchpad
+          git config user.name  "pipeleap-seo-os"
+          git config user.email "seo-os@pipeleap.com"
+          mkdir -p public/seo-dashboard-data
+          cp ../dashboard/summary.json      public/seo-dashboard-data/summary.json
+          cp ../dashboard/activity-log.json public/seo-dashboard-data/activity-log.json
+          cp ../dashboard/alerts.json       public/seo-dashboard-data/alerts.json
+          git add public/seo-dashboard-data/
+          if git diff --cached --quiet; then
+            echo "No dashboard data changes."
+          else
+            git commit -m "chore(seo-os): refresh dashboard data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Commit dashboard outputs
+        run: |
+          git add dashboard/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No dashboard changes."
+          else
+            git commit -m "dashboard: live update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Commit raw run outputs
+        run: |
+          git add outputs/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No raw output changes."
+          else
+            git commit -m "chore(seo-os): raw outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Save SEO OS state and dashboard cache
+        uses: actions/cache@v4
+        if: always()
+        with:
+          path: |
+            outputs/seo_os_state
+            dashboard
+          key: seo-os-cache-${{ github.run_id }}
+
+      - name: Upload daily briefing
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-os-briefing-${{ github.run_id }}
+          path: |
+            outputs/*/daily_briefing.md
+            outputs/*/seo_os_report.json
+          retention-days: 30
+
+      - name: Upload dashboard snapshot
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-dashboard-${{ github.run_id }}
+          path: dashboard/
+          retention-days: 90

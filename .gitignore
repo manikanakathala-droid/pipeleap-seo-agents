@@ -1,5 +1,6 @@
-# Website checkout used only as a publish target in CI/local runs
+# Website checkouts used only as publish targets in CI/local runs
 pipeleap-launchpad/
+temp_frontend_repo/
 
 # Credentials
 credentials/
