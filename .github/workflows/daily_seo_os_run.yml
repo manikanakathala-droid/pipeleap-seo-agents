@@ -68,8 +68,10 @@ jobs:
 
       - name: Run SEO OS Agent
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
+          MOZ_API_SECRET_KEY: ${{ secrets.MOZ_API_SECRET_KEY }}
+          BING_API_KEY: ${{ secrets.BING_API_KEY }}
           GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
           DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
           DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
@@ -89,23 +91,6 @@ jobs:
             echo "No structured SEO changes."
           else
             git commit -m "seo(os): structured outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
-          fi
-
-      - name: Push dashboard data to live site
-        run: |
-          cd pipeleap-launchpad
-          git config user.name  "pipeleap-seo-os"
-          git config user.email "seo-os@pipeleap.com"
-          mkdir -p public/seo-dashboard-data
-          cp ../dashboard/summary.json      public/seo-dashboard-data/summary.json
-          cp ../dashboard/activity-log.json public/seo-dashboard-data/activity-log.json
-          cp ../dashboard/alerts.json       public/seo-dashboard-data/alerts.json
-          git add public/seo-dashboard-data/
-          if git diff --cached --quiet; then
-            echo "No dashboard data changes."
-          else
-            git commit -m "chore(seo-os): refresh dashboard data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push
           fi
 

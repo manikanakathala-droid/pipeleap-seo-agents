@@ -2,6 +2,7 @@
 Backlink gap analysis connector.
 Uses Ahrefs or Majestic API to find domains that link to competitors but not Pipeleap.
 Set AHREFS_API_KEY in config or env vars.
+When Moz API credentials are provided, enriches fallback targets with live Domain Authority.
 Falls back to a curated priority target list when API is not configured.
 """
 from __future__ import annotations
@@ -13,6 +14,12 @@ try:
     _HAS_REQUESTS = True
 except ImportError:
     _HAS_REQUESTS = False
+
+try:
+    from connectors.moz_connector import MozConnector
+    _HAS_MOZ = True
+except ImportError:
+    _HAS_MOZ = False
 
 # High-authority outreach targets known to link to SaaS outbound automation tools
 # Curated fallback for teams without Ahrefs API
@@ -34,9 +41,18 @@ PRIORITY_GAP_TARGETS: list[dict[str, Any]] = [
 
 class BacklinkGapConnector:
 
-    def __init__(self, api_key: str = "", target_domain: str = "pipeleap.com") -> None:
+    def __init__(
+        self,
+        api_key: str = "",
+        target_domain: str = "pipeleap.com",
+        moz_access_id: str = "",
+        moz_secret_key: str = "",
+    ) -> None:
         self.api_key = api_key or os.environ.get("AHREFS_API_KEY", "")
         self.target_domain = target_domain
+        self._moz: MozConnector | None = None
+        if moz_access_id and moz_secret_key and _HAS_MOZ:
+            self._moz = MozConnector(access_id=moz_access_id, secret_key=moz_secret_key)
 
     @property
     def is_configured(self) -> bool:
@@ -45,11 +61,21 @@ class BacklinkGapConnector:
     def gap_analysis(self, competitor_domains: list[str]) -> list[dict[str, Any]]:
         """Return domains that link to competitors but not to target_domain."""
         if not self.is_configured:
-            return self._curated_fallback()
+            return self._enriched_fallback()
         try:
             return self._ahrefs_gap(competitor_domains)
         except Exception:
-            return self._curated_fallback()
+            return self._enriched_fallback()
+
+    def _enriched_fallback(self) -> list[dict[str, Any]]:
+        """Return curated fallback targets, enriched with live Moz DA when available."""
+        targets = self._curated_fallback()
+        if self._moz is not None:
+            try:
+                return self._moz.enrich_backlink_targets(targets)
+            except Exception:
+                pass
+        return targets
 
     def _ahrefs_gap(self, competitors: list[str]) -> list[dict[str, Any]]:
         headers = {"Authorization": f"Bearer {self.api_key}"}

@@ -11,9 +11,11 @@ IGNORED_PREFIXES = (
     ".git/",
     ".venv/",
     "build/",
+    "dashboard/",
     "dist/",
     "outputs/",
     "pipeleap-launchpad/",
+    "seo/",
     "__pycache__/",
 )
 

@@ -112,7 +112,9 @@ class GrowthEngineOrchestrator:
         self.glossary_updater = self._make_glossary_updater()
 
         growth_cfg = self.module_config
-        self.keyword_connector = FreeKeywordConnector()
+        self.keyword_connector = FreeKeywordConnector(
+            bing_api_key=growth_cfg.get("bing_api_key", ""),
+        )
         from modules.pipeleap_seo_engine.connectors.dataforseo import DataForSEOConnector
         self.dataforseo = DataForSEOConnector(
             login=growth_cfg.get("dataforseo_login", ""),
@@ -124,6 +126,8 @@ class GrowthEngineOrchestrator:
         self.backlink_gap = BacklinkGapConnector(
             growth_cfg.get("ahrefs_api_key", ""),
             self.site_config.get("domain", "pipeleap.com"),
+            moz_access_id=growth_cfg.get("moz_api_access_id", ""),
+            moz_secret_key=growth_cfg.get("moz_api_secret_key", ""),
         )
 
     def run(self) -> GrowthEngineReport:

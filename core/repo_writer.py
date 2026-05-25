@@ -26,8 +26,6 @@ STRICT RULES:
   - Keep all JSON machine-readable (no prose fields in arrays)
 """
 
-from __future__ import annotations
-
 import json
 import logging
 from datetime import datetime, timezone

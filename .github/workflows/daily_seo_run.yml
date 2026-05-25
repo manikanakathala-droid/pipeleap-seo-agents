@@ -88,15 +88,10 @@ jobs:
           DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
           PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
           AHREFS_API_KEY: ${{ secrets.AHREFS_API_KEY }}
+          MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
+          MOZ_API_SECRET_KEY: ${{ secrets.MOZ_API_SECRET_KEY }}
+          BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
-      - name: Run growth engine
-        if: ${{ env.RUN_GROWTH_ENGINE == 'true' }}
-        run: python run_growth_engine.py
-        env:
-          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
-          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
-          PAGESPEED_API_KEY: ${{ secrets.PAGESPEED_API_KEY }}
-          AHREFS_API_KEY: ${{ secrets.AHREFS_API_KEY }}
 
       - name: Audit launchpad duplicates before commit
         run: |

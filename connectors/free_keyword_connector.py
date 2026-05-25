@@ -6,9 +6,10 @@ Sources used (all free, no API key required):
   2. Google Trends        — relative search interest + trending breakout keywords (pytrends)
   3. GSC data             — real impressions/clicks for keywords you already rank for
   4. Bing Autosuggest     — secondary keyword expansion (no key needed)
+  5. Bing Webmaster Tools — real impression/click/position data (requires BING_API_KEY)
 
 Mirrors the DataForSEO interface so the orchestrator needs zero changes:
-  get_keyword_metrics()      — volume tier + trend score per keyword
+  get_keyword_metrics()      — volume tier + trend score per keyword, enriched with Bing stats
   get_keyword_suggestions()  — new keyword ideas from seed terms
   check_snippet_opportunities() — keywords with question intent (PAA/featured snippet targets)
 
@@ -20,7 +21,6 @@ Limitations vs DataForSEO:
 from __future__ import annotations
 
 import time
-import json
 from typing import Any
 
 try:
@@ -35,6 +35,11 @@ try:
 except ImportError:
     _HAS_PYTRENDS = False
 
+try:
+    from connectors.bing_keyword_connector import BingKeywordConnector
+    _HAS_BING = True
+except ImportError:
+    _HAS_BING = False
 
 # Maps Google Trends interest (0-100) to volume tier
 def _trends_to_volume_tier(score: int) -> str:
@@ -43,7 +48,6 @@ def _trends_to_volume_tier(score: int) -> str:
     if score >= 30:
         return "medium"
     return "low"
-
 
 # Rough monthly volume estimate from tier (used for sorting only)
 _TIER_VOLUME = {"high": 5000, "medium": 1000, "low": 200}
@@ -60,12 +64,18 @@ class FreeKeywordConnector:
     """
     Drop-in replacement for DataForSEOConnector using only free APIs.
     Always returns data — falls back gracefully if rate-limited.
+
+    Optionally enriched with Bing Webmaster Tools keyword stats
+    when bing_api_key is provided — adds real impression/click/position data.
     """
 
     is_configured = True  # always available, no credentials needed
 
-    def __init__(self) -> None:
+    def __init__(self, bing_api_key: str = "") -> None:
         self._trends: Any = None
+        self._bing: BingKeywordConnector | None = None
+        if bing_api_key and _HAS_BING:
+            self._bing = BingKeywordConnector(api_key=bing_api_key)
 
     def _get_trends_client(self):
         if not _HAS_PYTRENDS:
@@ -83,7 +93,8 @@ class FreeKeywordConnector:
         language_code: str = "en",
     ) -> list[dict[str, Any]]:
         """
-        Returns volume tier and trend score for each keyword via Google Trends.
+        Returns volume tier and trend score for each keyword via Google Trends,
+        enriched with real Bing impression/click/position data when available.
         Processes in batches of 5 (Trends limit).
         """
         results: list[dict[str, Any]] = []
@@ -99,17 +110,42 @@ class FreeKeywordConnector:
                 score = trend_scores.get(kw, 0)
                 tier = _trends_to_volume_tier(score)
                 results.append({
-                    "keyword":          kw,
-                    "search_volume":    _TIER_VOLUME[tier],
-                    "volume_tier":      tier,
-                    "trend_score":      score,
-                    "competition":      0.5,
-                    "cpc":              0.0,
+                    "keyword":           kw,
+                    "search_volume":     _TIER_VOLUME[tier],
+                    "volume_tier":       tier,
+                    "trend_score":       score,
+                    "competition":       0.5,
+                    "cpc":               0.0,
                     "keyword_difficulty": 50,
-                    "source":           "google_trends",
+                    "source":            "google_trends",
                 })
             if i + 5 < len(keywords):
                 time.sleep(1.5)  # respect Trends rate limit
+
+        # Enrich with Bing data if available
+        if self._bing is not None:
+            try:
+                bing_lookup = self._bing.enrich_keyword_metrics(keywords)
+                for item in results:
+                    kw = item["keyword"]
+                    if kw in bing_lookup:
+                        b = bing_lookup[kw]
+                        item["bing_impressions"] = b["impressions"]
+                        item["bing_clicks"]      = b["clicks"]
+                        item["bing_ctr"]         = b["ctr"]
+                        item["bing_position"]    = b["position"]
+                        item["source"]           = "google_trends+bing"
+                        # Override volume tier with real Bing impression count
+                        if b["impressions"] > 0:
+                            item["search_volume"] = b["impressions"]
+                            if b["impressions"] >= 5000:
+                                item["volume_tier"] = "high"
+                            elif b["impressions"] >= 1000:
+                                item["volume_tier"] = "medium"
+                            else:
+                                item["volume_tier"] = "low"
+            except Exception:
+                pass  # Non-fatal — keep trend-only data
 
         return results
 
