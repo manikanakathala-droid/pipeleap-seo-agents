@@ -11,11 +11,11 @@ import requests
 
 SITE_URL    = "https://www.pipeleap.com/"
 SITEMAP_URL = "https://www.pipeleap.com/sitemap.xml"
-API_KEY     = os.getenv("BING_WEBMASTER_API_KEY", "")
+API_KEY     = os.getenv("BING_WEBMASTER_API_KEY", os.getenv("BING_API_KEY", ""))
 
 if not API_KEY:
-    print("ERROR: Set BING_WEBMASTER_API_KEY env var first.")
-    print("  Find it in Bing Webmaster Tools → Settings → API access")
+    print("ERROR: Set BING_API_KEY env var first.")
+    print("  Find it in Bing Webmaster Tools > Settings > API access")
     sys.exit(1)
 
 print(f"Submitting sitemap to Bing Webmaster Tools ...")
