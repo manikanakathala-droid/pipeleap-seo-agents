@@ -19,19 +19,39 @@ from geo_agent.data.geo_entities import PIPELEAP_ENTITY
 from geo_agent.data.ai_source_sites import AI_SOURCE_SITES, citation_score
 from geo_agent.models import EntitySignal
 
+try:
+    from connectors.wikipedia_connector import WikipediaConnector
+    _HAS_WIKI = True
+except ImportError:
+    _HAS_WIKI = False
+
 SITE_URL = "https://pipeleap.com"
 
 
 class EntityAuthorityEngine:
     """
     Audits and strengthens Pipeleap's entity authority for AI engine recognition.
+    Optionally accepts a WikipediaConnector for live entity enrichment.
     """
+
+    def __init__(self, wikipedia: WikipediaConnector | None = None) -> None:
+        self._wikipedia = wikipedia
+        self._wikipedia_data: dict[str, Any] = {}
+
+    def _check_wikipedia(self) -> None:
+        if self._wikipedia_data:
+            return
+        if not self._wikipedia or not self._wikipedia.is_configured:
+            return
+        self._wikipedia_data = self._wikipedia.enrich_entity("Pipeleap")
 
     def audit(self) -> dict[str, Any]:
         """
         Run full entity authority audit.
         Returns scores, gaps, and recommended schema payloads.
         """
+        self._check_wikipedia()
+
         same_as_score   = self._score_same_as()
         schema_score    = self._score_schema_completeness()
         citation_s      = citation_score()
@@ -39,7 +59,7 @@ class EntityAuthorityEngine:
 
         overall = round((same_as_score + schema_score + citation_s + knowledge_score) / 4, 1)
 
-        return {
+        result: dict[str, Any] = {
             "overall_entity_score": overall,
             "same_as_score":        same_as_score,
             "schema_score":         schema_score,
@@ -49,6 +69,18 @@ class EntityAuthorityEngine:
             "schema_payloads":      self.generate_schema_payloads(),
             "recommendations":      self._recommendations(overall),
         }
+
+        if self._wikipedia_data:
+            result["wikipedia_check"] = {
+                "has_page": self._wikipedia_data.get("has_wikipedia_page", False),
+                "title": self._wikipedia_data.get("title", ""),
+                "extract": (self._wikipedia_data.get("extract", "") or "")[:200],
+                "url": self._wikipedia_data.get("url", ""),
+                "wikidata_id": self._wikipedia_data.get("wikidata_id", ""),
+                "categories": self._wikipedia_data.get("categories", []),
+            }
+
+        return result
 
     def generate_schema_payloads(self) -> list[dict[str, Any]]:
         """Return all schema objects to inject across Pipeleap pages."""
@@ -61,6 +93,8 @@ class EntityAuthorityEngine:
 
     def entity_signals(self) -> list[EntitySignal]:
         """Return all entity signals with current status."""
+        self._check_wikipedia()
+
         signals = []
         # sameAs link signals
         same_as_urls = PIPELEAP_ENTITY.get("sameAs", [])
@@ -89,25 +123,42 @@ class EntityAuthorityEngine:
                     implementation_effort="medium",
                 ))
 
-        # Wikipedia/Wikidata (highest weight, currently missing)
+        # Wikipedia/Wikidata (highest weight — live checked)
+        has_wiki = self._wikipedia_data.get("has_wikipedia_page", False)
+        wiki_url = self._wikipedia_data.get("url", "https://en.wikipedia.org/wiki/Pipeleap")
+        wiki_qid = self._wikipedia_data.get("wikidata_id", "")
+        wiki_status = "active" if has_wiki else "missing"
+
         signals.append(EntitySignal(
             signal_type="knowledge_graph",
             platform="Wikipedia",
-            url="https://en.wikipedia.org/wiki/Pipeleap",
+            url=wiki_url,
             description="Wikipedia article provides highest-weight LLM entity recognition signal",
-            status="missing",
+            status=wiki_status,
             impact_score=1.0,
             implementation_effort="high",
         ))
-        signals.append(EntitySignal(
-            signal_type="knowledge_graph",
-            platform="Wikidata",
-            url="https://www.wikidata.org/",
-            description="Wikidata entity record strengthens Knowledge Graph presence",
-            status="missing",
-            impact_score=0.9,
-            implementation_effort="medium",
-        ))
+
+        if has_wiki and wiki_qid:
+            signals.append(EntitySignal(
+                signal_type="knowledge_graph",
+                platform="Wikidata",
+                url=f"https://www.wikidata.org/entity/{wiki_qid}",
+                description=f"Wikidata entity ({wiki_qid}) strengthens Knowledge Graph presence",
+                status="active",
+                impact_score=0.9,
+                implementation_effort="medium",
+            ))
+        else:
+            signals.append(EntitySignal(
+                signal_type="knowledge_graph",
+                platform="Wikidata",
+                url="https://www.wikidata.org/",
+                description="Wikidata entity record strengthens Knowledge Graph presence",
+                status="missing",
+                impact_score=0.9,
+                implementation_effort="medium",
+            ))
 
         return sorted(signals, key=lambda s: s.impact_score, reverse=True)
 
@@ -203,14 +254,19 @@ class EntityAuthorityEngine:
         return 80.0  # 80/100 — missing aggregateRating (needs G2 reviews first)
 
     def _score_knowledge_graph_signals(self) -> float:
-        # Currently: LinkedIn + Product Hunt listed = 2 × 15 = 30
+        self._check_wikipedia()
+        has_wiki = self._wikipedia_data.get("has_wikipedia_page", False)
         listed_high_authority = sum(
             1 for s in AI_SOURCE_SITES
             if s["status"] == "listed" and s.get("citation_weight", 0) >= 7
         )
-        return min(100, listed_high_authority * 15)
+        base = min(100, listed_high_authority * 15)
+        if has_wiki:
+            base = min(100, base + 40)
+        return base
 
     def _identify_gaps(self) -> list[str]:
+        self._check_wikipedia()
         gaps = []
         if citation_score() < 50:
             gaps.append(f"Citation score {citation_score()}/100 — need G2, Capterra, TrustRadius listings")
@@ -218,13 +274,16 @@ class EntityAuthorityEngine:
             gaps.append("G2 listing missing — highest-weight LLM citation source for tool comparisons")
         if not any(s["site"] == "Capterra" and s["status"] == "listed" for s in AI_SOURCE_SITES):
             gaps.append("Capterra listing missing — critical for 'best X tools' AI recommendations")
-        if self._score_knowledge_graph_signals() < 30:
-            gaps.append("Wikipedia/Wikidata entity missing — adds highest LLM training weight")
+        has_wiki = self._wikipedia_data.get("has_wikipedia_page", False)
+        if not has_wiki:
+            if self._score_knowledge_graph_signals() < 30:
+                gaps.append("Wikipedia/Wikidata entity missing — adds highest LLM training weight")
         if len(PIPELEAP_ENTITY.get("sameAs", [])) < 5:
             gaps.append(f"Only {len(PIPELEAP_ENTITY.get('sameAs', []))} sameAs links — target 8+")
         return gaps
 
     def _recommendations(self, overall_score: float) -> list[str]:
+        self._check_wikipedia()
         recs = []
         if overall_score < 30:
             recs.append("CRITICAL: Create G2 and Capterra listings immediately — these are the #1 LLM citation sources for SaaS tools")
@@ -234,5 +293,10 @@ class EntityAuthorityEngine:
         if overall_score < 70:
             recs.append("Answer Quora questions about outbound automation with Pipeleap context")
             recs.append("Expand sameAs links to include G2, Capterra, Crunchbase once listed")
-        recs.append("Create Wikipedia article once 3+ independent editorial sources exist")
+        has_wiki = self._wikipedia_data.get("has_wikipedia_page", False)
+        if has_wiki:
+            wiki_title = self._wikipedia_data.get("title", "Pipeleap")
+            recs.append(f"Wikipedia article exists for '{wiki_title}' — keep it updated with latest differentiators")
+        else:
+            recs.append("Create Wikipedia article once 3+ independent editorial sources exist")
         return recs

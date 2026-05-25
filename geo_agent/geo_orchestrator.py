@@ -69,10 +69,17 @@ class GEOOrchestrator:
             cms_publish_dir=self.cms_dir,
         )
 
+        # Wikipedia connector for entity enrichment
+        try:
+            from connectors.wikipedia_connector import WikipediaConnector
+            self._wikipedia = WikipediaConnector()
+        except ImportError:
+            self._wikipedia = None
+
         # Engines
         self.answer_engine    = AnswerBlockEngine()
         self.citation_engine  = CitationGapEngine()
-        self.entity_engine    = EntityAuthorityEngine()
+        self.entity_engine    = EntityAuthorityEngine(wikipedia=self._wikipedia)
         self.visibility_engine= AIVisibilityEngine(
             registry_path=str(self.output_dir / "visibility_registry.json")
         )
