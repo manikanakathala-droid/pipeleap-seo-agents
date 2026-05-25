@@ -21,7 +21,6 @@ Full run sequence per execution:
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -58,11 +57,7 @@ class GEOOrchestrator:
         self.cms_dir    = config.get("integrations", {}).get("cms", {}).get("publish_dir", "")
 
         # Connectors
-        geo_cfg = config.get("geo_engine", {})
-        self.serp_connector = SERPAIConnector(
-            login=geo_cfg.get("dataforseo_login", "") or os.environ.get("DATAFORSEO_LOGIN", ""),
-            password=geo_cfg.get("dataforseo_password", "") or os.environ.get("DATAFORSEO_PASSWORD", ""),
-        )
+        self.serp_connector = SERPAIConnector()
         self.mention_tracker = MentionTracker(
             registry_path=str(self.output_dir / "mention_registry.json")
         )
@@ -107,17 +102,10 @@ class GEOOrchestrator:
             + all_global_queries()
         )
         self._log(f"  SERP check: {len(all_queries)} GEO queries ({len(all_global_queries())} global)")
-        serp_results = []
-        if self.serp_connector.is_configured:
-            serp_results = self.serp_connector.check_queries(
-                all_queries[:30],  # cap at 30 per run to manage API cost
-                delay=0.3,
-            )
-            ai_ov_count = len(self.serp_connector.ai_overview_queries(serp_results))
-            paa_count   = len(self.serp_connector.paa_queries(serp_results))
-            self._log(f"  SERP results: {ai_ov_count} AI Overviews, {paa_count} PAA detected")
-        else:
-            self._log("  SERP check skipped — DataForSEO not configured")
+        serp_results = self.serp_connector.check_queries(all_queries[:30], delay=0.3)
+        ai_ov_count = len(self.serp_connector.ai_overview_queries(serp_results))
+        paa_count   = len(self.serp_connector.paa_queries(serp_results))
+        self._log(f"  SERP results: {ai_ov_count} AI Overviews, {paa_count} PAA detected (free heuristics)")
 
         # ── 2. Citation gap detection ─────────────────────────────────────────
         published_slugs = self._get_published_slugs()
@@ -171,7 +159,6 @@ class GEOOrchestrator:
         self._log(f"  Outreach:      {len(outreach_targets)} citation targets outstanding")
 
         # ── 10. Publish GEO pages ─────────────────────────────────────────────
-        published_count = 0
         published_count = 0
         if self.cms_dir and geo_pages:
             published_count = self._publish_pages(geo_pages)

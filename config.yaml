@@ -59,3 +59,9 @@ seo:
 schedule:
   continuous: false
   interval_minutes: 1440
+
+alerts:
+  webhook_url: ""
+  alert_on_circuit_break: true
+  alert_on_github_conflict: true
+  alert_on_quota_exhaustion: true

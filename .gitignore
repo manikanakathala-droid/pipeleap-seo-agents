@@ -2,6 +2,7 @@
 pipeleap-launchpad/
 
 # Credentials
+credentials/
 service_account.json
 *.json.key
 secrets/

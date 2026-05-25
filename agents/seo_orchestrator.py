@@ -277,14 +277,32 @@ class SEOOrchestrator:
 
         return report_dict
 
-    def run_forever(self, interval_minutes: int) -> None:
+    def run_forever(self, interval_minutes: int, max_consecutive_failures: int = 3) -> None:
+        import signal
+        import threading
+        
+        shutdown = threading.Event()
+        
+        def signal_handler(signum, frame):
+            self.logger.info("Shutdown signal received")
+            shutdown.set()
+            
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+
         self.logger.info("Starting continuous SEO mode with %s minute intervals", interval_minutes)
-        while True:
+        consecutive_failures = 0
+        while not shutdown.is_set():
             try:
                 self.run_once()
+                consecutive_failures = 0
             except Exception as exc:  # pragma: no cover
-                self.logger.exception("Scheduled run failed: %s", exc)
-            time.sleep(max(interval_minutes, 1) * 60)
+                consecutive_failures += 1
+                self.logger.exception("Scheduled run failed (%d/%d): %s", consecutive_failures, max_consecutive_failures, exc)
+                if consecutive_failures >= max_consecutive_failures:
+                    self.logger.critical("Circuit breaker triggered — stopping continuous mode")
+                    break
+            shutdown.wait(timeout=max(interval_minutes, 1) * 60)
 
     def _crawl_site(self):
         if not self.execution.get("crawl_enabled", True):

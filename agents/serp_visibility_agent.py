@@ -26,8 +26,6 @@ Outputs:
   - outputs/{run_id}/weekly_serp_report.md
 """
 
-from __future__ import annotations
-
 import json
 import logging
 import os
@@ -91,7 +89,7 @@ class SerpVisibilityAgent:
         db_path = config.get("execution", {}).get("memory_db", "outputs/pipeleap_seo_memory.db")
         self.storage: SEOStorage | None = None
         try:
-            self.storage = SEOStorage(db_path, self.logger)
+            self.storage = SEOStorage(db_path)
         except Exception as exc:
             self.logger.warning("Storage init failed, running without persistence: %s", exc)
 

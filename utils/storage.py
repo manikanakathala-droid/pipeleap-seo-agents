@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from pathlib import Path
 from typing import Any, Optional
 
@@ -14,6 +15,7 @@ class SEOStorage:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.fallback_root = self.db_path.parent / f"{self.db_path.stem}_fallback"
         self.mode = "sqlite"
+        self.lock = threading.Lock()
         try:
             self._init_schema()
         except sqlite3.Error:
@@ -21,7 +23,10 @@ class SEOStorage:
             self.fallback_root.mkdir(parents=True, exist_ok=True)
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30, check_same_thread=False)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=10000")
+        return conn
 
     def _init_schema(self) -> None:
         with self._connect() as connection:
@@ -185,24 +190,25 @@ class SEOStorage:
             )
             return
 
-        with self._connect() as connection:
-            cursor = connection.cursor()
-            cursor.executemany(
-                """
-                INSERT INTO keyword_snapshots (run_id, keyword, payload, created_at)
-                VALUES (?, ?, ?, ?)
-                """,
-                [
-                    (
-                        run_id,
-                        self._payload_for(item)["keyword"],
-                        json.dumps(self._payload_for(item)),
-                        created_at,
-                    )
-                    for item in opportunities
-                ],
-            )
-            connection.commit()
+        with self.lock:
+            with self._connect() as connection:
+                cursor = connection.cursor()
+                cursor.executemany(
+                    """
+                    INSERT INTO keyword_snapshots (run_id, keyword, payload, created_at)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            run_id,
+                            self._payload_for(item)["keyword"],
+                            json.dumps(self._payload_for(item)),
+                            created_at,
+                        )
+                        for item in opportunities
+                    ],
+                )
+                connection.commit()
 
     def save_assets(self, run_id: str, created_at: str, assets: list[Any]) -> None:
         if self.mode != "sqlite":
@@ -221,25 +227,26 @@ class SEOStorage:
             )
             return
 
-        with self._connect() as connection:
-            cursor = connection.cursor()
-            cursor.executemany(
-                """
-                INSERT INTO assets (run_id, slug, page_type, payload, created_at)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                [
-                    (
-                        run_id,
-                        self._payload_for(asset)["slug"],
-                        self._payload_for(asset)["page_type"],
-                        json.dumps(self._payload_for(asset)),
-                        created_at,
-                    )
-                    for asset in assets
-                ],
-            )
-            connection.commit()
+        with self.lock:
+            with self._connect() as connection:
+                cursor = connection.cursor()
+                cursor.executemany(
+                    """
+                    INSERT INTO assets (run_id, slug, page_type, payload, created_at)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    [
+                        (
+                            run_id,
+                            self._payload_for(asset)["slug"],
+                            self._payload_for(asset)["page_type"],
+                            json.dumps(self._payload_for(asset)),
+                            created_at,
+                        )
+                        for asset in assets
+                    ],
+                )
+                connection.commit()
 
     def save_run_report(self, run_id: str, created_at: str, report: dict[str, Any]) -> None:
         if self.mode != "sqlite":
@@ -251,16 +258,17 @@ class SEOStorage:
             )
             return
 
-        with self._connect() as connection:
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                INSERT OR REPLACE INTO run_reports (run_id, payload, created_at)
-                VALUES (?, ?, ?)
-                """,
-                (run_id, json.dumps(report), created_at),
-            )
-            connection.commit()
+        with self.lock:
+            with self._connect() as connection:
+                cursor = connection.cursor()
+                cursor.execute(
+                    """
+                    INSERT OR REPLACE INTO run_reports (run_id, payload, created_at)
+                    VALUES (?, ?, ?)
+                    """,
+                    (run_id, json.dumps(report), created_at),
+                )
+                connection.commit()
 
     def fetch_previous_keyword(self, keyword: str) -> Optional[dict[str, Any]]:
         if self.mode != "sqlite":
@@ -354,16 +362,17 @@ class SEOStorage:
             return
         from datetime import datetime, timezone
         ts = created_at or datetime.now(timezone.utc).isoformat()
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO content_fingerprints
-                (slug, page_type, sha256, primary_keyword, topical_pillar, intent, word_count, created_at, run_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (slug, page_type, sha256, primary_keyword, topical_pillar, intent, word_count, ts, run_id),
-            )
-            conn.commit()
+        with self.lock:
+            with self._connect() as conn:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO content_fingerprints
+                    (slug, page_type, sha256, primary_keyword, topical_pillar, intent, word_count, created_at, run_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (slug, page_type, sha256, primary_keyword, topical_pillar, intent, word_count, ts, run_id),
+                )
+                conn.commit()
 
     def fetch_published_fingerprints(self, limit: int = 500) -> list[dict[str, Any]]:
         """Load published page metadata for cross-run uniqueness checks."""
@@ -429,18 +438,19 @@ class SEOStorage:
                   "lost_5plus": lost_5plus, "avg_position": avg_position, "created_at": created_at}],
             )
             return
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO organic_keyword_metrics
-                (run_id, period_start, period_end, total_ranking, new_keywords,
-                 lost_keywords, gained_5plus, lost_5plus, avg_position, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (run_id, period_start, period_end, total_ranking, new_keywords,
-                 lost_keywords, gained_5plus, lost_5plus, avg_position, created_at),
-            )
-            conn.commit()
+        with self.lock:
+            with self._connect() as conn:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO organic_keyword_metrics
+                    (run_id, period_start, period_end, total_ranking, new_keywords,
+                     lost_keywords, gained_5plus, lost_5plus, avg_position, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (run_id, period_start, period_end, total_ranking, new_keywords,
+                     lost_keywords, gained_5plus, lost_5plus, avg_position, created_at),
+                )
+                conn.commit()
 
     def fetch_organic_keyword_history(self, limit: int = 12) -> list[dict[str, Any]]:
         if self.mode != "sqlite":
@@ -488,18 +498,19 @@ class SEOStorage:
                   "avg_ctr": avg_ctr, "avg_position": avg_position, "created_at": created_at}],
             )
             return
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO organic_traffic_history
-                (run_id, period_start, period_end, total_clicks, total_impressions,
-                 avg_ctr, avg_position, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (run_id, period_start, period_end, total_clicks, total_impressions,
-                 avg_ctr, avg_position, created_at),
-            )
-            conn.commit()
+        with self.lock:
+            with self._connect() as conn:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO organic_traffic_history
+                    (run_id, period_start, period_end, total_clicks, total_impressions,
+                     avg_ctr, avg_position, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (run_id, period_start, period_end, total_clicks, total_impressions,
+                     avg_ctr, avg_position, created_at),
+                )
+                conn.commit()
 
     def fetch_organic_traffic_history(self, limit: int = 12) -> list[dict[str, Any]]:
         if self.mode != "sqlite":
@@ -534,20 +545,21 @@ class SEOStorage:
     ) -> None:
         if self.mode != "sqlite":
             return
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT INTO backlink_contacts
-                    (prospect_url, prospect_name, category, status, last_contacted, run_id, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(prospect_url) DO UPDATE SET
-                    status        = excluded.status,
-                    last_contacted = excluded.last_contacted,
-                    run_id        = excluded.run_id
-                """,
-                (prospect_url, prospect_name, category, status, created_at, run_id, created_at),
-            )
-            conn.commit()
+        with self.lock:
+            with self._connect() as conn:
+                conn.execute(
+                    """
+                    INSERT INTO backlink_contacts
+                        (prospect_url, prospect_name, category, status, last_contacted, run_id, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(prospect_url) DO UPDATE SET
+                        status        = excluded.status,
+                        last_contacted = excluded.last_contacted,
+                        run_id        = excluded.run_id
+                    """,
+                    (prospect_url, prospect_name, category, status, created_at, run_id, created_at),
+                )
+                conn.commit()
 
     def fetch_contacted_prospect_urls(self, within_days: int = 30) -> set[str]:
         """Returns URLs contacted within the last `within_days` days."""
@@ -590,6 +602,12 @@ class SEOStorage:
                 "SELECT run_id FROM run_reports ORDER BY created_at DESC LIMIT 1"
             ).fetchone()
         return row[0] if row else None
+
+    def fetch_actioned_directory_urls(self) -> set[str]:
+        return set()
+
+    def fetch_actioned_publication_urls(self) -> set[str]:
+        return set()
 
     @staticmethod
     def _append_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:

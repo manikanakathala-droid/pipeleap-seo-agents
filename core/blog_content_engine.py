@@ -238,6 +238,10 @@ class BlogContentEngine:
         else:
             depth_mode = "comprehensive"
 
+        trend_score: int = int(gsc_row.get("trend_score", 0)) if gsc_row else 0
+        if trend_score >= 50 and depth_mode in ("comprehensive", "depth_upgrade"):
+            depth_mode = "trending"
+
         return {
             "difficulty": difficulty,
             "target_word_count": target_word_count,
@@ -247,7 +251,83 @@ class BlogContentEngine:
             "position": position,
             "impressions": impressions,
             "ctr": ctr,
+            "trend_score": trend_score,
         }
+
+    # ── NEPQ opening ─────────────────────────────────────────────────────────
+
+    def _nepq_opening(self, keyword: str, intent: str, strategy: dict[str, Any]) -> str:
+        depth = strategy.get("depth_mode", "comprehensive")
+        trending = depth == "trending"
+
+        if intent == "commercial" or "alternative" in keyword or "vs " in keyword:
+            pain = (
+                f"Most VP Sales Ops evaluating {keyword} are not starting from scratch. "
+                f"They already have a stack. The question they are actually asking is whether "
+                f"the new tool will solve the coordination problem the current stack created."
+            )
+            cost = (
+                f"The cost of getting this wrong is not a failed tool purchase. "
+                f"It is six months of RevOps time rebuilding integrations, dirty CRM records "
+                f"that corrupt forecast accuracy, and a pipeline number that never closes the gap."
+            )
+            gap = (
+                f"Most evaluations skip the architecture question entirely. "
+                f"They compare feature checklists instead of asking: who owns the workflow after launch, "
+                f"and can that person update it without an engineering ticket?"
+            )
+        elif keyword.lower().startswith("how to") or keyword.lower().startswith("how "):
+            pain = (
+                f"The VP of Sales Ops who searches for {keyword} has usually already tried the obvious path. "
+                f"They have a tool. The tool does part of the job. "
+                f"The part it does not do is costing them pipeline."
+            )
+            cost = (
+                f"At 10 manual steps per contact, a 500-contact list means 5,000 hand-offs "
+                f"that can break before a single sequence fires. "
+                f"Each break compounds — bad data in CRM, duplicate outreach, replies that go to the wrong rep."
+            )
+            gap = (
+                f"The teams that solved {keyword} did not find a better tool. "
+                f"They stopped treating it as a tooling problem and started treating it as a systems problem. "
+                f"The specific platform matters less than whether all components are governed in one execution layer."
+            )
+        elif any(t in keyword.lower() for t in ("why ", "problem", "fix", "failing", "broken")):
+            pain = (
+                f"When a CRO asks why {keyword} is not working, the answer is almost never the tool. "
+                f"It is the architecture underneath it — and the fact that no single person owns "
+                f"the end-to-end flow."
+            )
+            cost = (
+                f"A broken {keyword} system does not announce itself. "
+                f"It shows up as forecast misses, declining reply rates, and RevOps spending "
+                f"a quarter investigating data quality instead of building pipeline."
+            )
+            gap = (
+                f"The standard fix is to add another point solution. "
+                f"That extends the integration surface, adds another failure point, "
+                f"and leaves the root problem — no governed execution layer — untouched."
+            )
+        else:
+            pain = (
+                f"Revenue leaders researching {keyword} are not looking for a definition. "
+                f"They are looking for a system that actually runs in production — "
+                f"one their RevOps team can own without filing engineering tickets every time a workflow breaks."
+            )
+            cost = (
+                f"Without a governed approach to {keyword}, the operational ceiling hits fast. "
+                f"Manual steps accumulate, data quality degrades, and the pipeline number "
+                f"becomes a function of how many hours RevOps can put in, not how good the strategy is."
+            )
+            gap = (
+                f"Most {keyword} implementations fail at the handoff layer — "
+                f"between enrichment and CRM, between CRM and sequencer, between sequence and reply routing. "
+                f"Each handoff is owned by a different tool, a different team, and a different failure mode."
+            )
+
+        if trending:
+            return _strip_formatting(f"{pain}\n\n{cost}")
+        return _strip_formatting(f"{pain}\n\n{cost}\n\n{gap}")
 
     # ── Blog body renderers ───────────────────────────────────────────────────
 
@@ -285,19 +365,7 @@ class BlogContentEngine:
             f"# {kw_title}",
             ctr_note,
             snippet,
-            f"## Why {kw_title} is harder than most teams expect",
-            (
-                f"Teams that attempt {keyword} without a governed system run into the same three "
-                f"failure modes: data quality breaks mid-workflow, CRM ownership is inconsistent, "
-                f"and there's no feedback loop to catch errors before they reach the inbox."
-            ),
-            "",
-            (
-                f"The teams with {keyword} working in production share one characteristic: they "
-                f"treat it as a systems problem, not a tooling problem. The specific enrichment "
-                f"provider or sequencer matters far less than whether those components are connected "
-                f"in one governed execution layer."
-            ),
+            self._nepq_opening(keyword, cluster.intent, strategy),
             "",
             f"## The four layers every {kw_title} system requires",
             "",
@@ -400,38 +468,11 @@ class BlogContentEngine:
     ) -> str:
         brand = self.brand
         snippet = self._snippet_block(keyword, "definition") if strategy["target_featured_snippet"] else ""
-        persona = self._persona(cluster.cluster_name)
 
         sections = [
             f"# {kw_title}",
             snippet,
-            f"## What {kw_title} actually means for {persona}",
-            (
-                f"When {persona} evaluate {keyword}, they are not looking for a definition. "
-                f"They are asking whether it will solve the specific operational problem slowing "
-                f"their pipeline down — and whether they can actually run it without adding headcount."
-            ),
-            "",
-            (
-                f"The teams getting the most from {keyword} in 2026 share three traits: they treat it "
-                f"as a system problem, not a tool selection; they measure outcomes (demos booked, "
-                f"CRM hygiene) rather than activity (emails sent); and they build feedback loops so "
-                f"the system improves without manual intervention."
-            ),
-            "",
-            f"## The operational problem {kw_title} is solving",
-            "",
-            (
-                f"Revenue teams hit a ceiling when {keyword} depends on manual steps — data lookup, "
-                f"CRM entry, sequence management, reply triage. Each manual step is a failure point "
-                f"and a rate limiter on scale."
-            ),
-            "",
-            (
-                f"Shifting to a governed {keyword} system eliminates these rate limiters by enforcing "
-                f"data quality at intake, automating handoffs between workflow steps, and providing "
-                f"the observability that lets RevOps iterate without breaking what's working."
-            ),
+            self._nepq_opening(keyword, cluster.intent, strategy),
             "",
             f"## Core components of a production-grade {kw_title} system",
             "",
@@ -487,26 +528,9 @@ class BlogContentEngine:
         sections = [
             f"# {kw_title}",
             snippet,
-            f"## The decision framework for {kw_title}",
+            self._nepq_opening(keyword, cluster.intent, strategy),
             "",
-            "Before evaluating specific tools, revenue teams should answer three questions:",
-            "",
-            (
-                f"**1. What outcome do you need?** — Pipeline generated, CRM hygiene improved, "
-                f"SDR time saved, or reply rates increased. The answer changes which architecture fits."
-            ),
-            (
-                f"**2. What does your current stack actually do?** — Most teams over-estimate their "
-                f"existing tool coverage and under-estimate integration overhead. Map the manual steps "
-                f"first."
-            ),
-            (
-                f"**3. Who owns the workflow after launch?** — RevOps-owned systems need different "
-                f"governance than engineering-owned ones. Choose a tool your actual operator can run "
-                f"and update."
-            ),
-            "",
-            f"## What revenue teams actually compare when evaluating {keyword}",
+            f"## What VP Sales Ops and RevOps leads actually compare when evaluating {keyword}",
             "",
             "| Dimension | Why it matters |",
             "| --- | --- |",
@@ -561,14 +585,7 @@ class BlogContentEngine:
         sections = [
             f"# {kw_title}",
             snippet,
-            f"## Root cause diagnosis",
-            "",
-            (
-                f"When {keyword} becomes a problem, the root cause is almost never the tool. "
-                f"It is the architecture. Most revenue teams discover this after months of trying "
-                f"to fix symptoms — open rates, reply rates, CRM hygiene — without addressing the "
-                f"underlying data and workflow fragmentation."
-            ),
+            self._nepq_opening(keyword, cluster.intent, strategy),
             "",
             f"## The three failure patterns",
             "",

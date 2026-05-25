@@ -1,12 +1,11 @@
 """
-SERP AI Connector — detects AI Overviews, PAA boxes, and AI-generated features
-in Google SERPs using DataForSEO's organic/advanced endpoint.
+SERP AI Connector — detects AI Overview, PAA, and featured snippet candidates
+using free signals: Google Autocomplete, question-intent analysis, and Trends.
 
-Feeds the CitationGapEngine and AIVisibilityEngine with real SERP feature data.
+No paid API required. Falls back gracefully on network errors.
 """
 from __future__ import annotations
 
-import os
 import time
 from typing import Any
 
@@ -16,148 +15,145 @@ try:
 except ImportError:
     _HAS_REQUESTS = False
 
-BASE_URL = "https://api.dataforseo.com/v3"
-DEFAULT_LOCATION = 2840  # US
+try:
+    from pytrends.request import TrendReq as _TrendReq
+    _HAS_PYTRENDS = True
+except ImportError:
+    _HAS_PYTRENDS = False
+
+DEFAULT_LOCATION = 2840
 DEFAULT_LANGUAGE = "en"
+
+# Question prefixes that strongly correlate with PAA / featured snippets
+_PAA_PREFIXES = ("what is", "what are", "how to", "how does", "why", "when", "which", "can i", "does")
+_SNIPPET_PREFIXES = ("what is", "what are", "how to", "how does", "define", "meaning of")
+_AI_OVERVIEW_SIGNALS = ("best", "vs", "compare", "review", "top", "alternative")
 
 
 class SERPAIConnector:
     """
-    Queries DataForSEO to detect AI-generated SERP features for GEO target queries.
-    Falls back to empty results when not configured — never crashes the agent.
+    Free replacement for the DataForSEO SERP connector.
+    Uses question-intent heuristics + Google Autocomplete to detect
+    AI Overview / PAA / featured snippet opportunities.
+    Always configured — no credentials needed.
     """
 
-    # DataForSEO SERP item types that signal AI answer presence
-    AI_FEATURE_TYPES = {
-        "ai_overview",
-        "generative_answer",
-        "featured_snippet",
-        "people_also_ask",
-        "knowledge_graph",
-        "rich_snippet",
-        "discussions_and_forums",
-    }
+    is_configured = True
 
-    def __init__(self, login: str = "", password: str = "") -> None:
-        import base64
-        self.login    = login    or os.environ.get("DATAFORSEO_LOGIN", "")
-        self.password = password or os.environ.get("DATAFORSEO_PASSWORD", "")
-        self._configured = bool(self.login and self.password and _HAS_REQUESTS)
-        if self._configured:
-            token = base64.b64encode(f"{self.login}:{self.password}".encode()).decode()
-            self._headers = {
-                "Authorization": f"Basic {token}",
-                "Content-Type": "application/json",
-            }
+    def __init__(self, login: str = "", password: str = "") -> None:  # noqa: ARG002
+        self._trends = None
 
-    @property
-    def is_configured(self) -> bool:
-        return self._configured
+    def _get_trends(self):
+        if not _HAS_PYTRENDS or self._trends is not None:
+            return self._trends
+        try:
+            self._trends = _TrendReq(hl="en-US", tz=0, timeout=(10, 25), retries=2, backoff_factor=0.5)
+        except Exception:
+            pass
+        return self._trends
 
     def check_queries(
         self,
         queries: list[str],
-        location_code: int = DEFAULT_LOCATION,
+        location_code: int = DEFAULT_LOCATION,  # noqa: ARG002
         delay: float = 0.25,
     ) -> list[dict[str, Any]]:
-        """
-        Check a list of queries for AI-generated SERP features.
-
-        Returns list of dicts:
-          keyword, has_ai_overview, has_paa, has_featured_snippet,
-          has_knowledge_graph, item_types (all types found)
-        """
-        if not self.is_configured:
-            return self._empty_results(queries)
-
         results = []
         for query in queries:
-            result = self._check_single(query, location_code)
-            results.append(result)
+            results.append(self._check_single(query))
             if delay:
                 time.sleep(delay)
-
         return results
 
     def check_queries_batch(
         self,
         queries: list[str],
-        location_code: int = DEFAULT_LOCATION,
-        batch_size: int = 5,
+        location_code: int = DEFAULT_LOCATION,  # noqa: ARG002
+        batch_size: int = 5,  # noqa: ARG002
     ) -> list[dict[str, Any]]:
-        """Batch check — groups queries to minimise API calls."""
-        all_results = []
-        for i in range(0, len(queries), batch_size):
-            batch = queries[i:i + batch_size]
-            all_results.extend(self.check_queries(batch, location_code, delay=0.2))
-        return all_results
+        return self.check_queries(queries, location_code, delay=0.2)
 
     def ai_overview_queries(self, results: list[dict]) -> list[str]:
-        """Return only queries where an AI Overview was detected."""
         return [r["keyword"] for r in results if r.get("has_ai_overview")]
 
     def paa_queries(self, results: list[dict]) -> list[str]:
-        """Return queries where People Also Ask boxes are present."""
         return [r["keyword"] for r in results if r.get("has_paa")]
 
     def featured_snippet_queries(self, results: list[dict]) -> list[str]:
-        """Return queries where a featured snippet is present (position-0 opportunity)."""
         return [r["keyword"] for r in results if r.get("has_featured_snippet")]
 
-    # ── Internals ──────────────────────────────────────────────────────────────
+    # ── Internals ─────────────────────────────────────────────────────────────
 
-    def _check_single(self, query: str, location_code: int) -> dict[str, Any]:
-        payload = [{
-            "keyword": query,
-            "location_code": location_code,
-            "language_code": DEFAULT_LANGUAGE,
-            "device": "desktop",
-        }]
-        try:
-            resp = _requests.post(
-                f"{BASE_URL}/serp/google/organic/live/advanced",
-                json=payload,
-                headers=self._headers,
-                timeout=20,
-            )
-            if resp.status_code == 403:
-                body = resp.text
-                if "40104" in body or "verify" in body.lower():
-                    return self._empty_result(query, error="account_not_verified")
-            resp.raise_for_status()
-            data = resp.json()
+    def _check_single(self, query: str) -> dict[str, Any]:
+        q = query.lower().strip()
 
-            item_types: set[str] = set()
-            for task in data.get("tasks", []):
-                for result in (task.get("result") or []):
-                    for item in (result.get("items") or []):
-                        item_types.add(item.get("type", ""))
+        has_paa = any(q.startswith(p) for p in _PAA_PREFIXES)
+        has_featured_snippet = any(q.startswith(p) for p in _SNIPPET_PREFIXES)
+        has_ai_overview = any(w in q for w in _AI_OVERVIEW_SIGNALS) or has_featured_snippet
 
-            return {
-                "keyword":              query,
-                "has_ai_overview":      "ai_overview" in item_types or "generative_answer" in item_types,
-                "has_paa":              "people_also_ask" in item_types,
-                "has_featured_snippet": "featured_snippet" in item_types,
-                "has_knowledge_graph":  "knowledge_graph" in item_types,
-                "item_types":           sorted(item_types & self.AI_FEATURE_TYPES),
-                "source":               "dataforseo",
-            }
-        except Exception as exc:
-            return self._empty_result(query, error=str(exc))
+        # Boost signals using Google Autocomplete question expansions
+        ac_questions = self._autocomplete_questions(query)
+        if ac_questions:
+            has_paa = True
 
-    @staticmethod
-    def _empty_result(query: str, error: str = "") -> dict[str, Any]:
+        # Trends interest as proxy for AI Overview likelihood
+        trend_score = self._trends_score(query)
+        if trend_score >= 60:
+            has_ai_overview = True
+
         return {
             "keyword":              query,
-            "has_ai_overview":      False,
-            "has_paa":              False,
-            "has_featured_snippet": False,
+            "has_ai_overview":      has_ai_overview,
+            "has_paa":              has_paa,
+            "has_featured_snippet": has_featured_snippet,
             "has_knowledge_graph":  False,
-            "item_types":           [],
-            "source":               "not_configured" if not error else "error",
-            "error":                error,
+            "item_types":           self._item_types(has_ai_overview, has_paa, has_featured_snippet),
+            "trend_score":          trend_score,
+            "paa_questions":        ac_questions[:5],
+            "source":               "free_heuristic",
         }
 
+    def _autocomplete_questions(self, seed: str) -> list[str]:
+        if not _HAS_REQUESTS:
+            return []
+        questions = []
+        for prefix in ("what is", "how to", "why", "best"):
+            try:
+                resp = _requests.get(
+                    "https://suggestqueries.google.com/complete/search",
+                    params={"client": "firefox", "q": f"{prefix} {seed}"},
+                    timeout=4,
+                    headers={"User-Agent": "Mozilla/5.0"},
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if isinstance(data, list) and len(data) > 1:
+                        questions.extend(data[1][:3])
+            except Exception:
+                pass
+            time.sleep(0.1)
+        return list(dict.fromkeys(questions))
+
+    def _trends_score(self, query: str) -> int:
+        pt = self._get_trends()
+        if not pt:
+            return 40
+        try:
+            pt.build_payload([query], geo="US", timeframe="today 12-m")
+            data = pt.interest_over_time()
+            if not data.empty and query in data.columns:
+                return int(data[query].mean())
+        except Exception:
+            pass
+        return 40
+
     @staticmethod
-    def _empty_results(queries: list[str]) -> list[dict[str, Any]]:
-        return [SERPAIConnector._empty_result(q, error="not_configured") for q in queries]
+    def _item_types(ai_overview: bool, paa: bool, snippet: bool) -> list[str]:
+        types = []
+        if ai_overview:
+            types.append("ai_overview")
+        if paa:
+            types.append("people_also_ask")
+        if snippet:
+            types.append("featured_snippet")
+        return types
