@@ -4,9 +4,9 @@ Rebuilds and commits public/sitemap.xml with:
 - All 73 glossary term URLs
 - All existing blog, tools, and category URLs preserved
 """
-import base64, re, requests
+import base64, os, re, requests
 
-TOKEN  = "os.getenv("GITHUB_TOKEN", "")"
+TOKEN  = os.getenv("GITHUB_TOKEN", "")
 REPO   = "manikanakathala-droid/pipeleap-launchpad-040053e5"
 BRANCH = "main"
 API    = "https://api.github.com"

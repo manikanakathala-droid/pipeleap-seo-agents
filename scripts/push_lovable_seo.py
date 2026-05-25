@@ -3,10 +3,10 @@ One-shot script — adds JSON-LD schema to 5 Lovable pages that were missing it.
 Pages: Results, GTMAudit, Pricing, About, Contact.
 Commits each file directly to the Lovable GitHub repo via the Contents API.
 """
-import base64, json, sys
+import base64, json, os, sys
 import requests
 
-TOKEN = "os.getenv("GITHUB_TOKEN", "")"
+TOKEN = os.getenv("GITHUB_TOKEN", "")
 REPO  = "manikanakathala-droid/pipeleap-launchpad-040053e5"
 BRANCH = "main"
 API = "https://api.github.com"

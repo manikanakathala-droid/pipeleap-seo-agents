@@ -3,9 +3,9 @@ Round 2 fixes:
 1. Blog.tsx — add CollectionPage JSON-LD to /blog index
 2. Index.tsx — add SoftwareApplication schema alongside existing Organization + WebSite
 """
-import base64, requests
+import base64, os, requests
 
-TOKEN  = "os.getenv("GITHUB_TOKEN", "")"
+TOKEN  = os.getenv("GITHUB_TOKEN", "")
 REPO   = "manikanakathala-droid/pipeleap-launchpad-040053e5"
 BRANCH = "main"
 API    = "https://api.github.com"
