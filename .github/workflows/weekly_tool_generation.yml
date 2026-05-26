@@ -76,6 +76,27 @@ jobs:
             exit 1
           fi
 
+      - name: Commit tool pages to launchpad
+        run: |
+          cd pipeleap-launchpad
+          git config user.name "pipeleap-seo-bot"
+          git config user.email "seo-bot@pipeleap.com"
+          git add src/data/tools/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No tool page changes to commit."
+          else
+            git commit -m "Weekly tool pages #${{ github.run_number }}"
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin main; then
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push tool page changes after 3 attempts." >&2
+            exit 1
+          fi
+
       - name: Upload generation artifacts
         if: always()
         uses: actions/upload-artifact@v4

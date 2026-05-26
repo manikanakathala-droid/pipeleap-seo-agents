@@ -94,7 +94,7 @@
       "repo": "manikanakathala-droid/pipeleap-launchpad-040053e5",
       "branch": "main",
       "blog_data_path": "src/data/blog-articles.ts",
-      "tools_data_path": "src/data/tools-data.ts"
+      "tools_data_path": "src/data/tools/index.ts"
     }
   },
   "seo": {
