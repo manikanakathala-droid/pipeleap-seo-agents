@@ -168,16 +168,33 @@ class GitHubPublisher:
             our_end = our_content.rfind(end_marker)
             if our_end == -1:
                 return our_content
-            last_open = our_content.rfind("{", 0, our_end)
-            if last_open == -1:
+            # Scan backward from ] to find matching opening { using depth tracking
+            depth = 0
+            pos = our_end - 1
+            in_string = False
+            string_char = None
+            while pos >= 0:
+                ch = our_content[pos]
+                if in_string:
+                    if ch == '\\':
+                        pos -= 1
+                    elif ch == string_char:
+                        in_string = False
+                else:
+                    if ch in ('"', "'", '`'):
+                        in_string = True
+                        string_char = ch
+                    elif ch in ('}', ']'):
+                        depth += 1
+                    elif ch in ('{', '['):
+                        if depth == 0:
+                            break
+                        depth -= 1
+                pos -= 1
+            if pos < 0:
                 return our_content
-            entry_start = our_content.rfind("\n", 0, last_open)
-            if entry_start == -1:
-                entry_start = 0
-            our_new_entry = our_content[entry_start:our_end].strip()
-            latest_end = latest_content.rfind(end_marker)
-            if latest_end == -1:
-                return our_content
+            our_new_entry = our_content[pos:our_end].strip()
+            latest_end = self._find_last_array_end(latest_content)
             before = latest_content[:latest_end].rstrip()
             if not before.endswith(","):
                 before += ","
@@ -242,10 +259,43 @@ class GitHubPublisher:
 
     # ── TypeScript data file manipulation ─────────────────────────────────────
 
+    @staticmethod
+    def _find_last_array_end(ts_content: str) -> int:
+        """Return position of `]` in the last top-level `];` that closes an array export.
+        Uses bracket-depth tracking and string-awareness to skip nested arrays and string content.
+        """
+        depth = 0
+        in_string = False
+        string_char = None
+        last_match = -1
+        i = 0
+        while i < len(ts_content):
+            ch = ts_content[i]
+            if in_string:
+                if ch == '\\' and i + 1 < len(ts_content):
+                    i += 2
+                    continue
+                if ch == string_char:
+                    in_string = False
+            else:
+                if ch in ('"', "'", '`'):
+                    in_string = True
+                    string_char = ch
+                elif ch in ('{', '['):
+                    depth += 1
+                elif ch in ('}', ']'):
+                    depth -= 1
+                    if depth == 0 and ch == ']' and i + 1 < len(ts_content) and ts_content[i + 1] == ';':
+                        last_match = i
+            i += 1
+        if last_match == -1:
+            raise ValueError("Could not find closing ]; in TypeScript data file")
+        return last_match
+
     def _append_ts_entry(self, ts_content: str, entry: dict[str, Any]) -> str:
         """
         Append a new object literal into the last array export in a TypeScript file.
-        Supports both `];` (direct array) and `allTools: Tool[] = [...existing]` (spread import) patterns.
+        Uses depth-tracked brace matching to find the correct insertion point.
         Skips if an entry with the same `slug` already exists.
         """
         slug = entry.get("slug", "")
@@ -257,24 +307,11 @@ class GitHubPublisher:
                     return ts_content
         entry_str = self._dict_to_ts_object(entry)
 
-        # Spread import pattern: ...SomeModule,\n];
-        spread_match = re.search(r"(\.\.\.\w+),\s*\]", ts_content)
-        if spread_match:
-            last_spread = ts_content.rfind("...")
-            insert_pos = ts_content.find("]", last_spread)
-            before = ts_content[:insert_pos].rstrip()
-            if not before.endswith(","):
-                before += ","
-            return before + f"\n  {entry_str},\n" + ts_content[insert_pos:]
-
-        # Standard direct array: ...\n];
-        last_bracket = ts_content.rfind("];")
-        if last_bracket == -1:
-            raise ValueError("Could not find closing ]; in TypeScript data file")
-        before = ts_content[:last_bracket].rstrip()
+        idx = self._find_last_array_end(ts_content)
+        before = ts_content[:idx].rstrip()
         if not before.endswith(","):
             before += ","
-        return before + f"\n  {entry_str},\n" + ts_content[last_bracket:]
+        return before + f"\n  {entry_str},\n" + ts_content[idx:]
 
     def _dict_to_ts_object(self, obj: dict[str, Any], indent: int = 2) -> str:
         """Convert a Python dict to a TypeScript object literal string."""

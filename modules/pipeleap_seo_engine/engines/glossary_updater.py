@@ -506,7 +506,7 @@ class GlossaryUpdater:
         marker = "];"
         idx = existing_content.rfind(marker + "\nexport const glossaryCategories")
         if idx == -1:
-            idx = existing_content.rfind(marker)
+            idx = self._find_last_array_end(existing_content)
         if idx != -1:
             updated_content = existing_content[:idx] + insertion + "\n" + marker + existing_content[idx + len(marker):]
         else:
@@ -521,6 +521,38 @@ class GlossaryUpdater:
             "total_count": len(all_slugs_after),
             "new_terms": [c["slug"] for c in unique_candidates],
         }
+
+    @staticmethod
+    def _find_last_array_end(ts_content: str) -> int:
+        """Return position of `]` in the last top-level `];` that closes an array export.
+        Uses bracket-depth tracking and string-awareness to skip nested arrays and string content.
+        Returns -1 if not found.
+        """
+        depth = 0
+        in_string = False
+        string_char = None
+        last_match = -1
+        i = 0
+        while i < len(ts_content):
+            ch = ts_content[i]
+            if in_string:
+                if ch == '\\' and i + 1 < len(ts_content):
+                    i += 2
+                    continue
+                if ch == string_char:
+                    in_string = False
+            else:
+                if ch in ('"', "'", '`'):
+                    in_string = True
+                    string_char = ch
+                elif ch in ('{', '['):
+                    depth += 1
+                elif ch in ('}', ']'):
+                    depth -= 1
+                    if depth == 0 and ch == ']' and i + 1 < len(ts_content) and ts_content[i + 1] == ';':
+                        last_match = i
+            i += 1
+        return last_match
 
     @staticmethod
     def _term_to_ts(term: dict) -> str:
