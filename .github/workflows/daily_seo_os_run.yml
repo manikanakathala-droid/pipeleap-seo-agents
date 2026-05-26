@@ -1,8 +1,6 @@
 name: Daily SEO OS Run
 
 on:
-  schedule:
-    - cron: "30 11 * * *"   # 11:30 UTC / 5:00 PM IST
   workflow_dispatch:
     inputs:
       disable_crawl:
@@ -23,7 +21,7 @@ concurrency:
 
 jobs:
   seo-os:
-    name: "SEO OS - OBSERVE -> DIFF -> DECIDE -> EXECUTE -> LEARN -> DASHBOARD"
+    name: "SEO OS - OBSERVE -> DIFF -> DECIDE -> EXECUTE -> LEARN"
     runs-on: ubuntu-latest
     timeout-minutes: 45
     if: >
@@ -60,12 +58,10 @@ jobs:
           mkdir -p credentials
           echo "$GSC_CREDENTIALS" > credentials/gsc_service_account.json
 
-      - name: Restore SEO OS state and dashboard cache
+      - name: Restore SEO OS state cache
         uses: actions/cache@v4
         with:
-          path: |
-            outputs/seo_os_state
-            dashboard
+          path: outputs/seo_os_state
           key: seo-os-cache-${{ github.run_id }}
           restore-keys: seo-os-cache-
 
@@ -104,24 +100,6 @@ jobs:
             exit 1
           fi
 
-      - name: Commit dashboard outputs
-        run: |
-          git add dashboard/ 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "No dashboard changes."
-          else
-            git commit -m "dashboard: live update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            for attempt in 1 2 3; do
-              if git push; then
-                exit 0
-              fi
-              git pull --rebase --autostash origin master
-              sleep $((attempt * 10))
-            done
-            echo "Unable to push dashboard changes after 3 attempts." >&2
-            exit 1
-          fi
-
       - name: Commit raw run outputs
         run: |
           git add -f outputs/ 2>/dev/null || true
@@ -140,13 +118,11 @@ jobs:
             exit 1
           fi
 
-      - name: Save SEO OS state and dashboard cache
+      - name: Save SEO OS state cache
         uses: actions/cache@v4
         if: always()
         with:
-          path: |
-            outputs/seo_os_state
-            dashboard
+          path: outputs/seo_os_state
           key: seo-os-cache-${{ github.run_id }}
 
       - name: Upload daily briefing
@@ -159,10 +135,4 @@ jobs:
             outputs/*/seo_os_report.json
           retention-days: 30
 
-      - name: Upload dashboard snapshot
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: seo-dashboard-${{ github.run_id }}
-          path: dashboard/
-          retention-days: 90
+

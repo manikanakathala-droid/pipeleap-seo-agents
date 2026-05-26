@@ -6,8 +6,7 @@ Run by daily_seo_os_run.yml in pipeleap-seo-workflows.
 
 Pipeline:
   1. SEOOSAgent.run_once()      — 11-step autonomous execution
-  2. repo_writer.write_all()    — structured /seo/ and /content/ outputs
-  3. dashboard_writer.write_dashboard() — live dashboard files
+   2. repo_writer.write_all()    — structured /seo/ and /content/ outputs
 """
 
 import json
@@ -60,24 +59,12 @@ def main() -> int:
     except Exception as exc:
         logger.error("Repo writer failed: %s", exc)
         result.setdefault("errors", []).append(f"repo_writer: {exc}")
-
-    # -- Step C: Write /dashboard/ files ------------------------------------
-    try:
-        from core.dashboard_writer import write_dashboard
-        dash_files = write_dashboard(run_id=run_id, result=result, repo_root=".")
-        logger.info("Dashboard writer: %d files written", len(dash_files))
-        result["dashboard_files_written"] = dash_files
-    except Exception as exc:
-        logger.error("Dashboard writer failed: %s", exc)
-        result.setdefault("errors", []).append(f"dashboard_writer: {exc}")
-
     print(json.dumps(result, indent=2, default=str))
     logger.info(
-        "SEO OS complete — score=%d mode=%s repo=%d dashboard=%d",
+        "SEO OS complete — score=%d mode=%s repo=%d",
         result.get("seo_score", {}).get("overall", 0),
         result.get("mode", ""),
         len(result.get("repo_files_written", [])),
-        len(result.get("dashboard_files_written", [])),
     )
     return 0
 

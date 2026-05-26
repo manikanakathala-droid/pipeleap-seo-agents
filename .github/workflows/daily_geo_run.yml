@@ -1,9 +1,6 @@
 name: Daily GEO Agent Run
 
 on:
-  schedule:
-    # 6:30 PM IST = 13:00 UTC daily
-    - cron: "0 13 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

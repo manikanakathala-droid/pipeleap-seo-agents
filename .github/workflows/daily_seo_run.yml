@@ -1,8 +1,6 @@
 name: Daily SEO Agent Run
 
 on:
-  push:
-    branches: [master]
   schedule:
     # 5:30 PM IST = 12:00 UTC daily
     - cron: "0 12 * * *"
