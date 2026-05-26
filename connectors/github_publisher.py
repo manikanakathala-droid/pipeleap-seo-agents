@@ -381,7 +381,7 @@ class GitHubPublisher:
 
         return {
             "slug": clean_slug,
-            "name": getattr(page, "seo_title", "") or getattr(page, "title", "") or getattr(page, "name", ""),
+            "name": getattr(page, "name", "") or getattr(page, "seo_title", "") or getattr(page, "title", ""),
             "categorySlug": cat_slug,
             "tagline": getattr(page, "meta_description", ""),
             "description": getattr(page, "meta_description", ""),

@@ -513,6 +513,8 @@
     "multi_competitor_pages_per_run": 4,
     "integration_pages_per_run": 10,
     "workflow_pages_per_run": 5,
+    "generate_tools_pages": true,
+    "tools_pages_per_run": 8,
     "generate_glossary": true,
     "generate_integrations": true,
     "generate_workflows": true,

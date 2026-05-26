@@ -1,0 +1,56 @@
+name: Weekly Tool Page Generation
+
+on:
+  schedule:
+    - cron: "0 6 * * MON"
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: Number of tool pages to generate
+        required: true
+        default: "20"
+        type: number
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  LAUNCHPAD_DEPLOY_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
+
+jobs:
+  generate-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml google-genai>=2.6.0 requests
+
+      - name: Generate and publish tool pages
+        id: generate
+        env:
+          TOOLS_BATCH_SIZE: ${{ inputs.batch_size || '20' }}
+        run: |
+          # Set batch size via config override (growth engine reads from config)
+          python -c "
+          import yaml
+          cfg = yaml.safe_load(open('config.yaml'))
+          cfg.setdefault('growth_engine', {})['tools_pages_per_run'] = ${{ inputs.batch_size || 20 }}
+          with open('config.yaml', 'w') as f:
+              yaml.dump(cfg, f, default_flow_style=False)
+          "
+          python run_growth_engine.py --tools-only
+          echo "Tool page generation complete"
+
+      - name: Upload generation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool-generation-outputs
+          path: outputs/
+          retention-days: 14

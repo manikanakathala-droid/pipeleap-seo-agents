@@ -172,11 +172,12 @@ class GrowthEngineOrchestrator:
             all_pages.extend(wf_pages)
             self._log(f"  Workflow recipes: {len(wf_pages)}")
 
-        # ── 5a. Tools pages — differentiated operator guides, one per category ─
+        # ── 5a. Tools pages — overview/review pages from tool database ─
         if mc.get("generate_tools_pages", True):
-            tools_pages = self.tools_gen.generate_all(existing_slugs)[:mc.get("tools_pages_per_run", 8)]
+            batch = mc.get("tools_pages_per_run", 20)
+            tools_pages = self.tools_gen.generate_all(existing_slugs, batch_size=batch)
             all_pages.extend(tools_pages)
-            self._log(f"  Tools pages:      {len(tools_pages)}")
+            self._log(f"  Tools pages:      {len(tools_pages)}/{batch}")
 
         # ── 5b. BOFU pages (demo, ROI, pricing comparison) ───────────────────
         if mc.get("generate_bofu", True):
@@ -485,7 +486,7 @@ class GrowthEngineOrchestrator:
                 repo=gh_cfg.get("repo", ""),
                 branch=gh_cfg.get("branch", "main"),
                 blog_data_path=gh_cfg.get("blog_data_path", "src/data/blog-articles.ts"),
-                tools_data_path=gh_cfg.get("tools_data_path", "src/data/tools-data.ts"),
+                tools_data_path=gh_cfg.get("tools_data_path", "src/data/tools/index.ts"),
             )
             if gh.is_configured():
                 for page in pages:

@@ -36,9 +36,12 @@ def main() -> int:
     competitors_arg = ""
     pages_arg = "all"
     dry_run = False
+    tools_only = False
 
     if "--dry-run" in sys.argv:
         dry_run = True
+    if "--tools-only" in sys.argv:
+        tools_only = True
 
     try:
         config = load_config(config_path)
@@ -53,6 +56,18 @@ def main() -> int:
 
     if competitors_arg:
         module_config["priority_competitors"] = [c.strip() for c in competitors_arg.split(",")]
+
+    if tools_only:
+        module_config["generate_roles"] = False
+        module_config["generate_use_cases"] = False
+        module_config["generate_competitors"] = False
+        module_config["generate_integrations"] = False
+        module_config["generate_workflows"] = False
+        module_config["generate_bofu"] = False
+        module_config["generate_objection_pages"] = False
+        module_config["generate_blog"] = False
+        module_config["generate_tools_pages"] = True
+        module_config["generate_glossary"] = False
 
     page_types = {p.strip().lower() for p in pages_arg.split(",")}
     if "all" not in page_types:
