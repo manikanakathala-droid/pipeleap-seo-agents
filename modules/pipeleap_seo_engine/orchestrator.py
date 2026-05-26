@@ -25,18 +25,9 @@ from modules.pipeleap_seo_engine.engines.decay_detector import DecayDetector
 from modules.pipeleap_seo_engine.engines.revenue_linker import RevenueLinkingEngine
 from modules.pipeleap_seo_engine.engines.content_memory import ContentMemory
 from modules.pipeleap_seo_engine.engines.glossary_updater import GlossaryUpdater
-from modules.pipeleap_seo_engine.generators.competitor_page import CompetitorPageGenerator
 from modules.pipeleap_seo_engine.generators.digital_pr import DigitalPREngine
 from modules.pipeleap_seo_engine.generators.glossary_page import GlossaryPageGenerator
-from modules.pipeleap_seo_engine.generators.integration_page import IntegrationPageGenerator
-from modules.pipeleap_seo_engine.generators.multi_competitor_page import MultiCompetitorPageGenerator
-from modules.pipeleap_seo_engine.generators.role_page import RolePageGenerator
-from modules.pipeleap_seo_engine.generators.use_case_page import UseCasePageGenerator, ProblemPageGenerator
 from modules.pipeleap_seo_engine.generators.tools_page import ToolsPageGenerator
-from modules.pipeleap_seo_engine.generators.workflow_recipe import WorkflowRecipeGenerator
-from modules.pipeleap_seo_engine.generators.bofu_page import BOFUPageGenerator
-from modules.pipeleap_seo_engine.generators.objection_page import ObjectionPageGenerator
-from modules.pipeleap_seo_engine.generators.market_page import MarketPageGenerator
 from modules.pipeleap_seo_engine.models import GrowthPage, GrowthEngineReport
 from modules.pipeleap_seo_engine.connectors.pagespeed import PageSpeedConnector
 from modules.pipeleap_seo_engine.connectors.backlink_gap import BacklinkGapConnector
@@ -60,21 +51,11 @@ class GrowthEngineOrchestrator:
 
         # Content engine (shared across all generators)
         content_engine = GrowthContentEngine(self.site_config)
+        self.content_engine = content_engine
 
         # Page generators
-        self.role_gen = RolePageGenerator(content_engine)
-        self.use_case_gen = UseCasePageGenerator(content_engine)
-        self.problem_gen = ProblemPageGenerator(content_engine)
-        self.competitor_gen = CompetitorPageGenerator(content_engine)
         self.glossary_gen = GlossaryPageGenerator(content_engine)
-        self.integration_gen = IntegrationPageGenerator(content_engine)
-        self.workflow_gen = WorkflowRecipeGenerator(content_engine)
         self.tools_gen = ToolsPageGenerator(content_engine)
-        self.multi_comp_gen = MultiCompetitorPageGenerator(content_engine)
-        # BOFU, objection, and global market generators
-        self.bofu_gen = BOFUPageGenerator(content_engine)
-        self.objection_gen = ObjectionPageGenerator(content_engine)
-        self.market_gen = MarketPageGenerator()
 
         # Engines
         self.keyword_engine = GrowthKeywordEngine()
@@ -143,82 +124,20 @@ class GrowthEngineOrchestrator:
         all_pages: list[GrowthPage] = []
         mc = self.module_config
 
-        # ── 1. Core pages ────────────────────────────────────────────────────
-        role_pages = self.role_gen.generate_all(existing_slugs)[:mc.get("role_pages_per_run", 5)]
-        uc_pages = self.use_case_gen.generate_all(existing_slugs)[:mc.get("use_case_pages_per_run", 5)]
-        prob_pages = self.problem_gen.generate_all(existing_slugs)[:mc.get("problem_pages_per_run", 2)]
-        all_pages.extend(role_pages + uc_pages + prob_pages)
-        self._log(f"  Core pages:       {len(role_pages)} role, {len(uc_pages)} use-case, {len(prob_pages)} problem")
-
-        # ── 2. Competitor pages ──────────────────────────────────────────────
-        priority_competitors = mc.get("priority_competitors", list(COMPETITORS.keys()))
-        vs_pages = self.competitor_gen.generate_vs_pages(priority_competitors, existing_slugs)[:mc.get("competitor_vs_pages_per_run", 5)]
-        alt_pages = self.competitor_gen.generate_alternative_pages(priority_competitors, existing_slugs)[:mc.get("competitor_alt_pages_per_run", 5)]
-        multi_pages = self.multi_comp_gen.generate_all(existing_slugs)[:mc.get("multi_competitor_pages_per_run", 4)]
-        all_pages.extend(vs_pages + alt_pages + multi_pages)
-        self._log(f"  Competitor pages: {len(vs_pages)} vs, {len(alt_pages)} alt, {len(multi_pages)} multi")
-
-        # ── 3. Glossary pages — disabled; glossary is a static frontend feature ─
-
-        # ── 4. Integration pages ──────────────────────────────────────────────
-        if mc.get("generate_integrations", True):
-            int_pages = self.integration_gen.generate_all(existing_slugs)[:mc.get("integration_pages_per_run", 10)]
-            all_pages.extend(int_pages)
-            self._log(f"  Integration pages:{len(int_pages)}")
-
-        # ── 5. Workflow recipe pages ──────────────────────────────────────────
-        if mc.get("generate_workflows", True):
-            wf_pages = self.workflow_gen.generate_all(existing_slugs)[:mc.get("workflow_pages_per_run", 5)]
-            all_pages.extend(wf_pages)
-            self._log(f"  Workflow recipes: {len(wf_pages)}")
-
-        # ── 5a. Tools pages — overview/review pages from tool database ─
+        # ── Tools pages — overview/review pages from tool database ─
         if mc.get("generate_tools_pages", True):
             batch = mc.get("tools_pages_per_run", 20)
             tools_pages = self.tools_gen.generate_all(existing_slugs, batch_size=batch)
             all_pages.extend(tools_pages)
             self._log(f"  Tools pages:      {len(tools_pages)}/{batch}")
 
-        # ── 5b. BOFU pages (demo, ROI, pricing comparison) ───────────────────
-        if mc.get("generate_bofu", True):
-            bofu_pages = self.bofu_gen.generate_all(existing_slugs)[:mc.get("bofu_pages_per_run", 8)]
-            all_pages.extend(bofu_pages)
-            self._log(f"  BOFU pages:       {len(bofu_pages)}")
-
-        # ── 5c. Objection / trust pages ──────────────────────────────────────
-        if mc.get("generate_objection_pages", True):
-            obj_pages = self.objection_gen.generate_all(existing_slugs)[:mc.get("objection_pages_per_run", 4)]
-            all_pages.extend(obj_pages)
-            self._log(f"  Objection pages:  {len(obj_pages)}")
-
-        # ── 5d. Global market landing pages ──────────────────────────────────
-        if mc.get("generate_market_pages", True):
-            market_pages_limit = mc.get("market_pages_per_run", 8)
-            market_assets = self.market_gen.generate_all(existing_slugs)[:market_pages_limit]
-            # Convert ContentAsset → GrowthPage for unified pipeline
-            from modules.pipeleap_seo_engine.models import GrowthPage
-            for asset in market_assets:
-                gp = GrowthPage(
-                    slug=asset.slug, page_type=asset.page_type,
-                    title=asset.seo_title, seo_title=asset.seo_title,
-                    meta_description=asset.meta_description, h1=asset.h1,
-                    body_markdown=asset.body_markdown, schema_markup=asset.schema_markup or [],
-                    call_to_action=asset.call_to_action, primary_keyword=asset.source_keywords[0] if asset.source_keywords else asset.slug,
-                    target_keywords=asset.source_keywords, internal_links=[],
-                    intent="commercial", topical_pillar="outbound-automation",
-                )
-                all_pages.append(gp)
-                existing_slugs.add(asset.slug)
-            self._log(f"  Market pages:     {len(market_assets)} global market pages")
-
-        # ── 6. Wire author info & Apply Quality Filters ───────────────────────
+        # ── Wire author info & Apply Quality Filters ───────────────────────
         for page in all_pages:
             if not page.author_name:
                 author = get_author_for_page_type(page.page_type)
                 page.author_name = author["name"]
                 page.author_slug = author["slug"]
-            # Apply quality filters to remove broken sentences and negative positioning
-            page.body_markdown = self.role_gen.ce.apply_quality_filters(page.body_markdown)
+            page.body_markdown = self.content_engine.apply_quality_filters(page.body_markdown)
 
         # ── 7. Content uniqueness — six-layer pre-publish gate ───────────────
         # Load full cross-run history from persistent ContentMemory.

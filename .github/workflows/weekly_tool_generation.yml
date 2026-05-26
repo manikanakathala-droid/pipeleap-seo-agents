@@ -90,15 +90,7 @@ jobs:
           git config user.name "pipeleap-seo-bot"
           git config user.email "seo-bot@pipeleap.com"
           # Copy research output from CMS publish dir to launchpad seo dir
-          PUB_DIR=$(ls -d ../outputs/growth-engine/*/published 2>/dev/null | head -1)
-          if [ -n "$PUB_DIR" ]; then
-            for slug_dir in "$PUB_DIR"/*/; do
-              slug=$(basename "$slug_dir")
-              mkdir -p "src/data/seo/$slug"
-              cp -r "$slug_dir"* "src/data/seo/$slug/" 2>/dev/null || true
-            done
-          fi
-          git add -f src/data/seo/ src/data/tools/ 2>/dev/null || true
+          git add -f src/data/tools/ 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No generated content to sync."
           else

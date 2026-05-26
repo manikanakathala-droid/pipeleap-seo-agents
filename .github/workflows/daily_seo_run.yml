@@ -126,7 +126,7 @@ jobs:
           }
           JSON
 
-          git add -f src/data/seo/ src/data/_seo_run_meta.json public/sitemap*.xml public/robots.txt
+          git add -f src/data/_seo_run_meta.json public/sitemap*.xml public/robots.txt
           git add src/data/glossary-terms.ts 2>/dev/null || true
           git add src/data/blog-articles.ts 2>/dev/null || true
           if git diff --staged --quiet; then

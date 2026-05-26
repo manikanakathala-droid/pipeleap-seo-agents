@@ -31,8 +31,6 @@ from geo_agent.engines.entity_authority_engine import EntityAuthorityEngine
 from geo_agent.engines.ai_visibility_engine import AIVisibilityEngine
 from geo_agent.engines.semantic_coverage_engine import SemanticCoverageEngine
 from geo_agent.engines.comparison_optimizer import ComparisonOptimizer
-from geo_agent.generators.geo_page_generator import GEOPageGenerator
-from geo_agent.generators.global_market_generator import GlobalMarketGenerator
 from geo_agent.generators.listing_generator import ListingGenerator
 from geo_agent.generators.quora_generator import QuoraGenerator
 from geo_agent.generators.outreach_generator import OutreachGenerator
@@ -85,8 +83,6 @@ class GEOOrchestrator:
         )
         self.coverage_engine  = SemanticCoverageEngine()
         self.comparison_engine= ComparisonOptimizer()
-        self.page_generator      = GEOPageGenerator()
-        self.global_market_gen   = GlobalMarketGenerator()
         self.listing_generator = ListingGenerator()
         self.quora_generator   = QuoraGenerator()
         self.outreach_generator= OutreachGenerator()
@@ -141,14 +137,7 @@ class GEOOrchestrator:
         eligible_blocks = sum(1 for b in answer_blocks if b.get("eligible_for_ai_overview"))
         self._log(f"  Answer blocks: {len(answer_blocks)} ({eligible_blocks} AIO-eligible)")
 
-        # ── 6. GEO page generation ────────────────────────────────────────────
-        geo_pages = self.page_generator.generate_all(set(published_slugs))
-        self._log(f"  GEO pages:     {len(geo_pages)} new pages generated")
-
-        # ── 6b. Global market GEO pages ───────────────────────────────────────
-        global_pages = self.global_market_gen.generate_all(set(published_slugs))
-        geo_pages.extend(global_pages)
-        self._log(f"  Global pages:  {len(global_pages)} international market pages")
+        geo_pages: list[GEOPage] = []
 
         # ── 7. Comparison optimization ────────────────────────────────────────
         comp_schemas = self.comparison_engine.all_comparison_schemas()
