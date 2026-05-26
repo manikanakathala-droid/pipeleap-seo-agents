@@ -14,6 +14,9 @@ on:
     types:
       - completed
 
+permissions:
+  contents: write
+
 concurrency:
   group: serp-visibility-${{ github.ref }}
   cancel-in-progress: false
