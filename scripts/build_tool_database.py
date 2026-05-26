@@ -1,7 +1,7 @@
 """
 Build a comprehensive tool database.
 
-Reads existing tools from frontend TS files, then uses Gemini to generate
+Reads existing tools from frontend TS files, then uses LLM (GitHub Models) to generate
 additional tools per category. Merges and deduplicates by slug and website domain.
 Outputs tool_database.json for the ToolsPageGenerator to consume.
 """
@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from connectors.gemini_client import GeminiClient
+from connectors.llm_client import LLMClient
 
 FRONTEND_TOOLS_DIR = Path(__file__).resolve().parent.parent / "temp_frontend_repo" / "src" / "data" / "tools"
 DATABASE_PATH = Path(__file__).resolve().parent.parent / "modules" / "pipeleap_seo_engine" / "data" / "tool_database.json"
@@ -117,7 +117,7 @@ def normalize_name(name: str) -> str:
     return name.strip().lower().replace(".", "").replace("-", " ").replace("  ", " ")
 
 
-def gemini_prompt_for_category(cat_slug: str, cat_name: str, description: str, gemini: GeminiClient) -> str:
+def llm_prompt_for_category(cat_slug: str, cat_name: str, description: str, llm: LLMClient) -> str:
     prompt = f"""You are building a comprehensive database of B2B sales and marketing tools.
 
 Category: {cat_name} ({cat_slug})
@@ -146,11 +146,11 @@ Return ONLY valid JSON. Format:
 ]
 
 Include well-known tools first. Focus on real, active products. Do NOT include placeholder or invented tools."""
-    return gemini.generate(prompt)
+    return llm.generate(prompt)
 
 
-def parse_gemini_response(text: str) -> list[dict]:
-    """Parse JSON from Gemini response. Handles markdown code fences."""
+def parse_llm_response(text: str) -> list[dict]:
+    """Parse JSON from LLM response. Handles markdown code fences."""
     if not text:
         return []
     text = text.strip()
@@ -187,9 +187,9 @@ def main():
     print("Tool Database Builder")
     print("=" * 60)
 
-    gemini = GeminiClient()
-    if not gemini.is_configured:
-        print("ERROR: GEMINI_API_KEY not set. Cannot generate tool database.")
+    llm = LLMClient()
+    if not llm.is_configured:
+        print("ERROR: No GitHub token (GITHUB_TOKEN / LAUNCHPAD_DEPLOY_TOKEN) set. Cannot generate tool database.")
         sys.exit(1)
 
     # Step 1: Load existing tools
@@ -198,22 +198,22 @@ def main():
     domain_map = build_domain_map(slug_map)
     existing_slugs = set(slug_map.keys())
 
-    # Step 2: Generate new tools per category via Gemini
-    print("\n[2/4] Generating tools per category via Gemini...")
+    # Step 2: Generate new tools per category via LLM
+    print("\n[2/4] Generating tools per category via LLM (GitHub Models)...")
     all_new_tools: list[dict] = []
     for cat_slug, cat_name in CATEGORY_MAP.items():
         desc = CATEGORY_PROMPTS[cat_slug]
         print(f"\n  --- {cat_name} ---")
-        print(f"  Asking Gemini for tools...")
-        resp = gemini_prompt_for_category(cat_slug, cat_name, desc, gemini)
-        new_tools = parse_gemini_response(resp)
-        print(f"  Got {len(new_tools)} tools from Gemini")
+        print(f"  Asking LLM for tools...")
+        resp = llm_prompt_for_category(cat_slug, cat_name, desc, llm)
+        new_tools = parse_llm_response(resp)
+        print(f"  Got {len(new_tools)} tools from LLM")
 
         # Tag with category
         for t in new_tools:
             t["categorySlug"] = cat_slug
             t["slug"] = slugify(t.get("name", ""))
-            t["_source"] = "gemini"
+            t["_source"] = "llm"
 
         # Filter: skip if slug or domain already exists
         before = len(new_tools)
@@ -280,9 +280,9 @@ def main():
             "starting_price": t.get("starting_price", ""),
             "has_free_tier": bool(t.get("has_free_tier", False)),
             "pricing_url": t.get("pricing_url", ""),
-            "_source": "gemini",
+            "_source": "llm",
         })
-    print(f"  New from Gemini: {len(all_new_tools)}")
+    print(f"  New from LLM: {len(all_new_tools)}")
     print(f"  Total merged: {len(merged_tools)}")
 
     # Step 4: Write database
