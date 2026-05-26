@@ -12,21 +12,33 @@ from utils.text import slugify, title_case_keyword
 import re as _re
 
 
+_ASCII_MAP = str.maketrans({
+    chr(0x2013): "-",   # en-dash
+    chr(0x2014): ",",   # em-dash
+    chr(0x2192): ">",   # right arrow
+    chr(0x2018): "'",   # left single quote
+    chr(0x2019): "'",   # right single quote
+    chr(0x201c): '"',   # left double quote
+    chr(0x201d): '"',   # right double quote
+    chr(0x2022): "-",   # bullet
+    chr(0x2026): "...", # ellipsis
+    chr(0x00a0): " ",   # non-breaking space
+    chr(0x00d7): "x",   # multiplication sign
+})
+
 def _strip_formatting(text: str) -> str:
-    """Remove em-dashes and asterisk bold/italic markup from blog body copy."""
-    # Em-dash → comma or colon depending on context; simple replacement to comma+space
-    text = text.replace("—", ",")   # — (em-dash)
-    text = text.replace(" -- ", ", ")   # double-hyphen em-dash variant
-    # Strip **bold** and *italic* markers (keep the text, remove the asterisks)
+    """Strip typographic Unicode, asterisk markup, and remaining non-ASCII from blog body copy."""
+    text = text.translate(_ASCII_MAP)
+    text = text.replace(" -- ", ", ")
     text = _re.sub(r"\*\*(.+?)\*\*", r"\1", text)
     text = _re.sub(r"\*(.+?)\*", r"\1", text)
+    text = _re.sub(r"[^\x00-\x7F]+", "", text)
     return text
-
 
 _EXTRA_FAQS: list[tuple[str, str]] = [
     (
         "How long does implementation take?",
-        "Most teams are running their first workflow within 48 hours. The full orchestration layer — enrichment, CRM sync, routing, sequencing — typically goes live within one week, depending on CRM complexity.",
+        "Most teams are running their first workflow within 48 hours. The full orchestration layer, enrichment, CRM sync, routing, sequencing, typically goes live within one week, depending on CRM complexity.",
     ),
     (
         "Do I need technical skills to build workflows?",
@@ -34,7 +46,7 @@ _EXTRA_FAQS: list[tuple[str, str]] = [
     ),
     (
         "Can Pipeleap replace my existing CRM?",
-        "Pipeleap complements your CRM rather than replacing it. It acts as an orchestration layer on top — handling enrichment, routing, and sequencing while writing clean, structured data back into your CRM in real time.",
+        "Pipeleap complements your CRM rather than replacing it. It acts as an orchestration layer on top, handling enrichment, routing, and sequencing while writing clean, structured data back into your CRM in real time.",
     ),
     (
         "What data sources does Pipeleap support?",
@@ -60,7 +72,7 @@ class ContentEngine:
         self.conversion_pages = config.get("seo", {}).get("conversion_pages", [])
         # Tracks 600-char intro samples to detect near-duplicate bodies at runtime
         self._generated_samples: list[str] = []
-        # Advanced GSC-aware content engine — replaces template renderers for blogs,
+        # Advanced GSC-aware content engine , replaces template renderers for blogs,
         # comparisons, and use-case pages.
         self._blog_engine = BlogContentEngine(config, logger)
 
@@ -113,11 +125,11 @@ class ContentEngine:
 
         # Dedup gate against session-level samples
         if self._is_near_duplicate(asset.body_markdown):
-            self.logger.warning("Near-duplicate detected — suppressing blog: %s", cluster.primary_keyword)
+            self.logger.warning("Near-duplicate detected , suppressing blog: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
 
-        # One CTA per blog — cta_variants must be empty so the CMS renders no extra buttons
+        # One CTA per blog , cta_variants must be empty so the CMS renders no extra buttons
         asset.cta_variants = []
         asset.hreflang_hints = self._hreflang_hints(asset.slug)
         asset.body_markdown = _strip_formatting(asset.body_markdown)
@@ -126,7 +138,7 @@ class ContentEngine:
     def generate_comparison_page(self, cluster: KeywordCluster) -> ContentAsset:
         asset = self._blog_engine.generate_comparison(cluster)
         if self._is_near_duplicate(asset.body_markdown):
-            self.logger.warning("Near-duplicate detected — suppressing comparison: %s", cluster.primary_keyword)
+            self.logger.warning("Near-duplicate detected , suppressing comparison: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
         asset.cta_variants = []
@@ -137,7 +149,7 @@ class ContentEngine:
     def generate_use_case_page(self, cluster: KeywordCluster) -> ContentAsset:
         asset = self._blog_engine.generate_use_case(cluster)
         if self._is_near_duplicate(asset.body_markdown):
-            self.logger.warning("Near-duplicate detected — suppressing use-case: %s", cluster.primary_keyword)
+            self.logger.warning("Near-duplicate detected , suppressing use-case: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
         asset.cta_variants = []
@@ -145,7 +157,7 @@ class ContentEngine:
         asset.body_markdown = _strip_formatting(asset.body_markdown)
         return asset
 
-    # ── Legacy template renderers — BLOCKED ───────────────────────────────────
+    # ── Legacy template renderers , BLOCKED ───────────────────────────────────
     # The methods below (_render_blog_body, _render_comparison_body,
     # _render_use_case_body) are no longer called by any production path.
     # All generation now routes through BlogContentEngine.
@@ -168,7 +180,7 @@ class ContentEngine:
         pain_variations = [
             f"Most teams hit a ceiling when outbound and workflow operations live across spreadsheets, enrichment tools, point integrations, and manual CRM cleanup. {self.site.get('brand', 'Pipeleap')} positions this motion as one orchestrated revenue workflow.",
             f"Scaling revenue operations is impossible when your data and execution layers are disconnected. {self.site.get('brand', 'Pipeleap')} solves the {brief.primary_keyword} bottleneck by unifying targeting, enrichment, and CRM sync into a single governed system.",
-            f"Fragmented sales stacks create 'tool fatigue' and high operational drag. For teams looking at {brief.primary_keyword}, the goal isn't more software—it's a unified operating model that drives predictable pipeline."
+            f"Fragmented sales stacks create 'tool fatigue' and high operational drag. For teams looking at {brief.primary_keyword}, the goal isn't more software, it's a unified operating model that drives predictable pipeline."
         ]
         pain_point = pain_variations[len(brief.primary_keyword) % len(pain_variations)]
 
@@ -295,7 +307,7 @@ class ContentEngine:
             f"### What makes {self.site.get('brand', 'Pipeleap')} different?",
             [
                 "It keeps automation close to the actual revenue workflow instead of treating sales, CRM updates, and data movement as separate systems.",
-                "We unify the entire revenue operating system—targeting, enrichment, and execution—into one governed layer, replacing fragmented point solutions.",
+                "We unify the entire revenue operating system, targeting, enrichment, and execution, into one governed layer, replacing fragmented point solutions.",
                 "Pipeleap is built for production-grade revenue workflows. It handles the 'edge cases' of CRM sync and routing that simpler tools miss."
             ][len(brief.primary_keyword) % 3],
             "",
@@ -431,14 +443,14 @@ class ContentEngine:
         return schema
 
     def _cta_block(self, stage: str = "") -> str:
-        # ONE CTA per post — no secondary link, no alternatives.
+        # ONE CTA per post , no secondary link, no alternatives.
         stage_cta = STAGE_CTA.get(stage, {})
         primary_label = stage_cta.get("primary_label") or self.cta.get("primary_label", "Book a demo")
         primary_url = self.cta.get("primary_url", self.site.get("site_url", "https://pipeleap.com"))
         subtext = stage_cta.get("primary_subtext", "")
         cta = f"[{primary_label}]({primary_url})"
         if subtext:
-            cta += f" — {subtext}"
+            cta += f", {subtext}"
         return cta
 
     def _persona_for_cluster(self, cluster_name: str) -> str:
@@ -511,7 +523,7 @@ class ContentEngine:
         return "\n".join(lines)
 
     def _stage_featured_snippet(self, stage: str, keyword: str) -> str:
-        """Returns a featured-snippet-optimised paragraph (40–60 words) for the given stage."""
+        """Returns a featured-snippet-optimised paragraph (40-60 words) for the given stage."""
         stage_data = STAGES.get(stage, {})
         context = stage_data.get("featured_snippet_context", "")
         if not context:
@@ -530,22 +542,22 @@ class ContentEngine:
         """40-60 word TL;DR block optimised for Google's AI Overviews and featured snippets."""
         if page_type == "comparison_page":
             return (
-                f"> **TL;DR — {keyword.title()}:** Evaluate options on workflow flexibility, "
+                f"> **TL;DR , {keyword.title()}:** Evaluate options on workflow flexibility, "
                 f"CRM depth, enrichment control, and outbound execution speed. "
                 f"Pipeleap unifies these into a single governed revenue layer rather than requiring "
                 f"separate tools for each step.\n"
             )
         if page_type == "use_case_page":
             return (
-                f"> **TL;DR — {keyword.title()}:** Connect raw signals to demo-ready opportunities "
+                f"> **TL;DR , {keyword.title()}:** Connect raw signals to demo-ready opportunities "
                 f"through governed automation. The workflow covers intake, enrichment, CRM sync, "
-                f"sequence assignment, and reply routing — without manual handoffs.\n"
+                f"sequence assignment, and reply routing , without manual handoffs.\n"
             )
         # blog_post default
         return (
-            f"> **TL;DR — {keyword.title()}:** A production-ready {keyword} system captures intent signals, "
+            f"> **TL;DR , {keyword.title()}:** A production-ready {keyword} system captures intent signals, "
             f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outbound "
-            f"sequences automatically — replacing fragmented point tools with one governed revenue workflow.\n"
+            f"sequences automatically , replacing fragmented point tools with one governed revenue workflow.\n"
         )
 
     # ------------------------------------------------------------------ #
@@ -612,7 +624,7 @@ class ContentEngine:
 
     @staticmethod
     def _eeat_checklist(page_type: str) -> list[dict[str, Any]]:
-        """Structured proof checklist — each item has a label, status, and instructions."""
+        """Structured proof checklist , each item has a label, status, and instructions."""
         base = [
             {"item": "Author byline", "status": "missing", "instructions": "Add a real RevOps or growth operator byline with LinkedIn or bio link."},
             {"item": "Publication date", "status": "auto-filled", "instructions": "datePublished and dateModified are set in schema. Verify CMS renders them in the HTML head."},
