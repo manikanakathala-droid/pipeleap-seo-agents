@@ -1,0 +1,597 @@
+{
+  "run_id": "20260526T021043Z",
+  "generated_at": "2026-05-26T02:10:43.328420+00:00",
+  "mode": "growth_mode",
+  "website_changes": {
+    "run_id": "20260526T021043Z",
+    "previous_run_id": "20260526T020707Z",
+    "new_pages": 0,
+    "updated_pages": 0,
+    "deleted_pages": 0,
+    "unchanged_pages": 1,
+    "broken_links": 0,
+    "orphan_pages": 0,
+    "missing_from_sitemap": 0,
+    "has_changes": false
+  },
+  "safe_actions": [
+    {
+      "action_id": "GM-001",
+      "category": "content",
+      "priority": 1,
+      "page_url": "https://pipeleap.com/blog",
+      "title": "Publish next content plan brief",
+      "description": "No site changes detected. Growth mode: publish next queued blog post from content_plan_briefs.json. Prioritise alternative/comparison cluster (highest conversion probability: 0.91).",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "high",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-002",
+      "category": "linking",
+      "priority": 2,
+      "page_url": "https://pipeleap.com",
+      "title": "Internal linking audit \u2014 reinforce pillar pages",
+      "description": "Growth mode: run linking cluster map from serp_strategy.py. Ensure every spoke article links to its pillar page. Add missing anchor text links from blog posts to /gtm-audit.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "medium",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-003",
+      "category": "metadata",
+      "priority": 2,
+      "page_url": "https://pipeleap.com/pricing",
+      "title": "Improve low-CTR pages from GSC",
+      "description": "Growth mode: pull pages with >100 impressions and <3% CTR from GSC. Rewrite meta descriptions to match the top triggering query per page.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "medium",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-004",
+      "category": "indexing",
+      "priority": 3,
+      "page_url": "https://pipeleap.com/sitemap.xml",
+      "title": "Resubmit sitemap to GSC",
+      "description": "Growth mode: ping GSC sitemap endpoint to trigger a fresh crawl. Ensures any recent content is picked up in the next index cycle.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "low",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-005",
+      "category": "content",
+      "priority": 3,
+      "page_url": "https://pipeleap.com/glossary",
+      "title": "Add new glossary term from keyword gaps",
+      "description": "Growth mode: pick the top-traffic, low-difficulty keyword from SERP_KEYWORD_CLUSTERS that lacks a dedicated glossary page. Create it.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "low",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "category": "metadata",
+      "page_url": "https://www.pipeleap.com/",
+      "title": "Title too short (8 chars)",
+      "description": "AI-generated or auto-populated titles under 30 characters are unlikely to be descriptive enough for search snippets.",
+      "fix_instructions": "Expand the title to 50-65 characters with the primary keyword and brand name (e.g., 'Keyword | Pipeleap').",
+      "impact_score": 61.0,
+      "severity": "Medium",
+      "requires_dev": false,
+      "dev_note": "",
+      "priority": 3,
+      "safe_mode": true
+    },
+    {
+      "category": "heading",
+      "page_url": "https://www.pipeleap.com/",
+      "title": "Missing H1",
+      "description": "The page does not expose a primary H1 heading.",
+      "fix_instructions": "Add one H1 that reflects the primary keyword and user intent.",
+      "impact_score": 60.0,
+      "severity": "Medium",
+      "requires_dev": false,
+      "dev_note": "",
+      "priority": 3,
+      "safe_mode": true
+    },
+    {
+      "category": "structured_data",
+      "page_url": "https://www.pipeleap.com/",
+      "title": "No structured data (JSON-LD) detected",
+      "description": "The page has no JSON-LD schema markup. Structured data is required for rich results (FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews.",
+      "fix_instructions": "Add a relevant JSON-LD block in the <head>. For blog posts use Article or BlogPosting; for product/landing pages use SoftwareApplication or Product; for FAQ sections use FAQPage.",
+      "impact_score": 53.0,
+      "severity": "Low",
+      "requires_dev": false,
+      "dev_note": "",
+      "priority": 4,
+      "safe_mode": true
+    },
+    {
+      "category": "metadata",
+      "page_url": "https://www.pipeleap.com/",
+      "title": "Meta description too short (48 chars)",
+      "description": "Short meta descriptions (under 70 characters) waste the snippet space and reduce click-through rates.",
+      "fix_instructions": "Expand to 140-160 characters with a keyword, value proposition, and CTA.",
+      "impact_score": 38.0,
+      "severity": "Low",
+      "requires_dev": false,
+      "dev_note": "",
+      "priority": 4,
+      "safe_mode": true
+    },
+    {
+      "category": "structured_data",
+      "page_url": "https://www.pipeleap.com",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, Google may display an inaccurate or sub-optimal site name.",
+      "fix_instructions": "Add WebSite JSON-LD to the homepage only:\n{\"@context\":\"https://schema.org\",\"@type\":\"WebSite\",\"name\":\"Pipeleap\",\"url\":\"https://pipeleap.com\"}\nOnly one WebSite schema per domain is supported.",
+      "impact_score": 36.0,
+      "severity": "Low",
+      "requires_dev": false,
+      "dev_note": "",
+      "priority": 4,
+      "safe_mode": true
+    }
+  ],
+  "dev_review_items": [],
+  "keyword_opportunities": [
+    {
+      "keyword": "outbound sales automation platform",
+      "type": "high_intent",
+      "cluster": "solution_evaluation",
+      "difficulty": 46.0,
+      "conversion_probability": 0.85,
+      "recommended_page_type": "blog_post"
+    },
+    {
+      "keyword": "best AI outbound sales tools 2025",
+      "type": "high_intent",
+      "cluster": "solution_evaluation",
+      "difficulty": 46.0,
+      "conversion_probability": 0.85,
+      "recommended_page_type": "blog_post"
+    },
+    {
+      "keyword": "sales workflow automation software",
+      "type": "high_intent",
+      "cluster": "solution_evaluation",
+      "difficulty": 46.0,
+      "conversion_probability": 0.85,
+      "recommended_page_type": "blog_post"
+    },
+    {
+      "keyword": "Apollo.io alternatives",
+      "type": "high_intent",
+      "cluster": "alternative_comparison",
+      "difficulty": 42.0,
+      "conversion_probability": 0.91,
+      "recommended_page_type": "landing_page"
+    },
+    {
+      "keyword": "Clay alternatives for sales",
+      "type": "high_intent",
+      "cluster": "alternative_comparison",
+      "difficulty": 42.0,
+      "conversion_probability": 0.91,
+      "recommended_page_type": "landing_page"
+    },
+    {
+      "keyword": "Outreach.io alternatives",
+      "type": "high_intent",
+      "cluster": "alternative_comparison",
+      "difficulty": 42.0,
+      "conversion_probability": 0.91,
+      "recommended_page_type": "landing_page"
+    },
+    {
+      "keyword": "Apollo.io alternatives",
+      "gap_source": "Apollo.io",
+      "type": "competitor_gap"
+    },
+    {
+      "keyword": "Clay alternatives for sales",
+      "gap_source": "Clay",
+      "type": "competitor_gap"
+    },
+    {
+      "keyword": "Outreach.io alternatives",
+      "gap_source": "Outreach",
+      "type": "competitor_gap"
+    },
+    {
+      "keyword": "Salesloft competitors",
+      "gap_source": "Salesloft",
+      "type": "competitor_gap"
+    },
+    {
+      "keyword": "sales engagement platform alternatives",
+      "gap_source": "multiple",
+      "type": "competitor_gap"
+    },
+    {
+      "keyword": "how to build outbound sales system for B2B SaaS",
+      "type": "long_tail",
+      "funnel_stage": "awareness"
+    },
+    {
+      "keyword": "outbound sales automation for small sales teams",
+      "type": "long_tail",
+      "funnel_stage": "consideration"
+    },
+    {
+      "keyword": "what is managed outbound sales service",
+      "type": "long_tail",
+      "funnel_stage": "awareness"
+    },
+    {
+      "keyword": "how long does GTM implementation take",
+      "type": "long_tail",
+      "funnel_stage": "consideration"
+    },
+    {
+      "keyword": "outbound pipeline predictability metrics",
+      "type": "long_tail",
+      "funnel_stage": "awareness"
+    }
+  ],
+  "content_generated": [
+    {
+      "type": "blog_post",
+      "style": "NEPQ",
+      "slug": "apollo-clay-pipeleap-comparison",
+      "title": "Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
+      "target_keyword": "Apollo.io alternatives",
+      "structure": [
+        "H1: Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
+        "Problem frame: What most teams get wrong about Apollo.io alternatives",
+        "Implication: What happens if this stays broken (pipeline, quota, headcount)",
+        "Solution reveal: How the right system changes the outcome",
+        "Evidence: Workflow architecture + outcome metrics",
+        "CTA: Internal link to /gtm-audit or /contact"
+      ],
+      "internal_links": [
+        "/glossary/icp-scoring",
+        "/gtm-audit"
+      ],
+      "persona": "Head of Sales evaluating outbound tools",
+      "eeat_notes": [
+        "Add feature comparison table",
+        "Include decision framework: who should pick which tool",
+        "Add outcome proof for Pipeleap managed service"
+      ],
+      "status": "brief_ready"
+    },
+    {
+      "type": "glossary_page",
+      "slug": "outbound-sales-automation",
+      "title": "Outbound Sales Automation",
+      "definition": "Outbound sales automation is the use of software and AI to execute prospecting, lead enrichment, personalised outreach, and follow-up sequences without manual rep effort. An automated outbound system runs continuously, learns from reply signals, and routes qualified prospects into the CRM pipeline.",
+      "related_terms": [
+        "ICP scoring",
+        "sales orchestration",
+        "GTM audit"
+      ],
+      "internal_links": [
+        "/",
+        "/gtm-audit",
+        "/glossary/icp-scoring"
+      ]
+    },
+    {
+      "type": "glossary_page",
+      "slug": "sales-orchestration",
+      "title": "Sales Orchestration",
+      "definition": "Sales orchestration is the coordination of every component in an outbound sales system \u2014 lead sourcing, enrichment, personalisation, sequencing, reply handling, and CRM handoff \u2014 into a single governed workflow. Unlike point tools that automate one slice, an orchestrated system manages the entire motion as one continuous pipeline.",
+      "related_terms": [
+        "outbound sales automation",
+        "GTM implementation",
+        "revenue operations"
+      ],
+      "internal_links": [
+        "/about",
+        "/",
+        "/glossary/outbound-sales-automation"
+      ]
+    },
+    {
+      "type": "glossary_page",
+      "slug": "gtm-audit",
+      "title": "GTM Audit",
+      "definition": "A GTM (go-to-market) audit is a structured review of a company's outbound sales motion, covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health. The output is a prioritised list of gaps and fixes that improve pipeline predictability.",
+      "related_terms": [
+        "ICP scoring",
+        "outbound sales automation",
+        "GTM implementation"
+      ],
+      "internal_links": [
+        "/gtm-audit",
+        "/glossary/icp-scoring",
+        "/glossary/outbound-sales-automation"
+      ]
+    }
+  ],
+  "pages_optimized": [
+    {
+      "page_url": "https://www.pipeleap.com/gtm-audit",
+      "recommended_title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
+      "recommended_meta": "Get a full audit of your outbound engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+      "current_title": "",
+      "current_meta": "",
+      "optimisation_actions": [
+        "Title: update to 'Free GTM Audit for B2B Sales Teams | Pipeleap'",
+        "Meta: update to 'Get a full audit of your outbound engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.'"
+      ],
+      "safe_mode": true,
+      "note": "Metadata only \u2014 no structural code changes required."
+    },
+    {
+      "page_url": "https://www.pipeleap.com/",
+      "recommended_title": "Outbound Sales Automation & GTM Implementation | Pipeleap",
+      "recommended_meta": "Pipeleap builds and runs your entire outbound engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+      "current_title": "Pipeleap",
+      "current_meta": "Outbound sales automation for B2B revenue teams.",
+      "optimisation_actions": [
+        "Title: update to 'Outbound Sales Automation & GTM Implementation | Pipeleap'",
+        "Meta: update to 'Pipeleap builds and runs your entire outbound engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.'",
+        "H1: missing \u2014 add keyword-anchored H1"
+      ],
+      "safe_mode": true,
+      "note": "Metadata only \u2014 no structural code changes required."
+    },
+    {
+      "page_url": "https://www.pipeleap.com/pricing",
+      "recommended_title": "Outbound Sales Automation Pricing | Pipeleap",
+      "recommended_meta": "Pipeleap pricing for managed outbound sales automation and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.",
+      "current_title": "",
+      "current_meta": "",
+      "optimisation_actions": [
+        "Title: update to 'Outbound Sales Automation Pricing | Pipeleap'",
+        "Meta: update to 'Pipeleap pricing for managed outbound sales automation and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.'"
+      ],
+      "safe_mode": true,
+      "note": "Metadata only \u2014 no structural code changes required."
+    }
+  ],
+  "linking_suggestions": [
+    {
+      "from_page": "/blog/ai-personalization-cold-email",
+      "to_page": "/",
+      "anchor_text": "outbound sales automation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Outbound Sales Automation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/cost-of-manual-prospecting",
+      "to_page": "/",
+      "anchor_text": "outbound sales automation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Outbound Sales Automation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/outbound-stack-too-many-tools",
+      "to_page": "/",
+      "anchor_text": "outbound sales automation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Outbound Sales Automation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/predictable-pipeline-without-sdrs",
+      "to_page": "/",
+      "anchor_text": "outbound sales automation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Outbound Sales Automation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/",
+      "to_page": "/glossary/outbound-sales",
+      "anchor_text": "outbound sales",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "Outbound Sales Automation",
+      "priority": "medium"
+    },
+    {
+      "from_page": "/",
+      "to_page": "/glossary/sales-automation",
+      "anchor_text": "sales automation",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "Outbound Sales Automation",
+      "priority": "medium"
+    },
+    {
+      "from_page": "/blog/how-to-run-gtm-audit",
+      "to_page": "/gtm-audit",
+      "anchor_text": "gtm implementation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "GTM Implementation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/sdr-agency-vs-outbound-automation",
+      "to_page": "/gtm-audit",
+      "anchor_text": "gtm implementation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "GTM Implementation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/apollo-clay-pipeleap-comparison",
+      "to_page": "/gtm-audit",
+      "anchor_text": "gtm implementation",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "GTM Implementation",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/gtm-audit",
+      "to_page": "/glossary/gtm-audit",
+      "anchor_text": "gtm audit",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "GTM Implementation",
+      "priority": "medium"
+    },
+    {
+      "from_page": "/gtm-audit",
+      "to_page": "/glossary/icp-scoring",
+      "anchor_text": "icp scoring",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "GTM Implementation",
+      "priority": "medium"
+    },
+    {
+      "from_page": "/blog/what-is-sales-orchestration",
+      "to_page": "/about",
+      "anchor_text": "sales orchestration",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Sales Orchestration",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/blog/11-modules-outbound-engine",
+      "to_page": "/about",
+      "anchor_text": "sales orchestration",
+      "placement": "First 200 words or within the most relevant section",
+      "cluster": "Sales Orchestration",
+      "priority": "high",
+      "note": "Content-level link only \u2014 no structural changes needed."
+    },
+    {
+      "from_page": "/about",
+      "to_page": "/glossary/sales-orchestration",
+      "anchor_text": "sales orchestration",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "Sales Orchestration",
+      "priority": "medium"
+    },
+    {
+      "from_page": "/about",
+      "to_page": "/glossary/outbound-sales",
+      "anchor_text": "outbound sales",
+      "placement": "Inline where the term is first mentioned",
+      "cluster": "Sales Orchestration",
+      "priority": "medium"
+    }
+  ],
+  "competitor_insights": [
+    {
+      "competitor": "Clay",
+      "category": "enrichment",
+      "their_strength": "Clay is a data enrichment and workflow building platform that connects to multiple enrichment sources via a waterfall model.",
+      "pipeleap_wins": [
+        "Unified enrichment + sequencing + CRM routing in one workflow engine",
+        "Signal-based triggering without manual recipe building",
+        "Governed CRM write-back on every workflow trigger",
+        "Predictable pricing that scales with outbound volume, not credits"
+      ],
+      "limitations": [
+        "No native outbound sequencing \u2014 requires Smartlead or Instantly integration",
+        "Waterfall enrichment requires manual recipe configuration and ongoing maintenance",
+        "No CRM write-back governance layer \u2014 data routing is manual",
+        "Pricing scales sharply with enrichment credits at volume",
+        "Primarily a data tool \u2014 outbound execution requires additional tools"
+      ],
+      "keyword_gaps_to_target": [
+        "Clay alternatives",
+        "Clay vs Pipeleap",
+        "better than Clay",
+        "Clay competitors 2025"
+      ],
+      "content_to_outrank": "Publish 'Clay vs Pipeleap' comparison page targeting transactional intent. Lead with concrete outcome differentials.",
+      "best_for": "Teams that need waterfall enrichment but already have sequencing and CRM tools configured"
+    },
+    {
+      "competitor": "Zapier",
+      "category": "automation",
+      "their_strength": "Zapier is a general-purpose automation platform that connects apps via triggers and actions.",
+      "pipeleap_wins": [
+        "Purpose-built for outbound workflow orchestration \u2014 not generic automation",
+        "Native outbound logic: signal detection, enrichment, sequencing, routing",
+        "Governed execution with audit trails and workflow performance tracking",
+        "Designed for revenue teams, not IT departments"
+      ],
+      "limitations": [
+        "General-purpose automation \u2014 not built for revenue workflow execution",
+        "No native understanding of sales sequences, CRM routing, or outbound logic",
+        "Brittle multi-step workflows break under high volume",
+        "No governance layer for outbound execution",
+        "Pricing escalates sharply with task volume"
+      ],
+      "keyword_gaps_to_target": [
+        "Zapier alternatives",
+        "Zapier vs Pipeleap",
+        "better than Zapier",
+        "Zapier competitors 2025"
+      ],
+      "content_to_outrank": "Publish 'Zapier vs Pipeleap' comparison page targeting transactional intent. Lead with concrete outcome differentials.",
+      "best_for": "Simple one-step automations between apps that don't require revenue workflow logic"
+    }
+  ],
+  "indexing_actions": [
+    {
+      "action": "resubmit_sitemap",
+      "url": "https://www.pipeleap.com/sitemap.xml",
+      "reason": "Weekly sitemap submission to GSC",
+      "status": "skipped: Expecting value: line 2 column 1 (char 1)",
+      "priority": 3
+    }
+  ],
+  "gsc_insights": [],
+  "risks_and_missed": [],
+  "seo_score": {
+    "overall": 53,
+    "technical": 96,
+    "content": 0,
+    "authority": 0,
+    "indexing": 100,
+    "breakdown": {
+      "pages_with_full_metadata": 0,
+      "total_pages": 1,
+      "pages_in_sitemap": 1,
+      "pages_with_schema": 0,
+      "broken_pages": 0,
+      "orphan_pages": 0,
+      "audit_critical": 0,
+      "audit_high": 0,
+      "audit_medium": 2,
+      "audit_total": 5
+    }
+  },
+  "next_day_plan": [
+    "Execute 1 high-priority safe actions from execution_plan.json",
+    "Publish 4 content pieces \u2014 start with blog post (highest conversion cluster)",
+    "Begin comparison page for Clay \u2014 targets transactional 'alternatives' cluster",
+    "Monitor GSC for CTR changes on any updated meta descriptions (48-hour window)",
+    "SEO score below 60 \u2014 prioritise technical fixes before content expansion"
+  ],
+  "output_files": [],
+  "errors": []
+}
