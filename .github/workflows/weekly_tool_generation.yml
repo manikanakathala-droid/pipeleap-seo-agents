@@ -76,16 +76,25 @@ jobs:
             exit 1
           fi
 
-      - name: Commit tool pages to launchpad
+      - name: Sync generated content to launchpad
         run: |
           cd pipeleap-launchpad
           git config user.name "pipeleap-seo-bot"
           git config user.email "seo-bot@pipeleap.com"
-          git add src/data/tools/ 2>/dev/null || true
+          # Copy research output from CMS publish dir to launchpad seo dir
+          PUB_DIR=$(ls -d ../outputs/growth-engine/*/published 2>/dev/null | head -1)
+          if [ -n "$PUB_DIR" ]; then
+            for slug_dir in "$PUB_DIR"/*/; do
+              slug=$(basename "$slug_dir")
+              mkdir -p "src/data/seo/$slug"
+              cp -r "$slug_dir"* "src/data/seo/$slug/" 2>/dev/null || true
+            done
+          fi
+          git add -f src/data/seo/ src/data/tools/ 2>/dev/null || true
           if git diff --staged --quiet; then
-            echo "No tool page changes to commit."
+            echo "No generated content to sync."
           else
-            git commit -m "Weekly tool pages #${{ github.run_number }}"
+            git commit -m "Weekly growth engine content sync #${{ github.run_number }}"
             for attempt in 1 2 3; do
               if git pull --rebase origin main && git push origin main; then
                 exit 0
@@ -93,7 +102,7 @@ jobs:
               git rebase --abort || true
               sleep $((attempt * 10))
             done
-            echo "Unable to push tool page changes after 3 attempts." >&2
+            echo "Unable to push content changes after 3 attempts." >&2
             exit 1
           fi
 
