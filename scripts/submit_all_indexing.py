@@ -14,7 +14,7 @@ import requests
 # ── Config ────────────────────────────────────────────────────────────────────
 SITE_URL      = "https://www.pipeleap.com"
 SITEMAP_URL   = "https://www.pipeleap.com/sitemap.xml"
-INDEXNOW_KEY  = "pipeleap-indexnow-2026"
+INDEXNOW_KEY  = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 KEY_LOCATION  = f"{SITE_URL}/{INDEXNOW_KEY}.txt"
 
 INDEXNOW_ENDPOINTS = [

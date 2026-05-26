@@ -28,8 +28,8 @@ try:
 except ImportError:
     _HAS_REQUESTS = False
 
-INDEXNOW_KEY      = "pipeleap-indexnow-2026"
-INDEXNOW_KEY_LOC  = "https://pipeleap.com/pipeleap-indexnow-2026.txt"
+INDEXNOW_KEY      = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
+INDEXNOW_KEY_LOC  = "https://pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt"
 SITEMAP_URL       = "https://pipeleap.com/sitemap.xml"
 
 

@@ -15,12 +15,21 @@ env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   LAUNCHPAD_DEPLOY_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
+  PIPELEAP_LAUNCHPAD_DIR: pipeleap-launchpad
 
 jobs:
   generate-tools:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Checkout launchpad publish target
+        uses: actions/checkout@v4
+        with:
+          repository: manikanakathala-droid/pipeleap-launchpad-040053e5
+          token: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
+          ref: main
+          path: pipeleap-launchpad
 
       - uses: actions/setup-python@v5
         with:
@@ -31,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml google-genai>=2.6.0 requests
 
-      - name: Generate and publish tool pages
+      - name: Generate, publish, and update glossary
         id: generate
         env:
           TOOLS_BATCH_SIZE: ${{ inputs.batch_size || '20' }}
@@ -45,7 +54,28 @@ jobs:
               yaml.dump(cfg, f, default_flow_style=False)
           "
           python run_growth_engine.py --tools-only
-          echo "Tool page generation complete"
+          echo "Tool page generation and glossary update complete"
+
+      - name: Commit glossary updates to launchpad
+        run: |
+          cd pipeleap-launchpad
+          git config user.name "pipeleap-seo-bot"
+          git config user.email "seo-bot@pipeleap.com"
+          git add src/data/glossary-terms.ts 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No glossary changes to commit."
+          else
+            git commit -m "Weekly glossary update #${{ github.run_number }}"
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin main; then
+                exit 0
+              fi
+              git rebase --abort || true
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push glossary changes after 3 attempts." >&2
+            exit 1
+          fi
 
       - name: Upload generation artifacts
         if: always()

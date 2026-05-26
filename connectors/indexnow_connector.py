@@ -40,7 +40,7 @@ INDEXNOW_ENDPOINTS = [
 ]
 
 # Pipeleap's IndexNow key — must match the key file at https://www.pipeleap.com/{key}.txt
-INDEXNOW_KEY = "pipeleap-indexnow-2026"
+INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 KEY_LOCATION  = f"https://www.pipeleap.com/{INDEXNOW_KEY}.txt"
 SITE_URL      = "https://www.pipeleap.com"
 

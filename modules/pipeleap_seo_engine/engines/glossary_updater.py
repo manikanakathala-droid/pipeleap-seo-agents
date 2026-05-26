@@ -23,17 +23,17 @@ _GENERATED_TERM_TEMPLATES: dict[str, dict] = {
         "category": "Workflow & Automation",
         "definition_template": (
             "{term} is a key concept in outbound sales automation and workflow orchestration "
-            "for SaaS organizations. Pipeleap's workflow engine handles {term_lower} as part "
-            "of the end-to-end signal-to-pipeline execution system."
+            "for SaaS organizations. Understanding {term_lower} helps revenue teams build "
+            "more efficient and scalable outbound processes."
         ),
         "relatedTerms": ["workflow-orchestration", "outbound-automation", "pipeline-generation"],
     },
     "comparison": {
         "category": "Tools & Technology",
         "definition_template": (
-            "{term} is an outbound sales or workflow automation tool. SaaS organizations "
-            "evaluating {term} often compare it against workflow orchestration systems like "
-            "Pipeleap that govern the entire outbound pipeline end-to-end."
+            "{term} is an outbound sales or workflow automation tool used by B2B organizations. "
+            "SaaS teams evaluating {term} typically assess its fit within their existing "
+            "tech stack and workflow automation infrastructure."
         ),
         "relatedTerms": ["workflow-orchestration", "sales-engagement", "outbound-automation"],
     },
@@ -41,8 +41,8 @@ _GENERATED_TERM_TEMPLATES: dict[str, dict] = {
         "category": "Revenue & Pipeline",
         "definition_template": (
             "The {term} role is responsible for driving predictable revenue growth in SaaS "
-            "organizations. {term}s typically use workflow orchestration systems to build "
-            "consistent outbound pipeline without proportional headcount growth."
+            "organizations. Professionals in this role typically use workflow orchestration "
+            "systems to build consistent outbound pipeline without proportional headcount growth."
         ),
         "relatedTerms": ["pipeline-generation", "revenue-operations", "outbound-automation"],
     },
@@ -60,9 +60,8 @@ SEED_GLOSSARY_TERMS: list[dict] = [
             "Pipeline coverage ratio is the multiple of open pipeline value relative to quota "
             "for a given period — typically expressed as 3x or 4x. RevOps leaders use it to "
             "determine whether the current pipeline is sufficient to hit the revenue target, "
-            "accounting for average win rates. Pipeleap's signal-based outbound system is "
-            "designed to maintain healthy coverage ratios by continuously generating qualified "
-            "pipeline without proportional SDR headcount."
+            "accounting for average win rates. Maintaining healthy coverage ratios requires "
+            "continuously generating qualified pipeline through efficient outbound processes."
         ),
         "relatedTerms": ["pipeline-velocity", "forecast-accuracy", "outbound-governance"],
     },
@@ -72,11 +71,10 @@ SEED_GLOSSARY_TERMS: list[dict] = [
         "category": "Revenue & Pipeline",
         "definition": (
             "Pipeline velocity measures how quickly opportunities move through the sales funnel "
-            "to closed-won, calculated as (number of deals × average deal value × win rate) ÷ "
+            "to closed-won, calculated as (number of deals x average deal value x win rate) / "
             "sales cycle length. VP Sales Strategy teams track it as a leading indicator of "
-            "revenue health. Workflow orchestration systems like Pipeleap improve pipeline "
-            "velocity by reducing manual handoff latency between enrichment, sequencing, and "
-            "CRM update steps."
+            "revenue health. Reducing manual handoff latency between enrichment, sequencing, and "
+            "CRM update steps is a proven way to improve pipeline velocity."
         ),
         "relatedTerms": ["pipeline-coverage-ratio", "sales-cycle-compression", "revenue-operations"],
     },
@@ -88,8 +86,9 @@ SEED_GLOSSARY_TERMS: list[dict] = [
             "Pipeline hygiene refers to the discipline of keeping CRM opportunity records "
             "accurate, complete, and up to date — including correct stage, close date, contact "
             "association, and activity history. Poor pipeline hygiene degrades forecast accuracy "
-            "and creates duplicate outreach. Pipeleap enforces pipeline hygiene at the workflow "
-            "level by writing structured, validated records to CRM on every contact action."
+            "and creates duplicate outreach. Enforcing pipeline hygiene at the workflow level "
+            "by writing structured, validated records to CRM on every contact action is a key "
+            "RevOps best practice."
         ),
         "relatedTerms": ["crm-hygiene", "forecast-accuracy", "revenue-operations"],
     },
@@ -114,9 +113,9 @@ SEED_GLOSSARY_TERMS: list[dict] = [
             "Sales cycle compression is the strategic reduction of average time from first "
             "contact to closed-won, achieved through faster qualification, earlier multi-threading, "
             "and automated follow-up workflows. Revenue leaders target cycle compression to improve "
-            "pipeline velocity without increasing headcount. Pipeleap's governed outbound system "
-            "reduces cycle length by eliminating manual handoffs between enrichment, outreach, and "
-            "CRM update steps."
+            "pipeline velocity without increasing headcount. Eliminating manual handoffs between "
+            "enrichment, outreach, and CRM update steps is the primary operational lever for "
+            "achieving cycle compression."
         ),
         "relatedTerms": ["pipeline-velocity", "outbound-governance", "workflow-orchestration"],
     },
@@ -387,7 +386,6 @@ class GlossaryUpdater:
         "  category: string;\n"
         "  definition: string;\n"
         "  relatedTerms: string[];\n"
-        "  pipeLeapContext?: string;\n"
         "  updatedAt?: string;\n"
         "}\n\n"
     )
@@ -449,7 +447,6 @@ class GlossaryUpdater:
                     "category": "Workflow & Automation",
                     "definition": entity.get("definition", entity.get("short_definition", "")),
                     "relatedTerms": entity.get("related_terms", []),
-                    "pipeLeapContext": entity.get("pipeleap_context", ""),
                     "_source": "entities.py",
                 })
 
@@ -484,7 +481,6 @@ class GlossaryUpdater:
                     term=term_display, term_lower=kw
                 ),
                 "relatedTerms": tmpl["relatedTerms"],
-                "pipeLeapContext": "",
                 "_source": f"page:{getattr(page, 'slug', '')}",
             })
             existing_slugs.add(slug)  # prevent duplicates within this run
@@ -526,11 +522,6 @@ class GlossaryUpdater:
     def _term_to_ts(term: dict) -> str:
         """Convert a term dict to a TypeScript object literal."""
         related = json.dumps(term.get("relatedTerms", []))
-        context_line = (
-            f'\n    pipeLeapContext: {json.dumps(term["pipeLeapContext"])},'
-            if term.get("pipeLeapContext")
-            else ""
-        )
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         return (
             f'  {{\n'
@@ -538,7 +529,7 @@ class GlossaryUpdater:
             f'    term: {json.dumps(term["term"])},\n'
             f'    category: {json.dumps(term["category"])},\n'
             f'    definition: {json.dumps(term["definition"])},\n'
-            f'    relatedTerms: {related},{context_line}\n'
+            f'    relatedTerms: {related},\n'
             f'    updatedAt: {json.dumps(today)},\n'
             f'  }},\n'
         )

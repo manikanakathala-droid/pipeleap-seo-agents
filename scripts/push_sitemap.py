@@ -388,8 +388,8 @@ except Exception as e:
 print("\nRe-submitting all URLs to Yandex IndexNow ...")
 all_urls = re.findall(r"<loc>(https://[^<]+)</loc>", new_sitemap)
 r = requests.post("https://yandex.com/indexnow",
-    json={"host": "www.pipeleap.com", "key": "pipeleap-indexnow-2026",
-          "keyLocation": "https://www.pipeleap.com/pipeleap-indexnow-2026.txt",
+    json={"host": "www.pipeleap.com", "key": "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55",
+          "keyLocation": "https://www.pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt",
           "urlList": all_urls}, timeout=20)
 print(f"  Yandex: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
 
