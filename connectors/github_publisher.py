@@ -235,7 +235,15 @@ class GitHubPublisher:
         """
         Append a new object literal into the last array export in a TypeScript file.
         Supports both `];` (direct array) and `allTools: Tool[] = [...existing]` (spread import) patterns.
+        Skips if an entry with the same `slug` already exists.
         """
+        slug = entry.get("slug", "")
+        if slug:
+            existing_slugs = re.findall(rf"slug:\s*`[^`]+`", ts_content)
+            for found in existing_slugs:
+                if f"`{slug}`" in found:
+                    log.warning("Skipping duplicate tool entry — slug `%s` already exists", slug)
+                    return ts_content
         entry_str = self._dict_to_ts_object(entry)
 
         # Spread import pattern: ...SomeModule,\n];
@@ -243,13 +251,13 @@ class GitHubPublisher:
         if spread_match:
             last_spread = ts_content.rfind("...")
             insert_pos = ts_content.find("]", last_spread)
-            return ts_content[:insert_pos].rstrip() + f",\n  {entry_str},\n" + ts_content[insert_pos:]
+            return ts_content[:insert_pos].rstrip(",\n\r ").rstrip() + f",\n  {entry_str},\n" + ts_content[insert_pos:]
 
         # Standard direct array: ...\n];
         last_bracket = ts_content.rfind("];")
         if last_bracket == -1:
             raise ValueError("Could not find closing ]; in TypeScript data file")
-        return ts_content[:last_bracket] + f"  {entry_str},\n" + ts_content[last_bracket:]
+        return ts_content[:last_bracket].rstrip(",\n\r ").rstrip() + f"  {entry_str},\n" + ts_content[last_bracket:]
 
     def _dict_to_ts_object(self, obj: dict[str, Any], indent: int = 2) -> str:
         """Convert a Python dict to a TypeScript object literal string."""
