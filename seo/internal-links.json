@@ -7,8 +7,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/cost-of-manual-prospecting",
@@ -18,8 +18,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/outbound-stack-too-many-tools",
@@ -29,8 +29,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/predictable-pipeline-without-sdrs",
@@ -40,8 +40,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/",
@@ -51,8 +51,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/",
@@ -62,8 +62,8 @@
     "cluster": "Outbound Sales Automation",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/how-to-run-gtm-audit",
@@ -73,8 +73,8 @@
     "cluster": "GTM Implementation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/sdr-agency-vs-outbound-automation",
@@ -84,8 +84,8 @@
     "cluster": "GTM Implementation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/apollo-clay-pipeleap-comparison",
@@ -95,8 +95,8 @@
     "cluster": "GTM Implementation",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/gtm-audit",
@@ -106,8 +106,8 @@
     "cluster": "GTM Implementation",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/gtm-audit",
@@ -117,8 +117,8 @@
     "cluster": "GTM Implementation",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/what-is-sales-orchestration",
@@ -128,8 +128,8 @@
     "cluster": "Sales Orchestration",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/blog/11-modules-outbound-engine",
@@ -139,8 +139,8 @@
     "cluster": "Sales Orchestration",
     "priority": "high",
     "note": "Content-level link only — no structural changes needed.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/about",
@@ -150,8 +150,8 @@
     "cluster": "Sales Orchestration",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   },
   {
     "from_page": "/about",
@@ -161,7 +161,7 @@
     "cluster": "Sales Orchestration",
     "priority": "medium",
     "note": "Content-level link only.",
-    "run_id": "20260526T011358Z",
-    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+    "run_id": "20260526T011445Z",
+    "updated_at": "2026-05-26T01:14:52.342255+00:00"
   }
 ]
