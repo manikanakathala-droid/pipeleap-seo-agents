@@ -385,6 +385,14 @@ class GitHubPublisher:
                 return cat
         return "Outbound Automation"
 
+    @staticmethod
+    def _strip_inline(text: str) -> str:
+        """Strip inline markdown: links, bold, italic."""
+        text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+        text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+        text = re.sub(r"\*(.+?)\*", r"\1", text)
+        return text
+
     def _body_to_blog_sections(self, body_markdown: str) -> list[dict[str, Any]]:
         sections: list[dict[str, Any]] = []
         lines = body_markdown.strip().split("\n")
@@ -395,27 +403,58 @@ class GitHubPublisher:
                 i += 1
                 continue
 
-            line = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", line)
+            line = self._strip_inline(line)
 
+            # Skip code fence markers
+            if line.startswith("```"):
+                i += 1
+                continue
+
+            # Skip horizontal rules and table separators
+            if re.match(r"^-{3,}$", line) or re.match(r"^\| ?-{3,} ?\|", line):
+                i += 1
+                continue
+
+            # H1 heading → skip (redundant with article title)
+            if line.startswith("# ") and not line.startswith("## "):
+                i += 1
+                continue
+
+            # H3+ sub-headings → strip markers, keep as paragraph
+            m = re.match(r"^#{3,}\s+(.+)$", line)
+            if m:
+                sections.append({"text": m.group(1).strip(), "type": "paragraph"})
+                i += 1
+                continue
+
+            # H2 heading
             if line.startswith("## "):
                 sections.append({"text": line[3:].strip(), "type": "h2"})
                 i += 1
                 continue
 
+            # Blockquote → strip "> " prefix
+            if line.startswith("> "):
+                sections.append({"text": line[2:].strip(), "type": "paragraph"})
+                i += 1
+                continue
+
+            # List items
             if line.startswith("- ") or line.startswith("* "):
                 items: list[str] = []
                 while i < len(lines):
                     l = lines[i].strip()
                     if l.startswith("- ") or l.startswith("* "):
-                        item_text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", l[2:].strip())
-                        items.append(item_text)
+                        items.append(self._strip_inline(l[2:].strip()))
                         i += 1
                     else:
                         break
                 sections.append({"items": items, "type": "list"})
                 continue
 
-            sections.append({"text": line, "type": "paragraph"})
+            # Default paragraph — strip numbered list prefix
+            text = re.sub(r"^\d+\.\s+", "", line)
+            sections.append({"text": text, "type": "paragraph"})
             i += 1
 
         if sections and sections[-1].get("type") != "cta":
