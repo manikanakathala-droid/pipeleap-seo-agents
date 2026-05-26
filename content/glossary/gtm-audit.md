@@ -25,7 +25,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T011358Z — 2026-05-26T01:14:02.644437+00:00*
+SEO OS glossary, run 20260526T011358Z, 2026-05-26T01:14:02.644437+00:00
 
 <!-- UPDATED 20260526T011445Z -->
 
@@ -56,7 +56,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T011445Z — 2026-05-26T01:14:52.341378+00:00*
+SEO OS glossary, run 20260526T011445Z, 2026-05-26T01:14:52.341378+00:00
 
 <!-- UPDATED 20260526T013309Z -->
 
@@ -87,7 +87,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T013309Z — 2026-05-26T01:33:13.458275+00:00*
+SEO OS glossary, run 20260526T013309Z, 2026-05-26T01:33:13.458275+00:00
 
 <!-- UPDATED 20260526T014700Z -->
 
@@ -118,7 +118,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T014700Z — 2026-05-26T01:47:08.378084+00:00*
+SEO OS glossary, run 20260526T014700Z, 2026-05-26T01:47:08.378084+00:00
 
 <!-- UPDATED 20260526T014919Z -->
 
@@ -149,7 +149,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T014919Z — 2026-05-26T01:49:23.577588+00:00*
+SEO OS glossary, run 20260526T014919Z, 2026-05-26T01:49:23.577588+00:00
 
 <!-- UPDATED 20260526T015245Z -->
 
@@ -180,7 +180,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T015245Z — 2026-05-26T01:52:50.048376+00:00*
+SEO OS glossary, run 20260526T015245Z, 2026-05-26T01:52:50.048376+00:00
 
 <!-- UPDATED 20260526T020707Z -->
 
@@ -211,7 +211,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T020707Z — 2026-05-26T02:07:12.490758+00:00*
+SEO OS glossary, run 20260526T020707Z, 2026-05-26T02:07:12.490758+00:00
 
 <!-- UPDATED 20260526T021043Z -->
 
@@ -242,7 +242,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T021043Z — 2026-05-26T02:10:49.915302+00:00*
+SEO OS glossary, run 20260526T021043Z, 2026-05-26T02:10:49.915302+00:00
 
 <!-- UPDATED 20260526T023930Z -->
 
@@ -273,7 +273,7 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T023930Z — 2026-05-26T02:39:34.431192+00:00*
+SEO OS glossary, run 20260526T023930Z, 2026-05-26T02:39:34.431192+00:00
 
 <!-- UPDATED 20260526T024015Z -->
 
@@ -304,4 +304,4 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 - [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
 
 ---
-*SEO OS glossary — run 20260526T024015Z — 2026-05-26T02:40:20.330683+00:00*
+SEO OS glossary, run 20260526T024015Z, 2026-05-26T02:40:20.330683+00:00

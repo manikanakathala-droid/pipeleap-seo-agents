@@ -13,9 +13,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -38,7 +38,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T011358Z — 2026-05-26T01:14:02.643924+00:00*
+SEO OS draft, run 20260526T011358Z, 2026-05-26T01:14:02.643924+00:00
 
 <!-- NEW DRAFT 20260526T011445Z -->
 
@@ -57,9 +57,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -82,7 +82,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T011445Z — 2026-05-26T01:14:52.340559+00:00*
+SEO OS draft, run 20260526T011445Z, 2026-05-26T01:14:52.340559+00:00
 
 <!-- NEW DRAFT 20260526T013309Z -->
 
@@ -101,9 +101,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -126,7 +126,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T013309Z — 2026-05-26T01:33:13.457639+00:00*
+SEO OS draft, run 20260526T013309Z, 2026-05-26T01:33:13.457639+00:00
 
 <!-- NEW DRAFT 20260526T014700Z -->
 
@@ -145,9 +145,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -170,7 +170,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T014700Z — 2026-05-26T01:47:08.377292+00:00*
+SEO OS draft, run 20260526T014700Z, 2026-05-26T01:47:08.377292+00:00
 
 <!-- NEW DRAFT 20260526T014919Z -->
 
@@ -189,9 +189,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -214,7 +214,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T014919Z — 2026-05-26T01:49:23.576758+00:00*
+SEO OS draft, run 20260526T014919Z, 2026-05-26T01:49:23.576758+00:00
 
 <!-- NEW DRAFT 20260526T015245Z -->
 
@@ -233,9 +233,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -258,7 +258,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T015245Z — 2026-05-26T01:52:50.047555+00:00*
+SEO OS draft, run 20260526T015245Z, 2026-05-26T01:52:50.047555+00:00
 
 <!-- NEW DRAFT 20260526T020707Z -->
 
@@ -277,9 +277,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -302,7 +302,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T020707Z — 2026-05-26T02:07:12.489992+00:00*
+SEO OS draft, run 20260526T020707Z, 2026-05-26T02:07:12.489992+00:00
 
 <!-- NEW DRAFT 20260526T021043Z -->
 
@@ -321,9 +321,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -346,7 +346,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T021043Z — 2026-05-26T02:10:49.914474+00:00*
+SEO OS draft, run 20260526T021043Z, 2026-05-26T02:10:49.914474+00:00
 
 <!-- NEW DRAFT 20260526T023930Z -->
 
@@ -365,9 +365,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -390,7 +390,7 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T023930Z — 2026-05-26T02:39:34.430402+00:00*
+SEO OS draft, run 20260526T023930Z, 2026-05-26T02:39:34.430402+00:00
 
 <!-- NEW DRAFT 20260526T024015Z -->
 
@@ -409,9 +409,9 @@ status: draft
 
 # Apollo.io vs Clay vs Pipeleap: What Is the Difference?
 
-**Target keyword:** Apollo.io alternatives  
-**Persona:** Head of Sales evaluating outbound tools  
-**Pillar page:** [/](/)
+Target keyword: Apollo.io alternatives  
+Persona: Head of Sales evaluating outbound tools  
+Pillar page: [/](/)
 
 ## Content Structure
 
@@ -434,4 +434,4 @@ status: draft
 - Add outcome proof for Pipeleap managed service
 
 ---
-*SEO OS draft — run 20260526T024015Z — 2026-05-26T02:40:20.329901+00:00*
+SEO OS draft, run 20260526T024015Z, 2026-05-26T02:40:20.329901+00:00

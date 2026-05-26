@@ -25,7 +25,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T011358Z — 2026-05-26T01:14:02.644110+00:00*
+SEO OS glossary, run 20260526T011358Z, 2026-05-26T01:14:02.644110+00:00
 
 <!-- UPDATED 20260526T011445Z -->
 
@@ -56,7 +56,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T011445Z — 2026-05-26T01:14:52.340810+00:00*
+SEO OS glossary, run 20260526T011445Z, 2026-05-26T01:14:52.340810+00:00
 
 <!-- UPDATED 20260526T013309Z -->
 
@@ -87,7 +87,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T013309Z — 2026-05-26T01:33:13.457841+00:00*
+SEO OS glossary, run 20260526T013309Z, 2026-05-26T01:33:13.457841+00:00
 
 <!-- UPDATED 20260526T014700Z -->
 
@@ -118,7 +118,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T014700Z — 2026-05-26T01:47:08.377549+00:00*
+SEO OS glossary, run 20260526T014700Z, 2026-05-26T01:47:08.377549+00:00
 
 <!-- UPDATED 20260526T014919Z -->
 
@@ -149,7 +149,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T014919Z — 2026-05-26T01:49:23.577023+00:00*
+SEO OS glossary, run 20260526T014919Z, 2026-05-26T01:49:23.577023+00:00
 
 <!-- UPDATED 20260526T015245Z -->
 
@@ -180,7 +180,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T015245Z — 2026-05-26T01:52:50.047797+00:00*
+SEO OS glossary, run 20260526T015245Z, 2026-05-26T01:52:50.047797+00:00
 
 <!-- UPDATED 20260526T020707Z -->
 
@@ -211,7 +211,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T020707Z — 2026-05-26T02:07:12.490222+00:00*
+SEO OS glossary, run 20260526T020707Z, 2026-05-26T02:07:12.490222+00:00
 
 <!-- UPDATED 20260526T021043Z -->
 
@@ -242,7 +242,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T021043Z — 2026-05-26T02:10:49.914728+00:00*
+SEO OS glossary, run 20260526T021043Z, 2026-05-26T02:10:49.914728+00:00
 
 <!-- UPDATED 20260526T023930Z -->
 
@@ -273,7 +273,7 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T023930Z — 2026-05-26T02:39:34.430668+00:00*
+SEO OS glossary, run 20260526T023930Z, 2026-05-26T02:39:34.430668+00:00
 
 <!-- UPDATED 20260526T024015Z -->
 
@@ -304,4 +304,4 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 - [/glossary/icp-scoring](/glossary/icp-scoring)
 
 ---
-*SEO OS glossary — run 20260526T024015Z — 2026-05-26T02:40:20.330167+00:00*
+SEO OS glossary, run 20260526T024015Z, 2026-05-26T02:40:20.330167+00:00
