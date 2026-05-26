@@ -228,5 +228,51 @@
     ],
     "safe_to_apply": true,
     "requires_dev_review": false
+  },
+  {
+    "run_id": "20260526T015245Z",
+    "generated_at": "2026-05-26T01:52:50.048812+00:00",
+    "url": "https://www.pipeleap.com/gtm-audit",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
+    "meta_description": "Get a full audit of your outbound engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+    "recommended_changes": [
+      "Title: update to 'Free GTM Audit for B2B Sales Teams | Pipeleap'",
+      "Meta: update to 'Get a full audit of your outbound engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260526T015245Z",
+    "generated_at": "2026-05-26T01:52:50.048812+00:00",
+    "url": "https://www.pipeleap.com/",
+    "current_title": "Pipeleap",
+    "current_meta": "Outbound sales automation for B2B revenue teams.",
+    "title": "Outbound Sales Automation & GTM Implementation | Pipeleap",
+    "meta_description": "Pipeleap builds and runs your entire outbound engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+    "recommended_changes": [
+      "Title: update to 'Outbound Sales Automation & GTM Implementation | Pipeleap'",
+      "Meta: update to 'Pipeleap builds and runs your entire outbound engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.'",
+      "H1: missing — add keyword-anchored H1"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260526T015245Z",
+    "generated_at": "2026-05-26T01:52:50.048812+00:00",
+    "url": "https://www.pipeleap.com/pricing",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Outbound Sales Automation Pricing | Pipeleap",
+    "meta_description": "Pipeleap pricing for managed outbound sales automation and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.",
+    "recommended_changes": [
+      "Title: update to 'Outbound Sales Automation Pricing | Pipeleap'",
+      "Meta: update to 'Pipeleap pricing for managed outbound sales automation and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
   }
 ]
