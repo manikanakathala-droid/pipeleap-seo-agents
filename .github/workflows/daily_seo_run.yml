@@ -100,6 +100,14 @@ jobs:
             echo "No audit-duplicates script found, skipping."
           fi
 
+      - name: Validate TypeScript compilation before commit
+        run: |
+          cd pipeleap-launchpad
+          if ! npx tsc --noEmit 2>&1; then
+            echo "TypeScript validation failed — aborting commit."
+            exit 1
+          fi
+
       - name: Commit and push generated launchpad content
         run: |
           cd pipeleap-launchpad

@@ -55,6 +55,14 @@ jobs:
           python run_growth_engine.py --tools-only
           echo "Tool page generation and glossary update complete"
 
+      - name: Validate TypeScript compilation before commit
+        run: |
+          cd pipeleap-launchpad
+          if ! npx tsc --noEmit 2>&1; then
+            echo "TypeScript validation failed — aborting commit."
+            exit 1
+          fi
+
       - name: Commit glossary updates to launchpad
         run: |
           cd pipeleap-launchpad
