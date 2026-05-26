@@ -93,7 +93,15 @@ jobs:
             echo "No structured SEO changes."
           else
             git commit -m "seo(os): structured outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
+            for attempt in 1 2 3; do
+              if git push; then
+                exit 0
+              fi
+              git pull --rebase origin main
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push structured SEO changes after 3 attempts." >&2
+            exit 1
           fi
 
       - name: Commit dashboard outputs
@@ -103,7 +111,15 @@ jobs:
             echo "No dashboard changes."
           else
             git commit -m "dashboard: live update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
+            for attempt in 1 2 3; do
+              if git push; then
+                exit 0
+              fi
+              git pull --rebase origin main
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push dashboard changes after 3 attempts." >&2
+            exit 1
           fi
 
       - name: Commit raw run outputs
@@ -113,7 +129,15 @@ jobs:
             echo "No raw output changes."
           else
             git commit -m "chore(seo-os): raw outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
+            for attempt in 1 2 3; do
+              if git push; then
+                exit 0
+              fi
+              git pull --rebase origin main
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push raw output changes after 3 attempts." >&2
+            exit 1
           fi
 
       - name: Save SEO OS state and dashboard cache
