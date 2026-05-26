@@ -1,0 +1,254 @@
+{
+  "run_id": "20260526T024012Z",
+  "generated_at": "2026-05-26T02:40:12.721019+00:00",
+  "snippet_recommendations": [
+    {
+      "page_path": "/",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Outbound Sales Automation & GTM Implementation | Pipeleap",
+      "recommended_meta": "Pipeleap builds and runs your entire outbound engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Pipeleap vs. Hiring an SDR: What Actually Builds Pipeline",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/about",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "About Pipeleap - End-to-End Outbound Built & Operated For You",
+      "recommended_meta": "We deploy your outbound system and run it as a managed service. No tool sprawl, no setup Saturdays. One working engine that gets smarter over time.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "The 11 Modules Every Outbound Engine Needs (Most Teams Have 3)",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/gtm-audit",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
+      "recommended_meta": "Get a full audit of your outbound engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Pipeleap vs. Hiring an SDR: What Actually Builds Pipeline",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/faq",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Outbound Sales Automation FAQ - Pipeleap",
+      "recommended_meta": "Answers to common questions about how Pipeleap builds, deploys, and operates outbound sales systems for B2B revenue teams.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "The 11 Modules Every Outbound Engine Needs (Most Teams Have 3)",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/pricing",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Outbound Sales Automation Pricing | Pipeleap",
+      "recommended_meta": "Pipeleap pricing for managed outbound sales automation and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Pipeleap vs. Hiring an SDR: What Actually Builds Pipeline",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    }
+  ],
+  "faq_briefs": [
+    {
+      "page_path": "/faq",
+      "questions": [
+        "What is outbound sales automation?",
+        "How long does it take to build a working outbound system?",
+        "What is a GTM audit and why does it matter?",
+        "What is ICP scoring in outbound sales?",
+        "How does AI personalisation improve reply rates in cold outreach?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    },
+    {
+      "page_path": "/gtm-audit",
+      "questions": [
+        "What is a GTM audit and why does it matter?",
+        "What does a GTM implementation partner do?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    },
+    {
+      "page_path": "/",
+      "questions": [
+        "What is outbound sales automation?",
+        "How long does it take to build a working outbound system?",
+        "What is ICP scoring in outbound sales?",
+        "What is the difference between a sales engagement platform and a managed outbound service?",
+        "Can outbound sales be fully automated?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    }
+  ],
+  "breadcrumb_recommendations": [
+    {
+      "page_path": "/blog/ai-personalization-cold-email",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Outbound Sales Automation",
+        "Ai Personalization Cold Email"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/blog/cost-of-manual-prospecting",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Outbound Sales Automation",
+        "Cost Of Manual Prospecting"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/blog/outbound-stack-too-many-tools",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Outbound Sales Automation",
+        "Outbound Stack Too Many Tools"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/blog/predictable-pipeline-without-sdrs",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Outbound Sales Automation",
+        "Predictable Pipeline Without Sdrs"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/glossary/outbound-sales",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Outbound Sales"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/glossary/sales-automation",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Sales Automation"
+      ],
+      "cluster": "Outbound Sales Automation"
+    },
+    {
+      "page_path": "/blog/how-to-run-gtm-audit",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "GTM Implementation",
+        "How To Run Gtm Audit"
+      ],
+      "cluster": "GTM Implementation"
+    },
+    {
+      "page_path": "/blog/sdr-agency-vs-outbound-automation",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "GTM Implementation",
+        "Sdr Agency Vs Outbound Automation"
+      ],
+      "cluster": "GTM Implementation"
+    },
+    {
+      "page_path": "/blog/apollo-clay-pipeleap-comparison",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "GTM Implementation",
+        "Apollo Clay Pipeleap Comparison"
+      ],
+      "cluster": "GTM Implementation"
+    },
+    {
+      "page_path": "/glossary/gtm-audit",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Gtm Audit"
+      ],
+      "cluster": "GTM Implementation"
+    },
+    {
+      "page_path": "/glossary/icp-scoring",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Icp Scoring"
+      ],
+      "cluster": "GTM Implementation"
+    },
+    {
+      "page_path": "/blog/what-is-sales-orchestration",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Sales Orchestration",
+        "What Is Sales Orchestration"
+      ],
+      "cluster": "Sales Orchestration"
+    },
+    {
+      "page_path": "/blog/11-modules-outbound-engine",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Sales Orchestration",
+        "11 Modules Outbound Engine"
+      ],
+      "cluster": "Sales Orchestration"
+    },
+    {
+      "page_path": "/glossary/sales-orchestration",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Sales Orchestration"
+      ],
+      "cluster": "Sales Orchestration"
+    },
+    {
+      "page_path": "/glossary/outbound-sales",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Outbound Sales"
+      ],
+      "cluster": "Sales Orchestration"
+    }
+  ],
+  "ctr_improvement_actions": [],
+  "page_two_opportunities": []
+}
