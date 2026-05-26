@@ -1,0 +1,167 @@
+[
+  {
+    "from_page": "/blog/ai-personalization-cold-email",
+    "to_page": "/",
+    "anchor_text": "outbound sales automation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Outbound Sales Automation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/cost-of-manual-prospecting",
+    "to_page": "/",
+    "anchor_text": "outbound sales automation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Outbound Sales Automation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/outbound-stack-too-many-tools",
+    "to_page": "/",
+    "anchor_text": "outbound sales automation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Outbound Sales Automation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/predictable-pipeline-without-sdrs",
+    "to_page": "/",
+    "anchor_text": "outbound sales automation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Outbound Sales Automation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/",
+    "to_page": "/glossary/outbound-sales",
+    "anchor_text": "outbound sales",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "Outbound Sales Automation",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/",
+    "to_page": "/glossary/sales-automation",
+    "anchor_text": "sales automation",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "Outbound Sales Automation",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/how-to-run-gtm-audit",
+    "to_page": "/gtm-audit",
+    "anchor_text": "gtm implementation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "GTM Implementation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/sdr-agency-vs-outbound-automation",
+    "to_page": "/gtm-audit",
+    "anchor_text": "gtm implementation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "GTM Implementation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/apollo-clay-pipeleap-comparison",
+    "to_page": "/gtm-audit",
+    "anchor_text": "gtm implementation",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "GTM Implementation",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/gtm-audit",
+    "to_page": "/glossary/gtm-audit",
+    "anchor_text": "gtm audit",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "GTM Implementation",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/gtm-audit",
+    "to_page": "/glossary/icp-scoring",
+    "anchor_text": "icp scoring",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "GTM Implementation",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/what-is-sales-orchestration",
+    "to_page": "/about",
+    "anchor_text": "sales orchestration",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Sales Orchestration",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/blog/11-modules-outbound-engine",
+    "to_page": "/about",
+    "anchor_text": "sales orchestration",
+    "placement": "First 200 words or within the most relevant section",
+    "cluster": "Sales Orchestration",
+    "priority": "high",
+    "note": "Content-level link only — no structural changes needed.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/about",
+    "to_page": "/glossary/sales-orchestration",
+    "anchor_text": "sales orchestration",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "Sales Orchestration",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  },
+  {
+    "from_page": "/about",
+    "to_page": "/glossary/outbound-sales",
+    "anchor_text": "outbound sales",
+    "placement": "Inline where the term is first mentioned",
+    "cluster": "Sales Orchestration",
+    "priority": "medium",
+    "note": "Content-level link only.",
+    "run_id": "20260526T011358Z",
+    "updated_at": "2026-05-26T01:14:02.645020+00:00"
+  }
+]
