@@ -1,0 +1,20 @@
+{
+  "run_id": "20260526T152604Z",
+  "previous_run_id": "20260526T024015Z",
+  "new_pages": [],
+  "updated_pages": [],
+  "deleted_pages": [],
+  "unchanged_pages": 1,
+  "broken_links": [],
+  "orphan_pages": [],
+  "missing_from_sitemap": [],
+  "has_changes": false,
+  "sitemap_added": [
+    "https://www.pipeleap.com/blog/saas-sales-team-workflow-automation",
+    "https://www.pipeleap.com/blog/lead-enrichment-workflows",
+    "https://www.pipeleap.com/blog/pipeleap",
+    "https://www.pipeleap.com/blog/how-to-automate-outbound-emails",
+    "https://www.pipeleap.com/tools/tools/artisan-ai"
+  ],
+  "sitemap_removed": []
+}
