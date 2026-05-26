@@ -1,1 +1,107 @@
-{"seo_score": 0, "trend": [], "last_updated": ""}
+{
+  "last_updated": "2026-05-26T01:14:02.652694+00:00",
+  "current_run_id": "20260526T011358Z",
+  "current_score": 53,
+  "current_score_breakdown": {
+    "technical": 96,
+    "content": 0,
+    "indexing": 100,
+    "authority": 0
+  },
+  "today": {
+    "date": "2026-05-26",
+    "total_actions": 46,
+    "safe_actions": 6,
+    "dev_review_items": 0,
+    "content_pieces": 4,
+    "keywords_found": 16,
+    "indexing_actions": 2,
+    "active_alerts": 0,
+    "mode": "change_response",
+    "pages_total": 0,
+    "pages_new": 1,
+    "pages_updated": 0,
+    "broken_pages": 0,
+    "orphan_pages": 0
+  },
+  "category_totals": {
+    "linking": 1,
+    "metadata": 2,
+    "heading": 1,
+    "structured_data": 2,
+    "technical": 20,
+    "content": 4,
+    "keywords": 16
+  },
+  "score_history": [
+    {
+      "date": "2026-05-26",
+      "value": 53,
+      "technical": 96,
+      "content": 0,
+      "indexing": 100,
+      "authority": 0,
+      "run_id": "20260526T011358Z"
+    }
+  ],
+  "daily_metrics": [
+    {
+      "date": "2026-05-26",
+      "run_id": "20260526T011358Z",
+      "total_actions": 46,
+      "active_alerts": 0,
+      "categories": {
+        "linking": 1,
+        "metadata": 2,
+        "heading": 1,
+        "structured_data": 2,
+        "technical": 20,
+        "content": 4,
+        "keywords": 16
+      },
+      "safe_actions": 6,
+      "dev_review": 0,
+      "mode": "change_response"
+    }
+  ],
+  "content_velocity": [
+    {
+      "date": "2026-05-26",
+      "value": 4,
+      "series": "content_pieces",
+      "run_id": "20260526T011358Z"
+    }
+  ],
+  "keyword_growth": [
+    {
+      "date": "2026-05-26",
+      "value": 16,
+      "series": "keywords_discovered",
+      "run_id": "20260526T011358Z"
+    }
+  ],
+  "technical_trend": [
+    {
+      "date": "2026-05-26",
+      "value": 20,
+      "series": "technical_issues",
+      "run_id": "20260526T011358Z"
+    }
+  ],
+  "indexing_trend": [
+    {
+      "date": "2026-05-26",
+      "value": 2,
+      "series": "indexing_actions",
+      "run_id": "20260526T011358Z"
+    }
+  ],
+  "next_day_plan": [
+    "Publish 4 content pieces — start with blog post (highest conversion cluster)",
+    "Submit 1 new/updated pages in GSC URL Inspection",
+    "Begin comparison page for Clay — targets transactional 'alternatives' cluster",
+    "Monitor GSC for CTR changes on any updated meta descriptions (48-hour window)",
+    "SEO score below 60 — prioritise technical fixes before content expansion"
+  ],
+  "errors": []
+}
