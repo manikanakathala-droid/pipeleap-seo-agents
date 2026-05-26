@@ -12,7 +12,6 @@ on:
         type: number
 
 env:
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   LAUNCHPAD_DEPLOY_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
   PIPELEAP_LAUNCHPAD_DIR: pipeleap-launchpad
@@ -38,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyyaml google-genai>=2.6.0 requests
+          pip install -r requirements.txt
 
       - name: Generate, publish, and update glossary
         id: generate

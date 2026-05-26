@@ -68,7 +68,6 @@ jobs:
 
       - name: Run SEO OS Agent
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
           MOZ_API_SECRET_KEY: ${{ secrets.MOZ_API_SECRET_KEY }}
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
