@@ -1,0 +1,83 @@
+{
+  "run_id": "20260526T014919Z",
+  "generated_at": "2026-05-26T01:49:22.346166+00:00",
+  "mode": "growth_mode",
+  "total_actions": 5,
+  "high_priority_count": 1,
+  "dev_review_count": 0,
+  "auto_executable_count": 5,
+  "growth_mode_triggered": true,
+  "actions": [
+    {
+      "action_id": "GM-001",
+      "category": "content",
+      "priority": 1,
+      "page_url": "https://pipeleap.com/blog",
+      "title": "Publish next content plan brief",
+      "description": "No site changes detected. Growth mode: publish next queued blog post from content_plan_briefs.json. Prioritise alternative/comparison cluster (highest conversion probability: 0.91).",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "high",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-002",
+      "category": "linking",
+      "priority": 2,
+      "page_url": "https://pipeleap.com",
+      "title": "Internal linking audit \u2014 reinforce pillar pages",
+      "description": "Growth mode: run linking cluster map from serp_strategy.py. Ensure every spoke article links to its pillar page. Add missing anchor text links from blog posts to /gtm-audit.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "medium",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-003",
+      "category": "metadata",
+      "priority": 2,
+      "page_url": "https://pipeleap.com/pricing",
+      "title": "Improve low-CTR pages from GSC",
+      "description": "Growth mode: pull pages with >100 impressions and <3% CTR from GSC. Rewrite meta descriptions to match the top triggering query per page.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "medium",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-004",
+      "category": "indexing",
+      "priority": 3,
+      "page_url": "https://pipeleap.com/sitemap.xml",
+      "title": "Resubmit sitemap to GSC",
+      "description": "Growth mode: ping GSC sitemap endpoint to trigger a fresh crawl. Ensures any recent content is picked up in the next index cycle.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "low",
+      "auto_executable": true,
+      "status": "pending"
+    },
+    {
+      "action_id": "GM-005",
+      "category": "content",
+      "priority": 3,
+      "page_url": "https://pipeleap.com/glossary",
+      "title": "Add new glossary term from keyword gaps",
+      "description": "Growth mode: pick the top-traffic, low-difficulty keyword from SERP_KEYWORD_CLUSTERS that lacks a dedicated glossary page. Create it.",
+      "safe_mode": true,
+      "requires_dev": false,
+      "dev_note": "",
+      "estimated_impact": "low",
+      "auto_executable": true,
+      "status": "pending"
+    }
+  ],
+  "skipped_reasons": []
+}
