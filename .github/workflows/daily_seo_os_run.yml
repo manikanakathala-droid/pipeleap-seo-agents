@@ -97,7 +97,7 @@ jobs:
               if git push; then
                 exit 0
               fi
-              git pull --rebase origin main
+              git pull --rebase --autostash origin main
               sleep $((attempt * 10))
             done
             echo "Unable to push structured SEO changes after 3 attempts." >&2
@@ -115,7 +115,7 @@ jobs:
               if git push; then
                 exit 0
               fi
-              git pull --rebase origin main
+              git pull --rebase --autostash origin main
               sleep $((attempt * 10))
             done
             echo "Unable to push dashboard changes after 3 attempts." >&2
@@ -133,7 +133,7 @@ jobs:
               if git push; then
                 exit 0
               fi
-              git pull --rebase origin main
+              git pull --rebase --autostash origin main
               sleep $((attempt * 10))
             done
             echo "Unable to push raw output changes after 3 attempts." >&2
