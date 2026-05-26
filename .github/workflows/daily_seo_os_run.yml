@@ -108,7 +108,7 @@ jobs:
 
       - name: Commit raw run outputs
         run: |
-          git add outputs/ 2>/dev/null || true
+          git add -f outputs/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No raw output changes."
           else
