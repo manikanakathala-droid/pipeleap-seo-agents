@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-26T01:14:02.652694+00:00",
-  "current_run_id": "20260526T011358Z",
+  "last_updated": "2026-05-26T01:14:52.351073+00:00",
+  "current_run_id": "20260526T011445Z",
   "current_score": 53,
   "current_score_breakdown": {
     "technical": 96,
@@ -10,28 +10,29 @@
   },
   "today": {
     "date": "2026-05-26",
-    "total_actions": 46,
-    "safe_actions": 6,
+    "total_actions": 95,
+    "safe_actions": 10,
     "dev_review_items": 0,
     "content_pieces": 4,
     "keywords_found": 16,
-    "indexing_actions": 2,
+    "indexing_actions": 1,
     "active_alerts": 0,
-    "mode": "change_response",
+    "mode": "growth_mode",
     "pages_total": 0,
-    "pages_new": 1,
+    "pages_new": 0,
     "pages_updated": 0,
     "broken_pages": 0,
     "orphan_pages": 0
   },
   "category_totals": {
-    "linking": 1,
-    "metadata": 2,
-    "heading": 1,
-    "structured_data": 2,
-    "technical": 20,
-    "content": 4,
-    "keywords": 16
+    "linking": 3,
+    "metadata": 7,
+    "heading": 3,
+    "structured_data": 6,
+    "technical": 59,
+    "content": 14,
+    "keywords": 48,
+    "indexing": 1
   },
   "score_history": [
     {
@@ -41,27 +42,28 @@
       "content": 0,
       "indexing": 100,
       "authority": 0,
-      "run_id": "20260526T011358Z"
+      "run_id": "20260526T011445Z"
     }
   ],
   "daily_metrics": [
     {
       "date": "2026-05-26",
-      "run_id": "20260526T011358Z",
-      "total_actions": 46,
+      "run_id": "20260526T011445Z",
+      "total_actions": 95,
       "active_alerts": 0,
       "categories": {
-        "linking": 1,
-        "metadata": 2,
-        "heading": 1,
-        "structured_data": 2,
-        "technical": 20,
-        "content": 4,
-        "keywords": 16
+        "linking": 2,
+        "metadata": 5,
+        "heading": 2,
+        "structured_data": 4,
+        "technical": 39,
+        "content": 10,
+        "keywords": 32,
+        "indexing": 1
       },
-      "safe_actions": 6,
+      "safe_actions": 10,
       "dev_review": 0,
-      "mode": "change_response"
+      "mode": "growth_mode"
     }
   ],
   "content_velocity": [
@@ -69,7 +71,7 @@
       "date": "2026-05-26",
       "value": 4,
       "series": "content_pieces",
-      "run_id": "20260526T011358Z"
+      "run_id": "20260526T011445Z"
     }
   ],
   "keyword_growth": [
@@ -77,28 +79,28 @@
       "date": "2026-05-26",
       "value": 16,
       "series": "keywords_discovered",
-      "run_id": "20260526T011358Z"
+      "run_id": "20260526T011445Z"
     }
   ],
   "technical_trend": [
     {
       "date": "2026-05-26",
-      "value": 20,
+      "value": 39,
       "series": "technical_issues",
-      "run_id": "20260526T011358Z"
+      "run_id": "20260526T011445Z"
     }
   ],
   "indexing_trend": [
     {
       "date": "2026-05-26",
-      "value": 2,
+      "value": 1,
       "series": "indexing_actions",
-      "run_id": "20260526T011358Z"
+      "run_id": "20260526T011445Z"
     }
   ],
   "next_day_plan": [
+    "Execute 1 high-priority safe actions from execution_plan.json",
     "Publish 4 content pieces — start with blog post (highest conversion cluster)",
-    "Submit 1 new/updated pages in GSC URL Inspection",
     "Begin comparison page for Clay — targets transactional 'alternatives' cluster",
     "Monitor GSC for CTR changes on any updated meta descriptions (48-hour window)",
     "SEO score below 60 — prioritise technical fixes before content expansion"
