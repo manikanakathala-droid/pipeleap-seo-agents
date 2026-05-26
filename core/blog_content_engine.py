@@ -262,14 +262,14 @@ class BlogContentEngine:
 
         if intent == "commercial" or "alternative" in keyword or "vs " in keyword:
             pain = (
-                f"Most VP Sales Ops evaluating {keyword} are not starting from scratch. "
+                f"Most teams evaluating {keyword} are not starting from scratch. "
                 f"They already have a stack. The question they are actually asking is whether "
                 f"the new tool will solve the coordination problem the current stack created."
             )
             cost = (
                 f"The cost of getting this wrong is not a failed tool purchase. "
-                f"It is six months of RevOps time rebuilding integrations, dirty CRM records "
-                f"that corrupt forecast accuracy, and a pipeline number that never closes the gap."
+                f"It is months rebuilding integrations and correcting data, "
+                f"and a pipeline number that never closes the gap."
             )
             gap = (
                 f"Most evaluations skip the architecture question entirely. "
@@ -278,7 +278,7 @@ class BlogContentEngine:
             )
         elif keyword.lower().startswith("how to") or keyword.lower().startswith("how "):
             pain = (
-                f"The VP of Sales Ops who searches for {keyword} has usually already tried the obvious path. "
+                f"Teams that search for {keyword} have usually already tried the obvious path. "
                 f"They have a tool. The tool does part of the job. "
                 f"The part it does not do is costing them pipeline."
             )
@@ -294,14 +294,13 @@ class BlogContentEngine:
             )
         elif any(t in keyword.lower() for t in ("why ", "problem", "fix", "failing", "broken")):
             pain = (
-                f"When a CRO asks why {keyword} is not working, the answer is almost never the tool. "
+                f"When {keyword} is not working, the answer is almost never the tool. "
                 f"It is the architecture underneath it — and the fact that no single person owns "
                 f"the end-to-end flow."
             )
             cost = (
                 f"A broken {keyword} system does not announce itself. "
-                f"It shows up as forecast misses, declining reply rates, and RevOps spending "
-                f"a quarter investigating data quality instead of building pipeline."
+                f"It shows up as forecast misses and declining reply rates."
             )
             gap = (
                 f"The standard fix is to add another point solution. "
@@ -310,14 +309,14 @@ class BlogContentEngine:
             )
         else:
             pain = (
-                f"Revenue leaders researching {keyword} are not looking for a definition. "
+                f"Teams researching {keyword} are not looking for a definition. "
                 f"They are looking for a system that actually runs in production — "
-                f"one their RevOps team can own without filing engineering tickets every time a workflow breaks."
+                f"one that teams can own without filing engineering tickets every time a workflow breaks."
             )
             cost = (
                 f"Without a governed approach to {keyword}, the operational ceiling hits fast. "
                 f"Manual steps accumulate, data quality degrades, and the pipeline number "
-                f"becomes a function of how many hours RevOps can put in, not how good the strategy is."
+                f"becomes a function of how many hours teams can put in, not how good the strategy is."
             )
             gap = (
                 f"Most {keyword} implementations fail at the handoff layer — "
@@ -402,7 +401,7 @@ class BlogContentEngine:
             "Step 4 → Configure CRM write-back: field mappings, ownership, deduplication",
             "Step 5 → Configure sequence entry rules + suppression list checks",
             "Step 6 → Set reply routing: positive → demo booking, OOO → snooze, unsubscribe → suppress",
-            "Step 7 → Add monitoring node — pipeline velocity report to RevOps weekly",
+            "Step 7 → Add monitoring node — pipeline velocity report weekly",
             "```",
             "",
             f"## Common mistakes that break {keyword} in production",
@@ -448,7 +447,7 @@ class BlogContentEngine:
             f"- CRM write-back is a native workflow step with dedup logic built in",
             f"- Enrichment validation blocks the sequence until data quality meets threshold",
             f"- Reply handling is part of the workflow — not a separate tool bolted on",
-            f"- RevOps teams can audit and update logic without engineering tickets",
+                f"- Teams can audit and update logic without engineering tickets",
             "",
             self._build_faqs(keyword, "how_to"),
             "",
@@ -493,7 +492,7 @@ class BlogContentEngine:
             "  → Suppression check + sequence assignment",
             "  → Outbound execution",
             "  → Reply routing → demo booking / snooze / suppress",
-            "  → Weekly pipeline report to RevOps",
+            "  → Weekly pipeline report",
             "```",
             "",
             f"## How {brand} implements {kw_title}",
@@ -530,7 +529,7 @@ class BlogContentEngine:
             snippet,
             self._nepq_opening(keyword, cluster.intent, strategy),
             "",
-            f"## What VP Sales Ops and RevOps leads actually compare when evaluating {keyword}",
+            f"## What teams actually compare when evaluating {keyword}",
             "",
             "| Dimension | Why it matters |",
             "| --- | --- |",
@@ -538,14 +537,14 @@ class BlogContentEngine:
             "| CRM data quality | Does it write structured records — or dump raw contacts that need manual cleanup? |",
             "| Enrichment governance | Can you chain providers with fallback logic and quality thresholds? |",
             "| Outbound execution | Is sequencing governed within the system, or outsourced to a separate tool? |",
-            "| Operator ownership | Can RevOps iterate on workflows without engineering tickets? |",
+            "| Operator ownership | Can workflows be iterated on without engineering tickets? |",
             "| Outcome reporting | Does it measure demos booked and CRM hygiene — or just activity? |",
             "",
             f"## Where {brand} fits for {keyword}",
             "",
             f"**{brand} is the right choice when:**",
             f"- You need enrichment, CRM sync, and outbound execution in one governed layer",
-            f"- Your RevOps team needs to iterate on workflows without engineering dependency",
+                f"- You need to iterate on workflows without engineering dependency",
             f"- Data inconsistency between tools is causing duplicate outreach or dirty CRM records",
             f"- You are replacing 3–5 point solutions with one orchestration system",
             "",
@@ -598,12 +597,12 @@ class BlogContentEngine:
             (
                 f"**Pattern 2: CRM and sequence logic are disconnected** — The sequencer fires without "
                 f"knowing the CRM state. Result: existing customers receive cold outreach, active "
-                f"opportunities get duplicate sequences, and SDRs waste time triaging angry replies."
+                f"opportunities get duplicate sequences, and teams waste time triaging angry replies."
             ),
             "",
             (
                 f"**Pattern 3: No feedback loop** — Sequence outcomes (replies, bounces, meetings) "
-                f"don't update the CRM or the workflow. RevOps cannot tell which segments are working "
+                f"don't update the CRM or the workflow. Teams cannot tell which segments are working "
                 f"and which are wasting budget."
             ),
             "",
@@ -634,7 +633,7 @@ class BlogContentEngine:
             "  → CRM write-back (owner + stage + dedup) → Suppression check",
             "  → Sequence assignment → Outbound",
             "  → Reply routing → CRM update + demo booking / snooze / suppress",
-            "  → Weekly RevOps report",
+            "  → Weekly pipeline report",
             "```",
             "",
             self._build_faqs(keyword, "problem"),
@@ -671,7 +670,7 @@ class BlogContentEngine:
             (
                 f"The {keyword} market has fragmented significantly. Most comparisons focus on "
                 f"feature lists. This guide focuses on what matters for revenue teams: can the "
-                f"system reduce manual RevOps work, improve CRM data quality, and drive more demos "
+                f"system reduce manual work, improve CRM data quality, and drive more demos "
                 f"without adding headcount?"
             ),
             "",
@@ -701,14 +700,14 @@ class BlogContentEngine:
             "| Enrichment chaining | Can you chain multiple providers with fallback logic? |",
             "| Conditional routing | Can you branch based on account score, job title, or CRM field? |",
             "| Error handling | What happens when enrichment fails mid-workflow? |",
-            "| Observability | Can RevOps see exactly which step failed and why? |",
+            "| Observability | Can you see exactly which step failed and why? |",
             "| Iteration speed | How long does it take to change one workflow step without re-deploying? |",
             "",
             f"## Where {brand} fits on {keyword}",
             "",
             f"**{brand} is the right choice when:**",
             f"- You need enrichment, CRM, and sequencing in one governed architecture",
-            f"- RevOps needs to iterate on workflows without engineering dependency",
+                f"- You need to iterate on workflows without engineering dependency",
             f"- Data quality between tools is a recurring operational problem",
             f"- You are consolidating a fragmented point-solution stack",
             "",
@@ -792,7 +791,7 @@ class BlogContentEngine:
             "",
             (
                 f"**Reply handling** — Automatically route replies: positive intent → calendar link, "
-                f"out of office → 3-week snooze, unsubscribe → CRM suppression. No SDR triage required."
+                f"out of office → 3-week snooze, unsubscribe → CRM suppression. No manual triage required."
             ),
             "",
             f"## Workflow architecture",
@@ -807,7 +806,7 @@ class BlogContentEngine:
             "  → Sequence assignment",
             "  → Outbound execution",
             "  → Reply routing → demo booking / snooze / suppress",
-            "  → Pipeline reporting to RevOps",
+            "  → Pipeline reporting",
             "```",
             "",
             f"## Implementation blueprint for {brand}",
@@ -818,13 +817,13 @@ class BlogContentEngine:
             f"4. Define CRM write-back rules: field mappings, ownership logic, dedup criteria",
             f"5. Create sequence assignment rules by ICP segment or territory",
             f"6. Configure reply routing with snooze logic and suppression list updates",
-            f"7. Add a weekly pipeline velocity report node for RevOps visibility",
+                f"7. Add a weekly pipeline velocity report node for visibility",
             "",
             f"## Expected outcomes",
             "",
             "| Metric | Before | After (typical) |",
             "| --- | --- | --- |",
-            "| SDR time on manual data tasks | 60–80% | < 20% |",
+            "| Time spent on manual data tasks | 60–80% | < 20% |",
             "| CRM contact completeness | 40–60% | 80–90% |",
             "| Demos booked per 100 sequences | 1–2 | 4–6 |",
             "| Time from signal to first outreach | 2–5 days | < 4 hours |",
@@ -852,7 +851,7 @@ class BlogContentEngine:
         if snippet_type == "decision":
             return (
                 f"> **Evaluating {keyword}?** Compare options on workflow depth, CRM write-back "
-                f"quality, enrichment governance, and whether RevOps can iterate without engineering. "
+                f"quality, enrichment governance, and whether workflows can be iterated without engineering. "
                 f"The winning system is the one your actual operator can run and improve over time.\n"
             )
         if snippet_type == "problem":
@@ -890,8 +889,8 @@ class BlogContentEngine:
                     f"lists that aren't shared with the enrichment layer.",
                 ),
                 (
-                    f"Can {keyword} work for a lean team without a dedicated RevOps engineer?",
-                    f"Yes. {brand} is designed for lean teams. Founders and growth operators can build and "
+                    f"Can {keyword} work for a lean team without a dedicated engineer?",
+                    f"Yes. {brand} is designed for lean teams. Teams can build and "
                     f"run production workflows without engineering support. The n8n-based builder provides "
                     f"visual configuration with full logic control.",
                 ),
@@ -907,7 +906,7 @@ class BlogContentEngine:
                     f"What is the most common mistake when evaluating {keyword} options?",
                     f"Comparing features instead of outcomes. The question isn't 'does it have an enrichment "
                     f"integration?' — it's 'does the enrichment result land in the CRM correctly, and can "
-                    f"my RevOps team change the logic without a developer?'",
+                    f"the workflow logic can be changed without a developer?'",
                 ),
                 (
                     f"How do I migrate from my current {keyword} setup to {brand}?",
@@ -919,7 +918,7 @@ class BlogContentEngine:
                     f"How does {brand} compare to building a custom {keyword} system in-house?",
                     f"Custom builds give maximum flexibility but require ongoing engineering investment to "
                     f"maintain, debug, and update as data sources and APIs change. {brand} provides a "
-                    f"governed system your RevOps team can iterate on without engineering tickets — faster "
+                    f"governed system your team can iterate on without engineering tickets — faster "
                     f"to launch and significantly cheaper to maintain at scale.",
                 ),
             ],
@@ -1121,11 +1120,11 @@ class BlogContentEngine:
     def _persona(self, cluster_name: str) -> str:
         cl = cluster_name.lower()
         if "outbound" in cl or "sdr" in cl:
-            return "growth marketers and SDR leaders"
+            return "growth and outbound teams"
         if "crm" in cl or "revenue" in cl:
-            return "RevOps teams"
+            return "revenue operations teams"
         if "n8n" in cl:
-            return "technical founders and automation operators"
+            return "automation and operations teams"
         return "revenue operations teams"
 
     def _cta(self, funnel_stage: str) -> str:
@@ -1167,7 +1166,7 @@ class BlogContentEngine:
     @staticmethod
     def _eeat_checklist(page_type: str) -> list[dict[str, Any]]:
         base = [
-            {"item": "Author byline", "status": "missing", "instructions": "Add a RevOps or growth operator byline with LinkedIn link."},
+            {"item": "Author byline", "status": "missing", "instructions": "Add an operator byline with LinkedIn link."},
             {"item": "Publication date", "status": "auto-filled", "instructions": "datePublished set in schema. Verify CMS injects it in the HTML head."},
             {"item": "Product screenshot", "status": "missing", "instructions": "Insert at least one real product screenshot showing the workflow builder."},
             {"item": "Outcome proof point", "status": "missing", "instructions": "Add a quantified result: reply rate lift, CRM hygiene improvement, or named customer quote."},
