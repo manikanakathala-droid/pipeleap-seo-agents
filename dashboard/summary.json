@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-05-26T01:33:13.467634+00:00",
-  "current_run_id": "20260526T013309Z",
+  "last_updated": "2026-05-26T01:47:08.389009+00:00",
+  "current_run_id": "20260526T014700Z",
   "current_score": 53,
   "current_score_breakdown": {
     "technical": 96,
@@ -10,7 +10,7 @@
   },
   "today": {
     "date": "2026-05-26",
-    "total_actions": 144,
+    "total_actions": 193,
     "safe_actions": 10,
     "dev_review_items": 0,
     "content_pieces": 4,
@@ -25,14 +25,14 @@
     "orphan_pages": 0
   },
   "category_totals": {
-    "linking": 6,
-    "metadata": 15,
-    "heading": 6,
-    "structured_data": 12,
-    "technical": 117,
-    "content": 30,
-    "keywords": 96,
-    "indexing": 3
+    "linking": 10,
+    "metadata": 26,
+    "heading": 10,
+    "structured_data": 20,
+    "technical": 194,
+    "content": 52,
+    "keywords": 160,
+    "indexing": 6
   },
   "score_history": [
     {
@@ -42,24 +42,24 @@
       "content": 0,
       "indexing": 100,
       "authority": 0,
-      "run_id": "20260526T013309Z"
+      "run_id": "20260526T014700Z"
     }
   ],
   "daily_metrics": [
     {
       "date": "2026-05-26",
-      "run_id": "20260526T013309Z",
-      "total_actions": 144,
+      "run_id": "20260526T014700Z",
+      "total_actions": 193,
       "active_alerts": 0,
       "categories": {
-        "linking": 3,
-        "metadata": 8,
-        "heading": 3,
-        "structured_data": 6,
-        "technical": 58,
-        "content": 16,
-        "keywords": 48,
-        "indexing": 2
+        "linking": 4,
+        "metadata": 11,
+        "heading": 4,
+        "structured_data": 8,
+        "technical": 77,
+        "content": 22,
+        "keywords": 64,
+        "indexing": 3
       },
       "safe_actions": 10,
       "dev_review": 0,
@@ -71,7 +71,7 @@
       "date": "2026-05-26",
       "value": 4,
       "series": "content_pieces",
-      "run_id": "20260526T013309Z"
+      "run_id": "20260526T014700Z"
     }
   ],
   "keyword_growth": [
@@ -79,15 +79,15 @@
       "date": "2026-05-26",
       "value": 16,
       "series": "keywords_discovered",
-      "run_id": "20260526T013309Z"
+      "run_id": "20260526T014700Z"
     }
   ],
   "technical_trend": [
     {
       "date": "2026-05-26",
-      "value": 58,
+      "value": 77,
       "series": "technical_issues",
-      "run_id": "20260526T013309Z"
+      "run_id": "20260526T014700Z"
     }
   ],
   "indexing_trend": [
@@ -95,7 +95,7 @@
       "date": "2026-05-26",
       "value": 1,
       "series": "indexing_actions",
-      "run_id": "20260526T013309Z"
+      "run_id": "20260526T014700Z"
     }
   ],
   "next_day_plan": [
