@@ -164,13 +164,24 @@ class GitHubPublisher:
             return latest_content.replace("</urlset>", "\n".join(new_entries) + "\n</urlset>")
         
         elif path.endswith(".ts"):
-            match = re.search(r"(\s*\{.*?\},\s*)\];$", our_content, re.DOTALL)
-            if match:
-                our_last_entry_str = match.group(1)
-                last_bracket = latest_content.rfind("];")
-                if last_bracket != -1:
-                    return latest_content[:last_bracket] + our_last_entry_str + latest_content[last_bracket:]
-            return our_content
+            end_marker = "];"
+            our_end = our_content.rfind(end_marker)
+            if our_end == -1:
+                return our_content
+            last_open = our_content.rfind("{", 0, our_end)
+            if last_open == -1:
+                return our_content
+            entry_start = our_content.rfind("\n", 0, last_open)
+            if entry_start == -1:
+                entry_start = 0
+            our_new_entry = our_content[entry_start:our_end].strip()
+            latest_end = latest_content.rfind(end_marker)
+            if latest_end == -1:
+                return our_content
+            before = latest_content[:latest_end].rstrip()
+            if not before.endswith(","):
+                before += ","
+            return before + f"\n  {our_new_entry},\n" + end_marker
         return our_content
 
     def _sitemap_path_for_url(self, url: str) -> str:
@@ -251,13 +262,19 @@ class GitHubPublisher:
         if spread_match:
             last_spread = ts_content.rfind("...")
             insert_pos = ts_content.find("]", last_spread)
-            return ts_content[:insert_pos].rstrip(",\n\r ").rstrip() + f",\n  {entry_str},\n" + ts_content[insert_pos:]
+            before = ts_content[:insert_pos].rstrip()
+            if not before.endswith(","):
+                before += ","
+            return before + f"\n  {entry_str},\n" + ts_content[insert_pos:]
 
         # Standard direct array: ...\n];
         last_bracket = ts_content.rfind("];")
         if last_bracket == -1:
             raise ValueError("Could not find closing ]; in TypeScript data file")
-        return ts_content[:last_bracket].rstrip(",\n\r ").rstrip() + f"  {entry_str},\n" + ts_content[last_bracket:]
+        before = ts_content[:last_bracket].rstrip()
+        if not before.endswith(","):
+            before += ","
+        return before + f"\n  {entry_str},\n" + ts_content[last_bracket:]
 
     def _dict_to_ts_object(self, obj: dict[str, Any], indent: int = 2) -> str:
         """Convert a Python dict to a TypeScript object literal string."""

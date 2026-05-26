@@ -500,13 +500,17 @@ class GlossaryUpdater:
         # Append new term blocks to the TS file
         new_blocks = [self._term_to_ts(c) for c in unique_candidates]
         separator = "\n  // ── Auto-added " + datetime.now(timezone.utc).strftime("%Y-%m-%d") + " ──\n"
-        # Insert before the closing ];
         insertion = separator + "".join(new_blocks)
-        updated_content = existing_content.rstrip()
-        if updated_content.endswith("];"):
-            updated_content = updated_content[:-2] + insertion + "\n];\n"
+        # Insert into the glossaryTerms array (before its closing ];) not at end of file
+        # The file has glossaryCategories after glossaryTerms.
+        marker = "];"
+        idx = existing_content.rfind(marker + "\nexport const glossaryCategories")
+        if idx == -1:
+            idx = existing_content.rfind(marker)
+        if idx != -1:
+            updated_content = existing_content[:idx] + insertion + "\n" + marker + existing_content[idx + len(marker):]
         else:
-            updated_content += insertion
+            updated_content = existing_content + insertion
 
         # Regenerate categories export
         all_slugs_after = set(re.findall(r'slug:\s*"([a-z0-9-]+)"', updated_content))
