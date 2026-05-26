@@ -135,3 +135,22 @@ Labels: **SAFE TO APPLY** | **REQUIRES DEV REVIEW**
 ### REQUIRES DEV REVIEW
 
 - No dev-review items this run.
+
+---
+
+## Audit Run: 20260526T021043Z
+**Date:** 2026-05-26T02:10:49.917631+00:00  
+**SEO Score:** 53/100  
+| Technical | Content | Indexing | Authority |
+|---|---|---|---|
+| 96/100 | 0/100 | 100/100 | 0/100 |
+
+### SAFE TO APPLY
+
+- **[METADATA]** `https://pipeleap.com/pricing` — Improve low-CTR pages from GSC
+- **[METADATA]** `https://www.pipeleap.com/` — Title too short (8 chars)
+- **[METADATA]** `https://www.pipeleap.com/` — Meta description too short (48 chars)
+
+### REQUIRES DEV REVIEW
+
+- No dev-review items this run.
