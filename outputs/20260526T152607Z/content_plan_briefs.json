@@ -1,0 +1,189 @@
+[
+  {
+    "slug": "apollo-clay-pipeleap-comparison",
+    "page_type": "blog_post",
+    "title": "Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
+    "seo_title": "Apollo.io vs Clay vs Pipeleap: Which Outbound Tool Is Right for You?",
+    "meta_description": "Comparing Apollo.io, Clay, and Pipeleap for outbound sales. Learn what each does, where each falls short, and which one actually builds predictable pipeline.",
+    "target_keyword": "Apollo.io alternatives",
+    "cluster": "alternative_comparison",
+    "pillar_link": "/gtm-audit",
+    "internal_links": [
+      "/glossary/icp-scoring",
+      "/gtm-audit"
+    ],
+    "persona": "Head of Sales evaluating outbound tools",
+    "eeat_notes": [
+      "Add feature comparison table",
+      "Include decision framework: who should pick which tool",
+      "Add outcome proof for Pipeleap managed service"
+    ]
+  },
+  {
+    "slug": "sdr-agency-vs-outbound-automation",
+    "page_type": "blog_post",
+    "title": "SDR Agency vs. Outbound Automation: What Is Better for Pipeline?",
+    "seo_title": "SDR Agency vs Outbound Automation | Pipeleap",
+    "meta_description": "Weighing an SDR agency against outbound automation? This guide breaks down cost, speed, quality, and scale so you can pick the right model for your stage.",
+    "target_keyword": "SDR agency vs automation",
+    "cluster": "alternative_comparison",
+    "pillar_link": "/gtm-audit",
+    "internal_links": [
+      "/gtm-audit",
+      "/"
+    ],
+    "persona": "B2B founder or VP Sales deciding how to staff outbound",
+    "eeat_notes": [
+      "Include real cost breakdown: agency retainer vs Pipeleap vs in-house SDR",
+      "Add speed-to-pipeline comparison"
+    ]
+  },
+  {
+    "slug": "what-is-sales-orchestration",
+    "page_type": "blog_post",
+    "title": "What Is Sales Orchestration? (And Why Point Tools Do Not Do It)",
+    "seo_title": "What Is Sales Orchestration? Definition, Examples, and Tools",
+    "meta_description": "Sales orchestration connects every outbound motion into one coordinated system. Learn what it is, how it differs from automation, and why it matters for pipeline.",
+    "target_keyword": "what is sales orchestration",
+    "cluster": "how_to",
+    "pillar_link": "/about",
+    "internal_links": [
+      "/about",
+      "/glossary/outbound-sales"
+    ],
+    "persona": "RevOps leader unfamiliar with orchestration",
+    "eeat_notes": [
+      "Include diagram: point tools vs orchestrated system",
+      "Contrast with sales engagement platforms"
+    ]
+  },
+  {
+    "slug": "how-to-run-gtm-audit",
+    "page_type": "blog_post",
+    "title": "How to Run a GTM Audit in 5 Steps",
+    "seo_title": "How to Run a GTM Audit: 5-Step Framework for B2B Sales Teams",
+    "meta_description": "A GTM audit identifies exactly where your outbound is leaking. Follow this 5-step framework to audit targeting, messaging, workflows, and pipeline health.",
+    "target_keyword": "how to do a GTM audit",
+    "cluster": "how_to",
+    "pillar_link": "/gtm-audit",
+    "internal_links": [
+      "/gtm-audit",
+      "/glossary/icp-scoring"
+    ],
+    "persona": "Head of Sales who suspects outbound is underperforming",
+    "eeat_notes": [
+      "Include inline audit checklist",
+      "Add real signals that indicate an audit is overdue"
+    ]
+  },
+  {
+    "slug": "predictable-pipeline-without-sdrs",
+    "page_type": "blog_post",
+    "title": "How to Build Predictable Pipeline Without Hiring More SDRs",
+    "seo_title": "How to Build Predictable Pipeline Without Hiring More SDRs | Pipeleap",
+    "meta_description": "Most companies hire SDRs to fix a pipeline problem that is actually a systems problem. Here is how to build predictable outbound pipeline through automation instead.",
+    "target_keyword": "predictable pipeline",
+    "cluster": "solution_evaluation",
+    "pillar_link": "/",
+    "internal_links": [
+      "/",
+      "/gtm-audit"
+    ],
+    "persona": "Founder frustrated with SDR headcount not delivering results",
+    "eeat_notes": [
+      "Open with cost of SDR hire vs automation ROI",
+      "Include pipeline model showing how automation compounds over time"
+    ]
+  },
+  {
+    "slug": "outbound-stack-too-many-tools",
+    "page_type": "blog_post",
+    "title": "Why Your Outbound Stack Has Too Many Tools and Not Enough Pipeline",
+    "seo_title": "Too Many Sales Tools, Not Enough Pipeline | Pipeleap",
+    "meta_description": "Adding more tools does not fix outbound. Here is why fragmented stacks fail and what a unified outbound engine looks like instead.",
+    "target_keyword": "outbound sales stack",
+    "cluster": "problem_pain",
+    "pillar_link": "/",
+    "internal_links": [
+      "/",
+      "/about"
+    ],
+    "persona": "VP Sales or RevOps leader drowning in tool sprawl",
+    "eeat_notes": [
+      "Lead with stat: average B2B sales stack has 10+ tools",
+      "Show the integration tax: each connector equals maintenance debt"
+    ]
+  },
+  {
+    "slug": "icp-scoring-guide",
+    "page_type": "blog_post",
+    "title": "ICP Scoring 101: How to Stop Wasting Cold Outreach on the Wrong Leads",
+    "seo_title": "ICP Scoring Guide for B2B Sales Teams | Pipeleap",
+    "meta_description": "ICP scoring tells you who to reach out to first. Learn how to build a scoring model that filters noise and sends outreach only to accounts most likely to convert.",
+    "target_keyword": "ICP scoring",
+    "cluster": "how_to",
+    "pillar_link": "/glossary/icp-scoring",
+    "internal_links": [
+      "/glossary/icp-scoring",
+      "/gtm-audit"
+    ],
+    "persona": "SDR manager or RevOps analyst building lead qualification",
+    "eeat_notes": [
+      "Include a sample scoring rubric with firmographic and behavioural signals"
+    ]
+  },
+  {
+    "slug": "ai-personalization-cold-email",
+    "page_type": "blog_post",
+    "title": "How AI Personalisation Changes Cold Email Reply Rates",
+    "seo_title": "AI Personalisation for Cold Email | Pipeleap",
+    "meta_description": "Generic cold email is dead. Here is how AI personalisation at scale works, what it takes to do it without sounding robotic, and what reply rates to expect.",
+    "target_keyword": "AI cold email personalisation",
+    "cluster": "how_to",
+    "pillar_link": "/",
+    "internal_links": [
+      "/",
+      "/blog/outbound-stack-too-many-tools"
+    ],
+    "persona": "SDR leader or founder running cold outreach campaigns",
+    "eeat_notes": [
+      "Include benchmark reply rates: generic vs personalised"
+    ]
+  },
+  {
+    "slug": "cost-of-manual-prospecting",
+    "page_type": "blog_post",
+    "title": "The Real Cost of Manual Prospecting for B2B Sales Teams",
+    "seo_title": "The Real Cost of Manual Prospecting | Pipeleap",
+    "meta_description": "Manual prospecting costs more than most sales leaders realise. Here is what it actually costs in time, rep attention, and missed pipeline.",
+    "target_keyword": "manual prospecting cost",
+    "cluster": "problem_pain",
+    "pillar_link": "/",
+    "internal_links": [
+      "/",
+      "/gtm-audit"
+    ],
+    "persona": "Sales leader trying to justify automation investment",
+    "eeat_notes": [
+      "Build a cost calculator: hours per rep x hourly rate x number of reps"
+    ]
+  },
+  {
+    "slug": "11-modules-outbound-engine",
+    "page_type": "blog_post",
+    "title": "The 11 Modules Every Outbound Engine Needs",
+    "seo_title": "The 11 Modules of a Complete Outbound Engine | Pipeleap",
+    "meta_description": "Most outbound stacks cover 3 of the 11 modules a complete engine needs. Here is what the full system looks like and why each module matters.",
+    "target_keyword": "outbound engine modules",
+    "cluster": "solution_evaluation",
+    "pillar_link": "/about",
+    "internal_links": [
+      "/about",
+      "/"
+    ],
+    "persona": "RevOps leader or Head of Sales architecting an outbound system",
+    "eeat_notes": [
+      "Use the actual Pipeleap 11-module framework as the structure"
+    ]
+  }
+]
