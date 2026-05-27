@@ -39,9 +39,9 @@ class IndexingTrigger:
         return {"status": "skipped", "reason": "Not fully implemented without google-api-python-client"}
 
     def _submit_bing(self, urls: list[str]) -> Any:
-        api_key = os.getenv("BING_WEBMASTER_API_KEY", "")
+        api_key = os.getenv("BING_API_KEY", "")
         if not api_key:
-            return {"status": "skipped", "reason": "No BING_WEBMASTER_API_KEY"}
+            return {"status": "skipped", "reason": "No BING_API_KEY"}
             
         endpoint = f"https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey={api_key}"
         site_url = "https://www.pipeleap.com"
