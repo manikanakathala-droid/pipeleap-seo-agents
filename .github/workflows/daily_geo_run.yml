@@ -166,21 +166,21 @@ jobs:
         if: ${{ env.DRY_RUN != 'true' }}
         run: |
           python -c "
-import os, json, urllib.request
-api_key = os.environ.get('BING_API_KEY', '')
-if not api_key:
-    print('No BING_API_KEY set — skipping Bing sitemap submission')
-    exit(0)
-payload = json.dumps({
-    'siteUrl': 'https://www.pipeleap.com',
-    'feedpath': 'https://www.pipeleap.com/sitemap.xml'
-}).encode('utf-8')
-endpoint = f'https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?apikey={api_key}'
-req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
-with urllib.request.urlopen(req) as resp:
-    result = json.loads(resp.read().decode('utf-8'))
-    print(f'Bing sitemap submission: {result}')
-"
+          import os, json, urllib.request
+          api_key = os.environ.get('BING_API_KEY', '')
+          if not api_key:
+              print('No BING_API_KEY set — skipping Bing sitemap submission')
+              exit(0)
+          payload = json.dumps({
+              'siteUrl': 'https://www.pipeleap.com',
+              'feedpath': 'https://www.pipeleap.com/sitemap.xml'
+          }).encode('utf-8')
+          endpoint = f'https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?apikey={api_key}'
+          req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
+          with urllib.request.urlopen(req) as resp:
+              result = json.loads(resp.read().decode('utf-8'))
+              print(f'Bing sitemap submission: {result}')
+          "
         env:
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
