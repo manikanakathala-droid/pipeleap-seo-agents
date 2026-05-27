@@ -127,6 +127,9 @@ with urllib.request.urlopen(req) as resp:
         env:
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
+      - name: Trigger Vercel deploy
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
       - name: Upload generation artifacts
         if: always()
         uses: actions/upload-artifact@v4

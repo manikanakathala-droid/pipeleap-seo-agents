@@ -184,6 +184,9 @@ with urllib.request.urlopen(req) as resp:
         env:
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
+      - name: Trigger Vercel deploy
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
       - name: Upload GEO artifacts
         uses: actions/upload-artifact@v4
         if: always()
