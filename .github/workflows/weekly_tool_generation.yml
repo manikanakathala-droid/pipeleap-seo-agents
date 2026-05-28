@@ -137,3 +137,23 @@ jobs:
           name: tool-generation-outputs
           path: outputs/
           retention-days: 14
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Weekly Tool Generation #${{ github.run_number }} — ${{ job.status }}"
+          to: ${{ secrets.MAIL_TO }}
+          from: SEO Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            Weekly tool page generation completed.
+
+            Status: ${{ job.status }}
+            Run: #${{ github.run_number }}
+            Batch size: ${{ inputs.batch_size || '20' }}
+            Glossary updated: see workflow log
+            Vercel Deploy: triggered

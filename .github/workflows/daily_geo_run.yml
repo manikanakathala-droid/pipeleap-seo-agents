@@ -197,3 +197,22 @@ jobs:
             !outputs/**/__pycache__/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "GEO Agent Run #${{ github.run_number }} — ${{ job.status }}"
+          to: ${{ secrets.MAIL_TO }}
+          from: SEO Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            Daily GEO Agent run completed.
+
+            Status: ${{ job.status }}
+            Run: #${{ github.run_number }}
+            Dry run: ${{ env.DRY_RUN }}
+            Indexing signals: fired (see workflow log for details)

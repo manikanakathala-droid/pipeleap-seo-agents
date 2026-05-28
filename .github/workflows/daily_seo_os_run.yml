@@ -125,6 +125,20 @@ jobs:
           path: outputs/seo_os_state
           key: seo-os-cache-${{ github.run_id }}
 
+      - name: Read daily briefing for email
+        if: always()
+        run: |
+          FILE=$(ls outputs/*/daily_briefing.md 2>/dev/null | head -1)
+          if [ -n "$FILE" ]; then
+            {
+              echo 'BRIEFING<<EOF'
+              head -n 200 "$FILE"
+              echo 'EOF'
+            } >> "$GITHUB_ENV"
+          else
+            echo "BRIEFING=No daily briefing file found." >> "$GITHUB_ENV"
+          fi
+
       - name: Upload daily briefing
         uses: actions/upload-artifact@v4
         if: always()
@@ -134,5 +148,20 @@ jobs:
             outputs/*/daily_briefing.md
             outputs/*/seo_os_report.json
           retention-days: 30
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "SEO OS Briefing #${{ github.run_number }} — ${{ job.status }}"
+          to: ${{ secrets.MAIL_TO }}
+          from: SEO Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            ${{ env.BRIEFING }}
+        continue-on-error: true
 
 

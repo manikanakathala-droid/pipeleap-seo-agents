@@ -178,3 +178,23 @@ jobs:
             !outputs/**/__pycache__/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Send email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "SEO Agent Run #${{ github.run_number }} — ${{ job.status }}"
+          to: ${{ secrets.MAIL_TO }}
+          from: SEO Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            Daily SEO Agent run completed.
+
+            Status: ${{ job.status }}
+            Run: #${{ github.run_number }}
+            Trigger: ${{ github.event_name }}
+            Growth Engine: ${{ env.RUN_GROWTH_ENGINE }}
+            Vercel Deploy: triggered
