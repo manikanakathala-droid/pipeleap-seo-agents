@@ -1,0 +1,33 @@
+name: Test Email Notification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send test email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Test email from SEO Agent pipeline — OK"
+          to: ${{ secrets.MAIL_TO }}
+          from: SEO Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            This is a test email to confirm the notification setup.
+
+            If you received this, email notifications are working correctly.
+
+            Secrets configured:
+            - MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+            - MAIL_PORT: ${{ secrets.MAIL_PORT }}
+            - MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+            - MAIL_TO: ${{ secrets.MAIL_TO }}
+
+            Pipeline: pipeleap-seo-agents
+            Run: #${{ github.run_number }}
+            Status: success
