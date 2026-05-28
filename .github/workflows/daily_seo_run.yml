@@ -22,15 +22,41 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: pipeleap-launchpad-publish
-  cancel-in-progress: false
-
 jobs:
+  check-skip:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check if a schedule run already happened today
+        id: check
+        if: github.event_name == 'schedule'
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          ALREADY_RAN=$(gh run list --workflow "Daily SEO Agent Run" --event schedule --limit 5 --json conclusion,startedAt --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
+          if [ "$ALREADY_RAN" -gt 0 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Successful schedule run already found for $TODAY — main job will be skipped."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "No successful schedule run yet for $TODAY — main job will proceed."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Default skip to false for non-schedule triggers
+        if: github.event_name != 'schedule'
+        run: echo "skip=false" >> "$GITHUB_OUTPUT"
+
   run-seo-growth:
     name: Run SEO Agent + Growth Engine
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    concurrency:
+      group: pipeleap-launchpad-publish
+      cancel-in-progress: false
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       DISABLE_CRAWL: ${{ github.event_name == 'workflow_dispatch' && inputs.disable_crawl == true }}
@@ -40,19 +66,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Skip if today already ran (prevents double runs from backup schedule)
-        if: github.event_name == 'schedule'
-        run: |
-          TODAY=$(date -u +%Y-%m-%d)
-          ALREADY_RAN=$(gh run list --workflow "Daily SEO Agent Run" --event schedule --limit 5 --json conclusion,startedAt --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
-          if [ "$ALREADY_RAN" -gt 0 ]; then
-            echo "Successful schedule run already found for $TODAY — skipping."
-            exit 0
-          fi
-          echo "No successful run yet for $TODAY — proceeding."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout launchpad publish target
         uses: actions/checkout@v4

@@ -14,11 +14,13 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Check if daily SEO run already happened today
         id: check
         run: |
           TODAY=$(date -u +%Y-%m-%d)
-          SUCCESS_COUNT=$(gh run list --workflow "Daily SEO Agent Run" --limit 10 --json conclusion,startedAt,event --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
+          SUCCESS_COUNT=$(gh run list --repo "${{ github.repository }}" --workflow "Daily SEO Agent Run" --limit 10 --json conclusion,startedAt,event --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
           echo "count=$SUCCESS_COUNT" >> "$GITHUB_OUTPUT"
           echo "Today: $TODAY — successful runs found: $SUCCESS_COUNT"
         env:
@@ -28,6 +30,6 @@ jobs:
         if: steps.check.outputs.count == '0'
         run: |
           echo "No successful run for today — triggering recovery dispatch."
-          gh workflow run "Daily SEO Agent Run" --ref master
+          gh workflow run "Daily SEO Agent Run" --repo "${{ github.repository }}" --ref master
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
