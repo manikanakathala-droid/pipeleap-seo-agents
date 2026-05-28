@@ -171,6 +171,9 @@ jobs:
             exit 1
           fi
 
+      - name: Trigger Vercel deploy
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
       - name: Submit sitemap to Bing Webmaster API
         run: |
           python -c "

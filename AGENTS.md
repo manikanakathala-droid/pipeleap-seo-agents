@@ -79,3 +79,13 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 
 **Files changed (8 workflow files total):**
 - `.github/workflows/daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`, `daily_seo_os_run.yml`, `daily_serp_run.yml`, `daily_scheduler_health.yml`, `validate.yml`, `deploy_dashboard.yml`
+
+### 10. Vercel deploy trigger added to SEO workflow (May 28)
+**Problem:** `daily_seo_run.yml` pushed content to the launchpad repo but never triggered a Vercel deploy — it depended entirely on the GEO agent (triggered by `workflow_run`). If GEO failed or was skipped, SEO-generated content would never reach production.
+
+**Fix:** Added `curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}` step to `daily_seo_run.yml` after the commit step. Each workflow now self-deploys immediately after pushing content.
+
+**New deploy chain (no single point of failure):**
+1. SEO agent runs → pushes to launchpad → triggers Vercel deploy
+2. GEO agent runs → pushes to launchpad → triggers Vercel deploy (2nd build, harmless)
+3. Weekly tool gen runs → pushes to launchpad → triggers Vercel deploy
