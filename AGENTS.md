@@ -64,3 +64,18 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - `.github/workflows/daily_seo_run.yml` — `urllib.error.HTTPError` + `Exception` catch
 - `.github/workflows/daily_geo_run.yml` — same fix
 - `.github/workflows/weekly_tool_generation.yml` — same fix
+
+### 9. Node.js 20 deprecation fixed (May 28)
+**Problem:** GitHub Actions warned that Node.js 20 is deprecated. Actions targeting Node.js 20 (`actions/checkout@v4`, `actions/setup-python@v5`, `actions/upload-artifact@v4`, `dawidd6/action-send-mail@v3`) were being force-run on Node.js 24 via `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`.
+
+**Fix:** Upgraded all 4 actions across all 7 workflow files to versions that natively support Node.js 24, then removed the `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var.
+
+| Action | Old | New |
+|---|---|---|
+| `actions/checkout` | `@v4` | `@v6` |
+| `actions/setup-python` | `@v5` | `@v6` |
+| `actions/upload-artifact` | `@v4` | `@v7` |
+| `dawidd6/action-send-mail` | `@v3` | `@v17` |
+
+**Files changed (8 workflow files total):**
+- `.github/workflows/daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`, `daily_seo_os_run.yml`, `daily_serp_run.yml`, `daily_scheduler_health.yml`, `validate.yml`, `deploy_dashboard.yml`

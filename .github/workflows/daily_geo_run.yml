@@ -26,15 +26,14 @@ jobs:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 30
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout launchpad publish target
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: manikanakathala-droid/pipeleap-launchpad-040053e5
           token: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
@@ -42,7 +41,7 @@ jobs:
           path: pipeleap-launchpad
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -193,7 +192,7 @@ jobs:
         run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
 
       - name: Upload GEO artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: geo-run-${{ github.run_number }}
@@ -205,7 +204,7 @@ jobs:
 
       - name: Send email notification
         if: always()
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v17
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           server_port: ${{ secrets.MAIL_PORT }}

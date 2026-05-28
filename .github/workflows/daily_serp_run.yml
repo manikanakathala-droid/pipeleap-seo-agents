@@ -30,17 +30,17 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout launchpad (read-only reference)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: manikanakathala-droid/pipeleap-launchpad-040053e5
           token: ${{ secrets.GH_PAT }}
           path: pipeleap-launchpad
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -85,7 +85,7 @@ jobs:
           fi
 
       - name: Upload SERP visibility artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: serp-visibility-${{ github.run_id }}

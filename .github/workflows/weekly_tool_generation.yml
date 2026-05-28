@@ -24,17 +24,17 @@ jobs:
   generate-tools:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Checkout launchpad publish target
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: manikanakathala-droid/pipeleap-launchpad-040053e5
           token: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
           ref: main
           path: pipeleap-launchpad
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -141,7 +141,7 @@ jobs:
 
       - name: Upload generation artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tool-generation-outputs
           path: outputs/
@@ -149,7 +149,7 @@ jobs:
 
       - name: Send email notification
         if: always()
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v17
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           server_port: ${{ secrets.MAIL_PORT }}
