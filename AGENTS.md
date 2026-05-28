@@ -31,3 +31,27 @@ After latest deploy completes, check LCP/FID/CLS via PSI or CrUX.
 - Self-referencing hreflang=en on every page via SEO.tsx
 - BreadcrumbList JSON-LD schema on glossary term pages
 - <h1> on /how-it-works: already present inside OutboundWorkflowDiagram (false positive, no fix needed)
+
+### 6. Email notifications configured
+Email notifications are sent via GitHub Actions after each scheduled run:
+
+| Workflow | Email subject | When |
+|---|---|---|
+| Daily SEO Agent Run | `SEO Agent Run #N — status` | Daily ~12:00 UTC |
+| Daily SEO OS Run | `SEO OS Briefing #N — status` | ~5 min after SEO run |
+| Daily GEO Agent Run | `GEO Agent Run #N — status` | ~5 min after SEO run |
+| Weekly Tool Generation | `Weekly Tool Generation #N — status` | Monday ~06:00 UTC |
+
+**Secrets stored in GitHub** (`pipeleap-seo-agents` → Settings → Secrets → Actions):
+- `MAIL_SERVER` — `smtp.gmail.com`
+- `MAIL_PORT` — `587`
+- `MAIL_USERNAME` — `manik.anakathala@gmail.com`
+- `MAIL_PASSWORD` — Gmail app password (generated at https://myaccount.google.com/apppasswords)
+- `MAIL_TO` — `manik.anakathala@gmail.com`
+
+**Tested:** Test email sent and confirmed received (May 28, 2026).
+
+**If emails stop arriving:**
+1. Check GitHub Actions run logs for `Send email notification` step
+2. Verify `MAIL_PASSWORD` hasn't expired (app passwords don't expire unless revoked)
+3. Check spam folder
