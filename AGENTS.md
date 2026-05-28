@@ -51,4 +51,16 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - `.github/workflows/daily_seo_run.yml` — dual cron + `check-skip` job (prevents double runs via proper job dependency)
 - `.github/workflows/daily_scheduler_health.yml` — new: `actions: write` permission, checks API, triggers recovery dispatch
 
-**Tested:** Health check triggered a recovery run (May 28, 17:04 UTC) which is currently executing.
+**Tested:** Health check triggered a recovery run (May 28, 17:04 UTC, #35). All steps passed including TypeScript validation; run marked failure only due to Bing Webmaster API returning HTTP 404 (non-functional endpoint).
+
+### 8. Bing Webmaster API failure (fixed May 28)
+**Problem:** `Submit sitemap to Bing Webmaster API` step returns HTTP 404 on `ssl.bing.com/webmaster/api.svc/json/SubmitSitemap`. This step exists in 3 workflows and was causing every SEO/GEO/weekly run to be marked **failure** despite all meaningful work succeeding.
+
+**Root cause:** The Bing Webmaster API endpoint appears deprecated or changed. Our IndexNow submission (via `submit_urls.py`) already notifies Bing — this step was redundant.
+
+**Fix:** Wrapped the Bing API call in try/except in all 3 workflows — HTTP errors are now logged as non-fatal warnings instead of failing the run.
+
+**Files changed:**
+- `.github/workflows/daily_seo_run.yml` — `urllib.error.HTTPError` + `Exception` catch
+- `.github/workflows/daily_geo_run.yml` — same fix
+- `.github/workflows/weekly_tool_generation.yml` — same fix

@@ -175,7 +175,7 @@ jobs:
       - name: Submit sitemap to Bing Webmaster API
         run: |
           python -c "
-          import os, json, urllib.request
+          import os, json, urllib.request, urllib.error
           api_key = os.environ.get('BING_API_KEY', '')
           if not api_key:
               print('No BING_API_KEY set — skipping Bing sitemap submission')
@@ -185,10 +185,15 @@ jobs:
               'feedpath': 'https://www.pipeleap.com/sitemap.xml'
           }).encode('utf-8')
           endpoint = f'https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?apikey={api_key}'
-          req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
-          with urllib.request.urlopen(req) as resp:
-              result = json.loads(resp.read().decode('utf-8'))
-              print(f'Bing sitemap submission: {result}')
+          try:
+              req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
+              with urllib.request.urlopen(req) as resp:
+                  result = json.loads(resp.read().decode('utf-8'))
+                  print(f'Bing sitemap submission: {result}')
+          except urllib.error.HTTPError as e:
+              print(f'Bing sitemap submission failed (non-fatal): HTTP {e.code} {e.reason}')
+          except Exception as e:
+              print(f'Bing sitemap submission failed (non-fatal): {e}')
           "
         env:
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
