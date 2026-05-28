@@ -1,0 +1,33 @@
+name: Daily Scheduler Health Check
+
+on:
+  schedule:
+    # Every 6 hours — catches any missed schedule runs within ~6h
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if daily SEO run already happened today
+        id: check
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          SUCCESS_COUNT=$(gh run list --workflow "Daily SEO Agent Run" --limit 10 --json conclusion,startedAt,event --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
+          echo "count=$SUCCESS_COUNT" >> "$GITHUB_OUTPUT"
+          echo "Today: $TODAY — successful runs found: $SUCCESS_COUNT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger recovery run if needed
+        if: steps.check.outputs.count == '0'
+        run: |
+          echo "No successful run for today — triggering recovery dispatch."
+          gh workflow run "Daily SEO Agent Run" --ref master
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

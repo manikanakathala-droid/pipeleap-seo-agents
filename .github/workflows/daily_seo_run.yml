@@ -2,8 +2,10 @@ name: Daily SEO Agent Run
 
 on:
   schedule:
-    # 5:30 PM IST = 12:00 UTC daily
+    # 5:30 PM IST = 12:00 UTC daily (primary)
     - cron: "0 12 * * *"
+    # 5:30 AM IST = 00:00 UTC daily (backup — catches missed primary)
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       disable_crawl:
@@ -38,6 +40,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Skip if today already ran (prevents double runs from backup schedule)
+        if: github.event_name == 'schedule'
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          ALREADY_RAN=$(gh run list --workflow "Daily SEO Agent Run" --event schedule --limit 5 --json conclusion,startedAt --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
+          if [ "$ALREADY_RAN" -gt 0 ]; then
+            echo "Successful schedule run already found for $TODAY — skipping."
+            exit 0
+          fi
+          echo "No successful run yet for $TODAY — proceeding."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout launchpad publish target
         uses: actions/checkout@v4
