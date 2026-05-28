@@ -16,6 +16,10 @@ env:
   GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
   PIPELEAP_LAUNCHPAD_DIR: pipeleap-launchpad
 
+concurrency:
+  group: pipeleap-launchpad-publish
+  cancel-in-progress: false
+
 jobs:
   generate-tools:
     runs-on: ubuntu-latest

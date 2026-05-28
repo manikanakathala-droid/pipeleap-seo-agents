@@ -165,9 +165,6 @@ jobs:
         env:
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
-      - name: Trigger Vercel deploy
-        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
-
       - name: Upload run artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -197,4 +194,4 @@ jobs:
             Run: #${{ github.run_number }}
             Trigger: ${{ github.event_name }}
             Growth Engine: ${{ env.RUN_GROWTH_ENGINE }}
-            Vercel Deploy: triggered
+            Vercel Deploy: delegated to GEO Agent
