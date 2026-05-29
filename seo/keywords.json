@@ -1153,5 +1153,110 @@
         "funnel_stage": "awareness"
       }
     ]
+  },
+  {
+    "run_id": "20260529T035253Z",
+    "generated_at": "2026-05-29T03:52:55.417794+00:00",
+    "count": 16,
+    "keywords": [
+      {
+        "keyword": "outbound sales automation platform",
+        "type": "high_intent",
+        "cluster": "solution_evaluation",
+        "difficulty": 46.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "blog_post"
+      },
+      {
+        "keyword": "best AI outbound sales tools 2025",
+        "type": "high_intent",
+        "cluster": "solution_evaluation",
+        "difficulty": 46.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "blog_post"
+      },
+      {
+        "keyword": "sales workflow automation software",
+        "type": "high_intent",
+        "cluster": "solution_evaluation",
+        "difficulty": 46.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "blog_post"
+      },
+      {
+        "keyword": "Apollo.io alternatives",
+        "type": "high_intent",
+        "cluster": "alternative_comparison",
+        "difficulty": 42.0,
+        "conversion_probability": 0.91,
+        "recommended_page_type": "landing_page"
+      },
+      {
+        "keyword": "Clay alternatives for sales",
+        "type": "high_intent",
+        "cluster": "alternative_comparison",
+        "difficulty": 42.0,
+        "conversion_probability": 0.91,
+        "recommended_page_type": "landing_page"
+      },
+      {
+        "keyword": "Outreach.io alternatives",
+        "type": "high_intent",
+        "cluster": "alternative_comparison",
+        "difficulty": 42.0,
+        "conversion_probability": 0.91,
+        "recommended_page_type": "landing_page"
+      },
+      {
+        "keyword": "Apollo.io alternatives",
+        "gap_source": "Apollo.io",
+        "type": "competitor_gap"
+      },
+      {
+        "keyword": "Clay alternatives for sales",
+        "gap_source": "Clay",
+        "type": "competitor_gap"
+      },
+      {
+        "keyword": "Outreach.io alternatives",
+        "gap_source": "Outreach",
+        "type": "competitor_gap"
+      },
+      {
+        "keyword": "Salesloft competitors",
+        "gap_source": "Salesloft",
+        "type": "competitor_gap"
+      },
+      {
+        "keyword": "sales engagement platform alternatives",
+        "gap_source": "multiple",
+        "type": "competitor_gap"
+      },
+      {
+        "keyword": "how to build outbound sales system for B2B SaaS",
+        "type": "long_tail",
+        "funnel_stage": "awareness"
+      },
+      {
+        "keyword": "outbound sales automation for small sales teams",
+        "type": "long_tail",
+        "funnel_stage": "consideration"
+      },
+      {
+        "keyword": "what is managed outbound sales service",
+        "type": "long_tail",
+        "funnel_stage": "awareness"
+      },
+      {
+        "keyword": "how long does GTM implementation take",
+        "type": "long_tail",
+        "funnel_stage": "consideration"
+      },
+      {
+        "keyword": "outbound pipeline predictability metrics",
+        "type": "long_tail",
+        "funnel_stage": "awareness"
+      }
+    ]
   }
 ]

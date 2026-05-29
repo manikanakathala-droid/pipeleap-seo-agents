@@ -9,6 +9,15 @@
     "status": "pending"
   },
   {
+    "run_id": "20260529T035253Z",
+    "queued_at": "2026-05-29T03:52:55.419313+00:00",
+    "url": "https://www.pipeleap.com/",
+    "action": "refresh_index",
+    "reason": "Key SEO fields updated — re-crawl requested via Indexing API",
+    "priority": 2,
+    "status": "pending"
+  },
+  {
     "run_id": "20260526T011358Z",
     "queued_at": "2026-05-26T01:14:02.646002+00:00",
     "url": "https://www.pipeleap.com/sitemap.xml",
