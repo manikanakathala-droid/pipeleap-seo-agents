@@ -129,11 +129,11 @@ class GrowthKeywordEngine:
     # Local market keywords — positions pipeleap as the best global platform,
     # while capturing local search intent (e.g. "best outbound automation in uk").
     LOCAL_MARKETS = [
-        ("uk",        ["in uk", "for uk businesses", "uk"]),
-        ("australia", ["in australia", "for australian businesses", "australia"]),
-        ("canada",    ["in canada", "for canadian businesses", "canada"]),
-        ("india",     ["in india", "for indian businesses", "india"]),
-        ("singapore", ["in singapore", "for singapore businesses", "singapore"]),
+        ("us",           ["in us", "for us businesses", "usa"]),
+        ("europe",       ["in europe", "for european businesses", "europe"]),
+        ("apac",         ["in apac", "for apac businesses", "apac"]),
+        ("dach",         ["in dach", "for dach businesses", "dach"]),
+        ("southeast_asia", ["in southeast asia", "for southeast asian businesses", "southeast asia"]),
     ]
 
     # Navigational queries for brand-aware searchers
