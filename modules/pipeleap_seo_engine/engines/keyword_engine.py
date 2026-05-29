@@ -92,6 +92,53 @@ class GrowthKeywordEngine:
         ("workflow orchestration pricing",              "BOFU",  "bofu_page"),
     ]
 
+    # Short-tail core terms (1-2 words) for broad commercial capture
+    SHORT_TAIL_TERMS = [
+        "outbound automation",
+        "sales automation",
+        "pipeline generation",
+        "workflow orchestration",
+        "lead enrichment",
+        "crm automation",
+        "sdr automation",
+        "revops automation",
+        "cold outreach",
+        "sales workflow",
+        "revenue operations",
+        "signal based outbound",
+        "sales engagement",
+        "gtm automation",
+    ]
+
+    # Medium-tail patterns that expand core terms into natural 3-4 word phrases
+    MEDIUM_TAIL_PATTERNS = [
+        ("{term} platform",               "commercial",     "landing_page",    "solution-aware"),
+        ("{term} software",               "commercial",     "comparison_page", "solution-aware"),
+        ("{term} tools",                  "commercial",     "comparison_page", "solution-aware"),
+        ("{term} system",                 "commercial",     "use_case_page",   "solution-aware"),
+        ("best {term}",                   "commercial",     "comparison_page", "solution-aware"),
+        ("{term} for b2b",               "commercial",     "use_case_page",   "solution-aware"),
+        ("{term} for saas companies",     "commercial",     "use_case_page",   "solution-aware"),
+        ("{term} for startups",           "commercial",     "use_case_page",   "solution-aware"),
+        ("{term} 2026",                   "informational",  "blog_post",       "problem-aware"),
+        ("{term} pricing",                "transactional",  "bofu_page",       "decision"),
+        ("{term} demo",                   "transactional",  "bofu_page",       "decision"),
+        ("{term} guide",                  "informational",  "blog_post",       "problem-aware"),
+    ]
+
+    # Navigational queries for brand-aware searchers
+    NAVIGATIONAL_TERMS = [
+        "pipeleap",
+        "pipeleap pricing",
+        "pipeleap demo",
+        "pipeleap login",
+        "pipeleap reviews",
+        "pipeleap platform",
+        "pipeleap gtm audit",
+        "pipeleap outbound automation",
+        "pipeleap workflow orchestration",
+    ]
+
     # Core terms to generate question + long-tail variants from
     CORE_TERMS = [
         "outbound sales automation",
@@ -121,6 +168,9 @@ class GrowthKeywordEngine:
         entries.extend(self._problem_keywords())
         entries.extend(self._role_x_use_case_keywords())
         entries.extend(self._role_x_competitor_keywords())
+        entries.extend(self._short_tail_keywords())
+        entries.extend(self._medium_tail_keywords())
+        entries.extend(self._navigational_keywords())
         # Existing gap fixes
         entries.extend(self._long_tail_keywords())
         entries.extend(self._question_keywords())
@@ -213,6 +263,8 @@ class GrowthKeywordEngine:
                 f"{name.lower()} alternative for saas",
                 f"best {name.lower()} alternative",
                 f"{name.lower()} alternative outbound automation",
+                f"replace {name.lower()} with pipeleap",
+                f"switch from {name.lower()} to pipeleap",
             ]:
                 entries.append({
                     "keyword": kw,
@@ -393,6 +445,58 @@ class GrowthKeywordEngine:
                 "source": f"bofu:{stage.lower()}",
                 "page_type": page_type,
                 "funnel_stage": stage_to_funnel.get(stage, "decision"),
+            })
+        return entries
+
+    # ─── Short-tail keywords ───────────────────────────────────────────────────
+    # Generates broad 1-2 word commercial terms for category-level capture.
+    # These have high competition but signal topical authority to search engines.
+
+    def _short_tail_keywords(self) -> list[dict[str, Any]]:
+        entries = []
+        for term in self.SHORT_TAIL_TERMS:
+            entries.append({
+                "keyword": term,
+                "intent": "commercial",
+                "source": "short_tail:core",
+                "page_type": "use_case_page",
+                "funnel_stage": "solution-aware",
+                "word_count": len(term.split()),
+            })
+        return entries
+
+    # ─── Medium-tail keywords ──────────────────────────────────────────────────
+    # Expands core terms into natural 3-4 word phrases using pattern templates.
+    # These bridge short-tail breadth and long-tail specificity.
+
+    def _medium_tail_keywords(self) -> list[dict[str, Any]]:
+        entries = []
+        for term in self.CORE_TERMS:
+            for template, intent, page_type, funnel_stage in self.MEDIUM_TAIL_PATTERNS:
+                kw = template.format(term=term)
+                entries.append({
+                    "keyword": kw,
+                    "intent": intent,
+                    "source": "medium_tail:pattern",
+                    "page_type": page_type,
+                    "funnel_stage": funnel_stage,
+                    "word_count": len(kw.split()),
+                })
+        return entries
+
+    # ─── Navigational keywords ─────────────────────────────────────────────────
+    # Captures brand-aware searchers who already know Pipeleap.
+    # Low volume initially but essential as brand awareness grows.
+
+    def _navigational_keywords(self) -> list[dict[str, Any]]:
+        entries = []
+        for kw in self.NAVIGATIONAL_TERMS:
+            entries.append({
+                "keyword": kw,
+                "intent": "navigational",
+                "source": "brand:navigational",
+                "page_type": "landing_page",
+                "funnel_stage": "decision",
             })
         return entries
 

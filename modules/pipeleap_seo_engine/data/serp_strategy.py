@@ -149,6 +149,41 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
             "how to build predictable pipeline",
         ],
     },
+    {
+        "cluster_name": "broad_category",
+        "intent": "commercial",
+        "funnel_stage": "awareness",
+        "conversion_probability": 0.45,
+        "business_fit": 0.90,
+        "estimated_difficulty": 65.0,
+        "speed_to_rank_score": 0.35,
+        "keywords": [
+            "outbound automation",
+            "sales automation",
+            "pipeline generation",
+            "workflow orchestration",
+            "lead enrichment",
+            "crm automation",
+            "sales workflow",
+            "revenue operations",
+        ],
+    },
+    {
+        "cluster_name": "brand_navigational",
+        "intent": "navigational",
+        "funnel_stage": "decision",
+        "conversion_probability": 0.95,
+        "business_fit": 1.0,
+        "estimated_difficulty": 5.0,
+        "speed_to_rank_score": 0.95,
+        "keywords": [
+            "pipeleap",
+            "pipeleap pricing",
+            "pipeleap demo",
+            "pipeleap login",
+            "pipeleap reviews",
+        ],
+    },
 ]
 
 # 5. Content plan - 10 blog post briefs

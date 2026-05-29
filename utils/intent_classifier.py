@@ -35,7 +35,7 @@ def classify_intent(keyword: str, brand: str = "Pipeleap") -> tuple[str, str]:
     keyword_lower = keyword.lower().strip()
     brand_lower = brand.lower().strip()
 
-    if keyword_lower == brand_lower or keyword_lower.startswith(f"{brand_lower} "):
+    if keyword_lower == brand_lower:
         return "navigational", "decision"
     if any(term in keyword_lower for term in COMPARISON_TERMS):
         return "commercial", "decision"
