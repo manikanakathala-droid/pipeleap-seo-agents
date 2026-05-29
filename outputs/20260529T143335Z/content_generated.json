@@ -1,0 +1,76 @@
+[
+  {
+    "type": "blog_post",
+    "style": "NEPQ",
+    "slug": "apollo-clay-pipeleap-comparison",
+    "title": "Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
+    "target_keyword": "Apollo.io alternatives",
+    "structure": [
+      "H1: Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
+      "Problem frame: What most teams get wrong about Apollo.io alternatives",
+      "Implication: What happens if this stays broken (pipeline, quota, headcount)",
+      "Solution reveal: How the right system changes the outcome",
+      "Evidence: Workflow architecture + outcome metrics",
+      "CTA: Internal link to /gtm-audit or /contact"
+    ],
+    "internal_links": [
+      "/glossary/icp-scoring",
+      "/gtm-audit"
+    ],
+    "persona": "Head of Sales evaluating outbound tools",
+    "eeat_notes": [
+      "Add feature comparison table",
+      "Include decision framework: who should pick which tool",
+      "Add outcome proof for Pipeleap managed service"
+    ],
+    "status": "brief_ready"
+  },
+  {
+    "type": "glossary_page",
+    "slug": "outbound-sales-automation",
+    "title": "Outbound Sales Automation",
+    "definition": "Outbound sales automation is the use of software and AI to execute prospecting, lead enrichment, personalised outreach, and follow-up sequences without manual rep effort. An automated outbound system runs continuously, learns from reply signals, and routes qualified prospects into the CRM pipeline.",
+    "related_terms": [
+      "ICP scoring",
+      "sales orchestration",
+      "GTM audit"
+    ],
+    "internal_links": [
+      "/",
+      "/gtm-audit",
+      "/glossary/icp-scoring"
+    ]
+  },
+  {
+    "type": "glossary_page",
+    "slug": "sales-orchestration",
+    "title": "Sales Orchestration",
+    "definition": "Sales orchestration is the coordination of every component in an outbound sales system \u2014 lead sourcing, enrichment, personalisation, sequencing, reply handling, and CRM handoff \u2014 into a single governed workflow. Unlike point tools that automate one slice, an orchestrated system manages the entire motion as one continuous pipeline.",
+    "related_terms": [
+      "outbound sales automation",
+      "GTM implementation",
+      "revenue operations"
+    ],
+    "internal_links": [
+      "/about",
+      "/",
+      "/glossary/outbound-sales-automation"
+    ]
+  },
+  {
+    "type": "glossary_page",
+    "slug": "gtm-audit",
+    "title": "GTM Audit",
+    "definition": "A GTM (go-to-market) audit is a structured review of a company's outbound sales motion, covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health. The output is a prioritised list of gaps and fixes that improve pipeline predictability.",
+    "related_terms": [
+      "ICP scoring",
+      "outbound sales automation",
+      "GTM implementation"
+    ],
+    "internal_links": [
+      "/gtm-audit",
+      "/glossary/icp-scoring",
+      "/glossary/outbound-sales-automation"
+    ]
+  }
+]
