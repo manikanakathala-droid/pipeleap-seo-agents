@@ -126,6 +126,16 @@ class GrowthKeywordEngine:
         ("{term} guide",                  "informational",  "blog_post",       "problem-aware"),
     ]
 
+    # Local market keywords — positions pipeleap as the best global platform,
+    # while capturing local search intent (e.g. "best outbound automation in uk").
+    LOCAL_MARKETS = [
+        ("uk",        ["in uk", "for uk businesses", "uk"]),
+        ("australia", ["in australia", "for australian businesses", "australia"]),
+        ("canada",    ["in canada", "for canadian businesses", "canada"]),
+        ("india",     ["in india", "for indian businesses", "india"]),
+        ("singapore", ["in singapore", "for singapore businesses", "singapore"]),
+    ]
+
     # Navigational queries for brand-aware searchers
     NAVIGATIONAL_TERMS = [
         "pipeleap",
@@ -171,6 +181,7 @@ class GrowthKeywordEngine:
         entries.extend(self._short_tail_keywords())
         entries.extend(self._medium_tail_keywords())
         entries.extend(self._navigational_keywords())
+        entries.extend(self._local_market_keywords())
         # Existing gap fixes
         entries.extend(self._long_tail_keywords())
         entries.extend(self._question_keywords())
@@ -496,6 +507,41 @@ class GrowthKeywordEngine:
                 "page_type": "landing_page",
                 "funnel_stage": "decision",
             })
+        return entries
+
+    # ─── Local market keywords ─────────────────────────────────────────────────
+    # Positions pipeleap globally while capturing country-level search intent.
+    # "best outbound automation platform in uk" — not "uk-specific tool".
+
+    def _local_market_keywords(self) -> list[dict[str, Any]]:
+        entries = []
+        local_terms = [
+            "outbound automation platform",
+            "sales automation platform",
+            "pipeline generation platform",
+            "workflow orchestration platform",
+            "lead enrichment platform",
+            "sdr automation platform",
+        ]
+        for term in local_terms:
+            entries.append({
+                "keyword": f"best {term}",
+                "intent": "commercial",
+                "source": "local_market:global",
+                "page_type": "landing_page",
+                "funnel_stage": "solution-aware",
+            })
+            for market_key, modifiers in self.LOCAL_MARKETS:
+                for mod in modifiers:
+                    kw = f"best {term} {mod}"
+                    entries.append({
+                        "keyword": kw,
+                        "intent": "commercial",
+                        "source": f"local_market:{market_key}",
+                        "page_type": "landing_page",
+                        "funnel_stage": "solution-aware",
+                        "market": market_key,
+                    })
         return entries
 
     # ─── Stage-specific natural language keywords ─────────────────────────────
