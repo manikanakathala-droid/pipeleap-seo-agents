@@ -81,7 +81,15 @@ jobs:
             echo "No new outputs to commit."
           else
             git commit -m "chore: SERP visibility agent outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
+            for attempt in 1 2 3; do
+              if git push; then
+                exit 0
+              fi
+              git pull --rebase --autostash origin master
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push SERP outputs after 3 attempts." >&2
+            exit 1
           fi
 
       - name: Upload SERP visibility artifacts
