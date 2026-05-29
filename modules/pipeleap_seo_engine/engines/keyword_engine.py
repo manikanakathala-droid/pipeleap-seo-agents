@@ -177,8 +177,6 @@ class GrowthKeywordEngine:
         entries.extend(self._industry_vertical_keywords())
         entries.extend(self._bofu_keywords())
         entries.extend(self._stage_natural_language_keywords())
-        # Global market keyword expansion
-        entries.extend(self._global_keyword_expansion())
 
         seen: set[str] = set()
         deduped = []
@@ -532,72 +530,6 @@ class GrowthKeywordEngine:
                     })
                 except KeyError:
                     pass
-        return entries
-
-    # ─── Global market keyword expansion ─────────────────────────────────────
-    # Generates 250+ regional keyword variants across all Tier 1/2/3 markets.
-    # These are zero-competition long-tail keywords with clear commercial intent
-    # that international SaaS teams search — completely uncovered before this fix.
-
-    def _global_keyword_expansion(self) -> list[dict[str, Any]]:
-        from modules.pipeleap_seo_engine.data.global_markets import GLOBAL_MARKETS, all_regional_keywords
-        entries = []
-
-        # 1. All pre-defined regional keywords from global_markets.py
-        for kw_entry in all_regional_keywords():
-            entries.append({
-                "keyword":       kw_entry["keyword"],
-                "intent":        "commercial",
-                "source":        kw_entry["source"],
-                "page_type":     "use_case_page",
-                "funnel_stage":  "solution-aware",
-                "market":        kw_entry["market"],
-                "region":        kw_entry["region"],
-            })
-
-        # 2. Cross-product: core terms × market modifiers
-        core_terms = [
-            "outbound automation",
-            "sales workflow automation",
-            "pipeline generation",
-            "workflow orchestration",
-            "sdr automation",
-            "crm automation",
-            "signal-based outbound",
-        ]
-        market_modifiers = {
-            "uk":        ["for uk saas", "uk b2b", "united kingdom saas"],
-            "australia": ["for australian saas", "australia b2b", "au saas"],
-            "india":     ["for indian saas", "india b2b", "bangalore saas", "for saas india"],
-            "canada":    ["for canadian saas", "canada b2b", "toronto saas"],
-            "singapore": ["for singapore saas", "apac saas", "southeast asia b2b"],
-            "europe":    ["for european saas", "europe b2b", "emea saas"],
-            "germany":   ["for german saas", "dach saas", "germany b2b"],
-            "uae":       ["for uae saas", "dubai b2b", "mena saas"],
-        }
-        for market_key, modifiers in market_modifiers.items():
-            for term in core_terms:
-                for mod in modifiers:
-                    kw = f"{term} {mod}"
-                    entries.append({
-                        "keyword":      kw,
-                        "intent":       "commercial",
-                        "source":       f"global_matrix:{market_key}",
-                        "page_type":    "use_case_page",
-                        "funnel_stage": "solution-aware",
-                        "market":       market_key,
-                    })
-
-        # 3. International comparison keywords
-        intl_comps = ["cognism", "dealfront", "lemlist europe", "lusha uk"]
-        for comp in intl_comps:
-            entries.extend([
-                {"keyword": f"pipeleap vs {comp}", "intent": "commercial",
-                 "source": f"global_comp:{comp}", "page_type": "comparison_page", "funnel_stage": "decision"},
-                {"keyword": f"{comp} alternative", "intent": "commercial",
-                 "source": f"global_alt:{comp}", "page_type": "alternative_page", "funnel_stage": "decision"},
-            ])
-
         return entries
 
     @staticmethod
