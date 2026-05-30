@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass, field
+from itertools import chain
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +37,7 @@ class ContentCoverage:
     page_index: dict[str, PageInfo] = field(default_factory=dict)
     covered_slugs: set[str] = field(default_factory=set)
     covered_keywords: set[str] = field(default_factory=set)
+    _data_dir: Path | None = field(default=None, repr=False)
 
     def check_keyword(self, keyword: str) -> dict[str, Any]:
         kw_slug = _slugify(keyword)
@@ -98,9 +101,13 @@ class ContentCoverage:
         }
 
     def to_dict(self) -> dict[str, Any]:
+        corpus_len = 0
+        if self._data_dir:
+            corpus_len = len(self._build_corpus(self._data_dir))
         return {
             "total_pages": len(self.page_index),
             "total_slugs": len(self.covered_slugs),
+            "corpus_chars": corpus_len,
             "by_type": {
                 pt: len([p for p in self.page_index.values() if p.page_type == pt])
                 for pt in {p.page_type for p in self.page_index.values()}
@@ -118,6 +125,7 @@ class ContentCoverage:
         coverage._load_tools(data_dir)
         coverage._load_static_pages()
 
+        coverage._data_dir = data_dir
         return coverage
 
     # ── Internal loaders ─────────────────────────────────────────────────
@@ -233,6 +241,164 @@ class ContentCoverage:
             self.covered_slugs.add(slug)
             for word in _tokenize(title):
                 self.covered_keywords.add(word.lower())
+
+    # ── Text extraction for latent keyword mining ────────────────────────
+
+    def _extract_blog_text(self, data_dir: Path) -> str:
+        path = data_dir / "blog-articles.ts"
+        if not path.exists():
+            return ""
+        text = path.read_text(encoding="utf-8")
+        text_fields = re.findall(r'text["`]?\s*:\s*["`]([^"`]{10,})["`]', text)
+        return " ".join(text_fields)
+
+    def _extract_glossary_text(self, data_dir: Path) -> str:
+        path = data_dir / "glossary-terms.ts"
+        if not path.exists():
+            return ""
+        text = path.read_text(encoding="utf-8")
+        definitions = re.findall(r'definition["`]?\s*:\s*["`]([^"`]{20,})["`]', text)
+        return " ".join(definitions)
+
+    def _extract_tool_text(self, data_dir: Path) -> str:
+        tools_dir = data_dir / "tools"
+        if not tools_dir.exists():
+            return ""
+        chunks: list[str] = []
+        for ts_file in tools_dir.glob("*.ts"):
+            if ts_file.name == "index.ts":
+                continue
+            text = ts_file.read_text(encoding="utf-8")
+            descs = re.findall(r'(?:description|intro|body|pipeLeapAngle)["`]?\s*:\s*["`]([^"`]{20,})["`]', text)
+            chunks.extend(descs)
+            list_items = re.findall(r'["`]([A-Z][^"`]{10,})["`]', text)
+            for item in list_items:
+                if len(item.split()) >= 3:
+                    chunks.append(item)
+        return " ".join(chunks)
+
+    def _build_corpus(self, data_dir: Path | None = None) -> str:
+        texts: list[str] = []
+        if data_dir:
+            texts.append(self._extract_blog_text(data_dir))
+            texts.append(self._extract_glossary_text(data_dir))
+            texts.append(self._extract_tool_text(data_dir))
+        return " ".join(t for t in texts if t)
+
+    def mine_latent_keywords(
+        self,
+        data_dir: Path | None = None,
+        top_n: int = 20,
+        min_freq: int = 2,
+    ) -> list[dict[str, Any]]:
+        corpus = self._build_corpus(data_dir)
+        if not corpus or len(corpus) < 500:
+            return []
+
+        tokens = _tokenize(corpus)
+        tokens = [t for t in tokens if t not in _DOMAIN_STOP_WORDS and len(t) > 1]
+
+        bigrams = [" ".join(tokens[i:i + 2]) for i in range(len(tokens) - 1) if len(tokens[i]) > 2 and len(tokens[i + 1]) > 2]
+        trigrams = [" ".join(tokens[i:i + 3]) for i in range(len(tokens) - 2) if all(len(tokens[i + j]) > 2 for j in range(3))]
+
+        bg_counts = Counter(bigrams)
+        tg_counts = Counter(trigrams)
+
+        def _intent_bonus(phrase: str) -> float:
+            high_intent = {"best", "vs", "versus", "alternative", "alternatives", "review", "pricing", "cost", "compare", "comparison", "top", "demo", "trial", "buy", "signup", "book"}
+            words = set(phrase.split())
+            overlap = words & high_intent
+            return 1.5 if overlap else 1.0
+
+        def _is_covered(phrase: str) -> bool:
+            slug = _slugify(phrase)
+            if slug in self.covered_slugs:
+                return True
+            if phrase.lower() in self.covered_keywords:
+                return True
+            for existing in self.covered_slugs:
+                if slug in existing or existing in slug:
+                    return True
+            return False
+
+        candidates: list[dict[str, Any]] = []
+        seen: set[str] = set()
+
+        for phrase, freq in chain(bg_counts.items(), tg_counts.items()):
+            if freq < min_freq:
+                continue
+            if phrase in seen:
+                continue
+            seen.add(phrase)
+            if _is_covered(phrase):
+                continue
+            bonus = _intent_bonus(phrase)
+            candidates.append({
+                "keyword": phrase,
+                "frequency": freq,
+                "intent_bonus": bonus,
+                "score": round(freq * bonus, 1),
+                "source": "content_mining",
+            })
+
+        candidates.sort(key=lambda x: x["score"], reverse=True)
+        return candidates[:top_n]
+
+
+_DOMAIN_STOP_WORDS: set[str] = {
+    # Common English stop words
+    "the", "and", "for", "are", "was", "were", "been", "being", "have",
+    "has", "had", "having", "do", "does", "did", "doing", "will", "would",
+    "can", "could", "shall", "should", "may", "might", "must", "need",
+    "dare", "ought", "used", "this", "that", "these", "those", "what",
+    "which", "who", "whom", "whose", "when", "where", "why", "how",
+    "all", "each", "every", "both", "few", "more", "most", "other",
+    "some", "such", "no", "nor", "not", "only", "own", "same", "so",
+    "than", "too", "very", "just", "because", "as", "until", "while",
+    "of", "at", "by", "with", "about", "against", "between", "into",
+    "through", "during", "before", "after", "above", "below", "from",
+    "up", "down", "in", "out", "on", "off", "over", "under", "again",
+    "further", "then", "once", "here", "there", "when", "where", "why",
+    "how", "all", "any", "both", "each", "few", "more", "most", "other",
+    "some", "such", "no", "nor", "not", "only", "own", "same",
+    "but", "nor", "or", "yet", "so",
+    "your", "current", "specific", "multiple", "various", "multiple",
+    # Domain-specific noise
+    "tool", "tools", "system", "systems", "platform", "platforms", "software",
+    "team", "teams", "process", "processes", "data", "workflow",
+    "workflows", "automation", "need", "needs", "use", "using",
+    "help", "helps", "helping", "make", "makes", "making", "get",
+    "gets", "getting", "way", "ways", "thing", "things",
+    "like", "well", "also", "even", "much", "many",
+    "still", "already", "actually", "however", "without", "within", "back",
+    "every", "going", "around", "across", "along", "always", "another",
+    "become", "becomes", "becoming", "might", "must", "never", "next",
+    "often", "once", "really", "said", "says", "since", "something",
+    "sometimes", "start", "starts", "starting", "take", "takes", "taking",
+    "tell", "tells", "telling", "toward", "towards", "usually", "various",
+    "without", "worth", "yet", "away", "able", "asked", "begin", "behind",
+    "believe", "beyond", "bring", "brings", "coming", "common", "could",
+    "course", "day", "days", "deals", "doing", "down", "else", "enough",
+    "example", "fact", "feel", "gave", "given", "giving",
+    "good", "great", "group", "groups", "happens", "hard",
+    "high", "hold", "idea", "important", "interest",
+    "keep", "keeps", "kept", "kind", "kinds",
+    "know", "known", "knows", "large", "last", "later", "leave", "left",
+    "less", "let", "life", "likely", "line", "long", "longer",
+    "looks", "made", "main", "matter", "mean", "means", "meet", "meets",
+    "months", "most", "move", "moving", "name", "near", "necessary",
+    "number", "numbers", "order", "orders", "part", "particular", "parts",
+    "past", "per", "place", "places", "point", "points", "possible",
+    "present", "problem", "problems", "put", "puts", "question", "questions",
+    "rather", "reason", "reasons", "result", "results", "right", "run",
+    "running", "runs", "saw", "say", "seeing", "seem", "seems", "seen",
+    "sense", "serious", "set", "sets", "short", "show", "shows", "shown",
+    "side", "significant", "similar", "simple", "simply", "small", "sure",
+    "talk", "talks", "talking", "term", "terms", "type", "types", "understand",
+    "understanding", "value", "values", "view", "views", "wait", "waiting",
+    "walk", "walking", "want", "wants", "weeks", "whole", "wide", "word",
+    "words", "work", "works", "working", "year", "years",
+}
 
 
 def _slugify(value: str) -> str:

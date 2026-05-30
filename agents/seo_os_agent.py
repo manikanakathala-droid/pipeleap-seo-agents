@@ -25,6 +25,7 @@ Output: structured JSON report + human-readable daily briefing
 
 import json
 import logging
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,6 +73,7 @@ class SEOOSResult:
     indexing_actions: list[dict] = field(default_factory=list)
     gsc_insights: list[dict] = field(default_factory=list)
     content_gaps: list[dict] = field(default_factory=list)
+    latent_keywords: list[dict] = field(default_factory=list)
     risks_and_missed: list[dict] = field(default_factory=list)
     seo_score: SEOScore = field(default_factory=SEOScore)
     next_day_plan: list[str] = field(default_factory=list)
@@ -94,6 +96,7 @@ class SEOOSResult:
             "indexing_actions": self.indexing_actions,
             "gsc_insights": self.gsc_insights,
             "content_gaps": self.content_gaps,
+            "latent_keywords": self.latent_keywords,
             "risks_and_missed": self.risks_and_missed,
             "seo_score": self.seo_score.to_dict(),
             "next_day_plan": self.next_day_plan,
@@ -206,7 +209,10 @@ class SEOOSAgent:
             coverage = self._build_content_coverage()
             if coverage:
                 result.content_gaps = coverage.get("gaps", [])
+                result.latent_keywords = coverage.get("latent_keywords", [])
                 self._write_json(output_dir / "content_coverage.json", coverage.get("report", {}))
+                if result.latent_keywords:
+                    self._write_json(output_dir / "latent_keywords.json", result.latent_keywords)
         except Exception as exc:
             self.logger.warning("Content coverage skipped: %s", exc)
 
@@ -349,15 +355,31 @@ class SEOOSAgent:
         if not launchpad_dir.exists():
             self.logger.warning("Launchpad dir not found at %s — skipping content coverage", launchpad_dir)
             return None
+
+        # Pull latest to avoid stale coverage
+        try:
+            subprocess.run(
+                ["git", "pull", "--rebase"],
+                cwd=str(launchpad_dir),
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except Exception as exc:
+            self.logger.warning("git pull in temp_frontend_repo failed (non-fatal): %s", exc)
+
         try:
             coverage = ContentCoverage.build(str(launchpad_dir))
             gaps = detect_content_gaps(self._get_all_keyword_candidates(), coverage, min_confidence=0.4)
+            latent = coverage.mine_latent_keywords(data_dir=launchpad_dir / "src" / "data", top_n=20)
             return {
                 "gaps": gaps,
+                "latent_keywords": latent,
                 "report": {
                     "total_pages": len(coverage.page_index),
                     "total_keywords_checked": len(self._get_all_keyword_candidates()),
                     "gaps_found": len(gaps),
+                    "latent_keywords_found": len(latent),
                     "by_type": {
                         pt: len([p for p in coverage.page_index.values() if p.page_type == pt])
                         for pt in {p.page_type for p in coverage.page_index.values()}
@@ -1000,6 +1022,13 @@ class SEOOSAgent:
                 lines.append(f"- **{kw}** (difficulty: {diff_val})")
             if len(result.content_gaps) > 8:
                 lines.append(f"- … and {len(result.content_gaps) - 8} more gaps — see content_coverage.json")
+
+        if result.latent_keywords:
+            lines += ["", "---", "", "## 4c. Latent Keywords (Mined from Existing Content)"]
+            for lk in result.latent_keywords[:10]:
+                lines.append(f"- **{lk.get('keyword','')}** (freq: {lk.get('frequency',0)}, score: {lk.get('score',0)})")
+            if len(result.latent_keywords) > 10:
+                lines.append(f"- … and {len(result.latent_keywords) - 10} more — see latent_keywords.json")
 
         lines += ["", "---", "", "## 5. Content Generated"]
         for item in result.content_generated:
