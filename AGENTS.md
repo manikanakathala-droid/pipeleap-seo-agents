@@ -89,3 +89,19 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 1. SEO agent runs → pushes to launchpad → triggers Vercel deploy
 2. GEO agent runs → pushes to launchpad → triggers Vercel deploy (2nd build, harmless)
 3. Weekly tool gen runs → pushes to launchpad → triggers Vercel deploy
+
+### 11. Always push fixes immediately (May 30)
+**Rule:** Every fix or change must be committed and pushed immediately after applying. Unpushed changes are wasted work — they don't deploy, don't fix broken workflows, and don't improve the site.
+
+**Checklist before declaring a fix done:**
+1. Apply the change
+2. Stage + commit (with meaningful message)
+3. `git pull --rebase` if push is rejected (remote has new commits)
+4. `git push`
+5. For the **launchpad repo** (`temp_frontend_repo/`), repeat steps 2-4 in that directory
+
+**Two repos to manage:**
+| Repo | Directory | Purpose |
+|---|---|---|
+| `pipeleap-seo-agents` | `.` | Workflows, agents, SEO content |
+| `pipeleap-launchpad-040053e5` | `temp_frontend_repo/` | Website frontend (Vercel deploy) |
