@@ -130,7 +130,7 @@ jobs:
         run: |
           FILE=$(ls outputs/*/daily_briefing.md 2>/dev/null | head -1)
           if [ -n "$FILE" ]; then
-            DELIM="BRF_$(date +%s)_$$"
+            DELIM=$(uuidgen)
             {
               echo "BRIEFING<<${DELIM}"
               head -n 200 "$FILE"
