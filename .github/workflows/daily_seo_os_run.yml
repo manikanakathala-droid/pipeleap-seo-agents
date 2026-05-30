@@ -1,4 +1,4 @@
-name: Daily SEO OS Run
+﻿name: Daily SEO OS Run
 
 on:
   workflow_dispatch:
