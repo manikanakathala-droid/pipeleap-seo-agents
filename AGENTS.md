@@ -128,6 +128,10 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - First SEO OS run with content coverage: 252 pages, 391 covered slugs, 2 gaps ("Apollo.io alternatives" from SERP clusters + competitor gaps).
 - Test of `mine_latent_keywords()` on 473K char corpus: 20 clean keywords — top results: "real time" (freq=113), "multi channel" (freq=105), "mid market" (freq=70), "crm sync" (freq=52), "conversation intelligence" (freq=50).
 - Commit `f4205a3` pushed with latent mining + git pull freshness.
+- **GSC connection fix** — `connectors/gsc_connector.py` now reads `GSC_SITE_URL` env var as fallback (was being ignored in CI/CD, causing empty data every run).
+- **Sitemap URL mismatch fix** — `connectors/post_publish_hook.py` and `connectors/search_engine_submitter.py` now use `https://www.pipeleap.com/sitemap.xml` (was missing `www.`, causing 301 redirect — Google silently dropped the sitemap).
+- **Self-diagnosing GSC failure** — `agents/seo_os_agent.py` now logs warning with `site_url` when GSC returns 0 rows.
+- Commit `079c9bb` pushed with all 4 GSC + sitemap fixes.
 
 **In Progress:**
 - (none — waiting for next direction)

@@ -30,7 +30,7 @@ except ImportError:
 
 INDEXNOW_KEY      = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 INDEXNOW_KEY_LOC  = "https://pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt"
-SITEMAP_URL       = "https://pipeleap.com/sitemap.xml"
+SITEMAP_URL       = "https://www.pipeleap.com/sitemap.xml"
 
 
 class SearchEngineSubmitter:

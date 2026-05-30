@@ -21,8 +21,8 @@ from pathlib import Path
 from typing import Any
 
 
-SITEMAP_URL  = "https://pipeleap.com/sitemap.xml"
-SITE_URL     = "https://pipeleap.com"
+SITEMAP_URL  = "https://www.pipeleap.com/sitemap.xml"
+SITE_URL     = "https://www.pipeleap.com"
 INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 
 

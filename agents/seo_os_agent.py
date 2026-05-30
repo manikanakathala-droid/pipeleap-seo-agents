@@ -675,8 +675,10 @@ class SEOOSAgent:
     def _run_gsc_performance_audit(self) -> list[dict]:
         from connectors.gsc_connector import GoogleSearchConsoleConnector
         gsc = GoogleSearchConsoleConnector(self.config, self.logger)
+        site_url = gsc.site_url or "unknown"
         current_rows, previous_rows = gsc.fetch_two_periods(days_per_period=28, row_limit=500)
         if not current_rows:
+            self.logger.warning("GSC returned 0 rows for site_url=%s — check credentials and property", site_url)
             return []
 
         def _aggregate(rows: list[dict]) -> dict[str, dict]:

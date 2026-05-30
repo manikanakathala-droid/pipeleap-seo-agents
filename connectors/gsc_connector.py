@@ -42,8 +42,15 @@ class GoogleSearchConsoleConnector:
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.logger = logger
         self.config = config.get("integrations", {}).get("gsc", {})
-        self.site_url = self.config.get("site_url") or config.get("site", {}).get("site_url", "")
-        self.plain_site_url = config.get("site", {}).get("site_url", "").rstrip("/")
+        self.site_url = (
+            self.config.get("site_url")
+            or config.get("site", {}).get("site_url", "")
+            or os.getenv("GSC_SITE_URL", "")
+        )
+        self.plain_site_url = (
+            config.get("site", {}).get("site_url", "")
+            or os.getenv("GSC_SITE_URL", "")
+        ).rstrip("/")
         self.credentials_path = self.config.get("credentials_path", "")
         self.data_export_path = self.config.get("data_export_path", "")
 
