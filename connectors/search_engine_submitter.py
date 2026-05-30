@@ -29,7 +29,7 @@ except ImportError:
     _HAS_REQUESTS = False
 
 INDEXNOW_KEY      = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
-INDEXNOW_KEY_LOC  = "https://pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt"
+INDEXNOW_KEY_LOC  = "https://www.pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt"
 SITEMAP_URL       = "https://www.pipeleap.com/sitemap.xml"
 
 
@@ -64,7 +64,7 @@ class SearchEngineSubmitter:
             return report
 
         indexnow_payload = {
-            "host":        "pipeleap.com",
+            "host":        "www.pipeleap.com",
             "key":         INDEXNOW_KEY,
             "keyLocation": INDEXNOW_KEY_LOC,
             "urlList":     urls[:500],

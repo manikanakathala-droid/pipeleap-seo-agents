@@ -106,17 +106,34 @@ class IndexNowConnector:
         return results
 
     def submit_sitemap_urls(self, sitemap_path: str | Path) -> dict[str, Any]:
-        """Extract all URLs from a sitemap file and submit them."""
+        """Extract all URLs from a sitemap file (handles index + flat) and submit."""
         try:
             from xml.etree import ElementTree as ET
+            ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
             content = Path(sitemap_path).read_text(encoding="utf-8")
-            root    = ET.fromstring(content)
-            ns      = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
-            urls    = [
-                u.find(f"{ns}loc").text
-                for u in root.findall(f"{ns}url")
-                if u.find(f"{ns}loc") is not None
-            ]
+            root = ET.fromstring(content)
+            urls: list[str] = []
+            if root.tag == f"{ns}sitemapindex":
+                parent_dir = Path(sitemap_path).parent
+                for sm in root.findall(f"{ns}sitemap"):
+                    loc = sm.find(f"{ns}loc")
+                    if loc is not None and loc.text:
+                        sub_filename = loc.text.rstrip("/").rsplit("/", 1)[-1]
+                        sub_path = parent_dir / sub_filename
+                        if sub_path.exists():
+                            sub_content = sub_path.read_text(encoding="utf-8")
+                            sub_root = ET.fromstring(sub_content)
+                            urls.extend([
+                                u.find(f"{ns}loc").text
+                                for u in sub_root.findall(f"{ns}url")
+                                if u.find(f"{ns}loc") is not None and u.find(f"{ns}loc").text
+                            ])
+            elif root.tag == f"{ns}urlset":
+                urls = [
+                    u.find(f"{ns}loc").text
+                    for u in root.findall(f"{ns}url")
+                    if u.find(f"{ns}loc") is not None and u.find(f"{ns}loc").text
+                ]
             if not urls:
                 return {"ok": False, "error": "no URLs found in sitemap"}
             results = self.submit_all_endpoints(urls)

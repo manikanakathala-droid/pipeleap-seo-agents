@@ -145,8 +145,25 @@ class PostPublishHook:
 
     # ── Helpers ───────────────────────────────────────────────────────────────
 
-    def _slug_urls(self, slugs: list[str]) -> list[str]:
-        return [f"{SITE_URL}/blog/{slug}" for slug in slugs if slug]
+    def _slug_urls(self, slugs_or_assets: list[str | dict]) -> list[str]:
+        urls: list[str] = []
+        for item in slugs_or_assets:
+            if isinstance(item, dict):
+                slug = item.get("slug", "")
+                if not slug:
+                    continue
+                ptype = item.get("page_type", "blog_post") or "blog_post"
+                if ptype == "blog_post":
+                    urls.append(f"{SITE_URL}/blog/{slug}")
+                elif ptype == "glossary_term":
+                    urls.append(f"{SITE_URL}/glossary/{slug}")
+                elif ptype.startswith("tool"):
+                    urls.append(f"{SITE_URL}/tools/{slug}")
+                else:
+                    urls.append(f"{SITE_URL}/{slug}")
+            elif item:
+                urls.append(f"{SITE_URL}/blog/{item}")
+        return urls
 
     def _load_sitemap_urls(self, sitemap_path: str | Path) -> list[str]:
         p = Path(sitemap_path)
@@ -154,13 +171,25 @@ class PostPublishHook:
             return []
         try:
             from xml.etree import ElementTree as ET
+            ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
             root = ET.fromstring(p.read_text(encoding="utf-8"))
-            ns   = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
-            return [
-                u.find(f"{ns}loc").text
-                for u in root.findall(f"{ns}url")
-                if u.find(f"{ns}loc") is not None
-            ]
+            urls: list[str] = []
+            if root.tag == f"{ns}sitemapindex":
+                parent_dir = p.parent
+                for sm in root.findall(f"{ns}sitemap"):
+                    loc = sm.find(f"{ns}loc")
+                    if loc is not None and loc.text:
+                        sub_filename = loc.text.rstrip("/").rsplit("/", 1)[-1]
+                        sub_path = parent_dir / sub_filename
+                        if sub_path.exists():
+                            urls.extend(self._load_sitemap_urls(sub_path))
+            elif root.tag == f"{ns}urlset":
+                urls = [
+                    u.find(f"{ns}loc").text
+                    for u in root.findall(f"{ns}url")
+                    if u.find(f"{ns}loc") is not None and u.find(f"{ns}loc").text
+                ]
+            return urls
         except Exception:
             return []
 

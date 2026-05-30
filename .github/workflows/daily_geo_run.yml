@@ -77,6 +77,7 @@ jobs:
         env:
           DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
           DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
 
       - name: Audit launchpad duplicates before commit
         if: ${{ env.DRY_RUN != 'true' }}
@@ -161,32 +162,20 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
         continue-on-error: true
 
-      - name: Submit sitemap to Bing Webmaster API
+      - name: Submit sitemap URLs via IndexNow (Bing/Yandex/Seznam)
         if: ${{ env.DRY_RUN != 'true' }}
         run: |
           python -c "
-          import os, json, urllib.request, urllib.error
-          api_key = os.environ.get('BING_API_KEY', '')
-          if not api_key:
-              print('No BING_API_KEY set — skipping Bing sitemap submission')
-              exit(0)
-          payload = json.dumps({
-              'siteUrl': 'https://www.pipeleap.com',
-              'feedpath': 'https://www.pipeleap.com/sitemap.xml'
-          }).encode('utf-8')
-          endpoint = f'https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?apikey={api_key}'
-          try:
-              req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
-              with urllib.request.urlopen(req) as resp:
-                  result = json.loads(resp.read().decode('utf-8'))
-                  print(f'Bing sitemap submission: {result}')
-          except urllib.error.HTTPError as e:
-              print(f'Bing sitemap submission failed (non-fatal): HTTP {e.code} {e.reason}')
-          except Exception as e:
-              print(f'Bing sitemap submission failed (non-fatal): {e}')
+          from connectors.indexnow_connector import IndexNowConnector
+          idx = IndexNowConnector()
+          result = idx.submit_sitemap_urls('pipeleap-launchpad/public/sitemap.xml')
+          print(f'IndexNow: {result.get(\"urls_submitted\", 0)} URLs submitted to {result.get(\"endpoints_ok\", 0)}/{result.get(\"endpoints_total\", 3)} endpoints')
+          if not result.get('ok'):
+              print(f'  Errors: {result.get(\"error\", \"unknown\")}')
+          for r in result.get('results', []):
+              status = 'OK' if r.get('ok') else f'FAIL ({r.get(\"status\", r.get(\"error\", \"?\"))})'
+              print(f'  {r.get(\"endpoint\",\"?\")}: {status}')
           "
-        env:
-          BING_API_KEY: ${{ secrets.BING_API_KEY }}
 
       - name: Trigger Vercel deploy
         run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}

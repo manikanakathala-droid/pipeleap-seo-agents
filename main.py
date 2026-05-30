@@ -47,9 +47,9 @@ def main() -> int:
     hook = PostPublishHook(config, logging.getLogger("pipeleap_seo_agent"))
     sitemap_path = "pipeleap-launchpad/public/sitemap.xml"
     
-    # Pass generated slugs to ensure indexing signals target new content
-    new_slugs = [asset.get("slug") for asset in result.get("assets_generated", []) if isinstance(asset, dict)]
-    hook.run(sitemap_path=sitemap_path, new_slugs=new_slugs, output_dir="outputs/post_publish")
+    # Pass generated assets to ensure indexing signals target all content types
+    new_assets = result.get("assets_generated", [])
+    hook.run(sitemap_path=sitemap_path, new_slugs=new_assets, output_dir="outputs/post_publish")
     return 0
 
 
