@@ -80,15 +80,15 @@ jobs:
           fi
           python run_seo_os.py $CRAWL_FLAG
 
-      - name: Commit structured SEO repo outputs
+      - name: Commit repo outputs (structured + raw combined)
         run: |
           git config user.name  "pipeleap-seo-os"
           git config user.email "seo-os@pipeleap.com"
-          git add seo/ content/ 2>/dev/null || true
+          git add seo/ content/ outputs/ 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No structured SEO changes."
+            echo "No repo changes to commit."
           else
-            git commit -m "seo(os): structured outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "seo(os): run #${{ github.run_number }}"
             for attempt in 1 2 3; do
               if git push; then
                 exit 0
@@ -96,25 +96,7 @@ jobs:
               git pull --rebase --autostash origin master
               sleep $((attempt * 10))
             done
-            echo "Unable to push structured SEO changes after 3 attempts." >&2
-            exit 1
-          fi
-
-      - name: Commit raw run outputs
-        run: |
-          git add -f outputs/ 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "No raw output changes."
-          else
-            git commit -m "chore(seo-os): raw outputs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            for attempt in 1 2 3; do
-              if git push; then
-                exit 0
-              fi
-              git pull --rebase --autostash origin master
-              sleep $((attempt * 10))
-            done
-            echo "Unable to push raw output changes after 3 attempts." >&2
+            echo "Unable to push repo changes after 3 attempts." >&2
             exit 1
           fi
 
@@ -151,7 +133,7 @@ jobs:
         run: |
           FILE=$(ls outputs/*/daily_briefing.md 2>/dev/null | head -1)
           if [ -n "$FILE" ]; then
-            python -u -c "
+            FILE="$FILE" python -u -c "
           import base64, os
           with open(os.environ['FILE']) as f:
               content = f.read(16000)

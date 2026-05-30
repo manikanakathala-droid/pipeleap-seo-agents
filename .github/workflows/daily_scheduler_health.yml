@@ -16,13 +16,21 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Check if daily SEO run already happened today
+      - name: Check if any daily workflow already ran today
         id: check
         run: |
           TODAY=$(date -u +%Y-%m-%d)
-          SUCCESS_COUNT=$(gh run list --repo "${{ github.repository }}" --workflow "Daily SEO Agent Run" --limit 10 --json conclusion,startedAt,event --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
-          echo "count=$SUCCESS_COUNT" >> "$GITHUB_OUTPUT"
-          echo "Today: $TODAY — successful runs found: $SUCCESS_COUNT"
+          for WF in "Daily SEO Agent Run" "Daily SEO OS Run" "Daily GEO Agent Run"; do
+            COUNT=$(gh run list --repo "${{ github.repository }}" --workflow "$WF" --limit 10 --json conclusion,startedAt --jq "[.[] | select(.startedAt | startswith(\"${TODAY}\")) | select(.conclusion == \"success\")] | length")
+            echo "  $WF: $COUNT successful runs today"
+            if [ "$COUNT" -gt 0 ]; then
+              echo "count=1" >> "$GITHUB_OUTPUT"
+              echo "Already ran today via $WF — skipping recovery."
+              exit 0
+            fi
+          done
+          echo "count=0" >> "$GITHUB_OUTPUT"
+          echo "No successful runs for any daily workflow today."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -31,5 +39,7 @@ jobs:
         run: |
           echo "No successful run for today — triggering recovery dispatch."
           gh workflow run "Daily SEO Agent Run" --repo "${{ github.repository }}" --ref master
+          sleep 30
+          gh workflow run "Daily GEO Agent Run" --repo "${{ github.repository }}" --ref master
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
