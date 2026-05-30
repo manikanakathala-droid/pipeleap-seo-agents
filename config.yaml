@@ -90,7 +90,7 @@
       "webhook_url": ""
     },
     "github": {
-      "token": "",
+      "token": "$GITHUB_TOKEN",
       "repo": "manikanakathala-droid/pipeleap-launchpad-040053e5",
       "branch": "main",
       "blog_data_path": "src/data/blog-articles.ts",
@@ -238,6 +238,22 @@
       {
         "label": "Homepage",
         "url": "https://pipeleap.com/"
+      },
+      {
+        "label": "GTM Audit",
+        "url": "https://pipeleap.com/gtm-audit"
+      },
+      {
+        "label": "Pricing",
+        "url": "https://pipeleap.com/pricing"
+      },
+      {
+        "label": "Contact",
+        "url": "https://pipeleap.com/contact"
+      },
+      {
+        "label": "How It Works",
+        "url": "https://pipeleap.com/how-it-works"
       }
     ],
     "competitors": [

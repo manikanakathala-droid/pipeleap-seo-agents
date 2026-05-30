@@ -187,12 +187,14 @@ class SEOOSAgent:
 
         # ── Step 4b: GSC Performance Audit ───────────────────────────────────
         self.logger.info("Step 4b: GSC performance audit")
+        raw_gsc_rows: list[dict] = []
         try:
-            gsc_insights = self._run_gsc_performance_audit()
+            gsc_insights, raw_gsc_rows = self._run_gsc_performance_audit()
             result.gsc_insights = gsc_insights
             self._write_json(output_dir / "gsc_insights.json", gsc_insights)
         except Exception as exc:
             self.logger.warning("GSC audit skipped: %s", exc)
+            raw_gsc_rows = []
 
         # ── Step 4c: GA4 Analytics Audit ─────────────────────────────────────
         self.logger.info("Step 4c: GA4 analytics audit")
@@ -219,7 +221,7 @@ class SEOOSAgent:
         # ── Step 5: Keyword Engine ────────────────────────────────────────────
         self.logger.info("Step 5: Keyword engine")
         try:
-            keywords = self._run_keyword_engine(diff)
+            keywords = self._run_keyword_engine(diff, gsc_rows=raw_gsc_rows)
             result.keyword_opportunities = keywords
             self._write_json(output_dir / "keyword_opportunities.json", keywords)
         except Exception as exc:
@@ -229,7 +231,7 @@ class SEOOSAgent:
         # ── Step 6: Content Engine ────────────────────────────────────────────
         self.logger.info("Step 6: Content engine")
         try:
-            content = self._run_content_engine(diff, run_id)
+            content = self._run_content_engine(diff, run_id, keywords)
             result.content_generated = content
             self._write_json(output_dir / "content_generated.json", content)
         except Exception as exc:
@@ -272,6 +274,35 @@ class SEOOSAgent:
             self._write_json(output_dir / "indexing_actions.json", indexing)
         except Exception as exc:
             self.logger.warning("Indexing step skipped: %s", exc)
+
+        # ── Post-Publish Signals (IndexNow, GSC, Indexing API) ────────────────
+        try:
+            from connectors.post_publish_hook import PostPublishHook
+            hook = PostPublishHook(self.config, self.logger)
+            launchpad_sitemap = Path(__file__).resolve().parent.parent / "temp_frontend_repo" / "public" / "sitemap.xml"
+            new_slugs = [c.get("slug", "") for c in result.content_generated if c.get("slug")]
+            hook.run(sitemap_path=str(launchpad_sitemap) if launchpad_sitemap.exists() else None,
+                     new_slugs=new_slugs,
+                     output_dir=str(output_dir))
+            self.logger.info("Post-publish signals fired for %d new slugs", len(new_slugs))
+        except Exception as exc:
+            self.logger.warning("Post-publish signals skipped: %s", exc)
+
+        # ── GitHub publish (blog posts only — structured outputs handled by repo_writer) ──
+        try:
+            from connectors.github_publisher import GitHubPublisher
+            gh_cfg = self.config.get("integrations", {}).get("github", {})
+            publisher = GitHubPublisher(
+                token=gh_cfg.get("token", ""),
+                repo=gh_cfg.get("repo", ""),
+                branch=gh_cfg.get("branch", "main"),
+            )
+            if publisher.is_configured():
+                for item in result.content_generated:
+                    if item.get("type") == "blog_post" and item.get("slug"):
+                        publisher.publish_blog_post(item)
+        except Exception as exc:
+            self.logger.warning("GitHub publish skipped: %s", exc)
 
         # ── Step 11: Self-Improvement Loop ────────────────────────────────────
         self.logger.info("Step 11: Self-improvement loop")
@@ -391,99 +422,117 @@ class SEOOSAgent:
             return None
 
     def _get_all_keyword_candidates(self) -> list[dict]:
-        from modules.pipeleap_seo_engine.data.serp_strategy import SERP_KEYWORD_CLUSTERS
+        # Derive from config seed keywords instead of hardcoding
+        seed = self.config.get("seo", {}).get("seed_keywords", {})
         keywords: list[dict] = []
-        for cluster in SERP_KEYWORD_CLUSTERS:
-            for kw in cluster["keywords"][:3]:
-                keywords.append({"keyword": kw, "cluster": cluster["cluster_name"]})
-        competitor_gaps = [
-            {"keyword": "Apollo.io alternatives", "type": "competitor_gap"},
-            {"keyword": "Clay alternatives for sales", "type": "competitor_gap"},
-            {"keyword": "Outreach.io alternatives", "type": "competitor_gap"},
-            {"keyword": "Salesloft competitors", "type": "competitor_gap"},
-            {"keyword": "sales engagement platform alternatives", "type": "competitor_gap"},
-        ]
-        keywords.extend(competitor_gaps)
-        long_tail = [
-            {"keyword": "how to build outbound sales system for B2B SaaS"},
-            {"keyword": "outbound sales automation for small sales teams"},
-            {"keyword": "what is managed outbound sales service"},
-            {"keyword": "how long does GTM implementation take"},
-            {"keyword": "outbound pipeline predictability metrics"},
-        ]
-        keywords.extend(long_tail)
+        seen: set[str] = set()
+        for category, kws in seed.items():
+            for kw in kws:
+                if kw not in seen:
+                    seen.add(kw)
+                    keywords.append({"keyword": kw, "cluster": category, "type": category})
         return keywords
 
-    def _run_keyword_engine(self, diff: SiteDiff) -> list[dict]:
-        from modules.pipeleap_seo_engine.data.serp_strategy import SERP_KEYWORD_CLUSTERS
+    def _run_keyword_engine(self, diff: SiteDiff, gsc_rows: list[dict] | None = None) -> list[dict]:
+        from core.keyword_engine import KeywordEngine as RealKeywordEngine
+        from core.content_coverage import ContentCoverage
 
-        keywords: list[dict] = []
+        engine = RealKeywordEngine(self.config, self.logger)
+        existing_slugs = self._load_existing_slugs()
 
-        # 10 high-intent
-        high_intent_sources = [c for c in SERP_KEYWORD_CLUSTERS if c["intent"] in ("transactional", "commercial")]
-        for cluster in high_intent_sources:
-            for kw in cluster["keywords"][:3]:
-                keywords.append({
-                    "keyword": kw,
-                    "type": "high_intent",
-                    "cluster": cluster["cluster_name"],
-                    "difficulty": cluster["estimated_difficulty"],
-                    "conversion_probability": cluster["conversion_probability"],
-                    "recommended_page_type": "landing_page" if cluster["intent"] == "transactional" else "blog_post",
+        # Build content coverage so engine can skip covered keywords
+        coverage = None
+        launchpad_dir = Path(__file__).resolve().parent.parent / "temp_frontend_repo"
+        if launchpad_dir.exists():
+            try:
+                coverage = ContentCoverage.build(str(launchpad_dir))
+            except Exception:
+                pass
+
+        clusters, _ = engine.discover(
+            gsc_rows or [],
+            pages=[],
+            existing_slugs=existing_slugs,
+            content_coverage=coverage,
+        )
+
+        results: list[dict] = []
+        for cluster in clusters:
+            for opp in cluster.opportunities[:3]:
+                results.append({
+                    "keyword": opp.keyword,
+                    "type": opp.intent,
+                    "cluster": cluster.cluster_name,
+                    "difficulty": opp.estimated_difficulty,
+                    "conversion_probability": opp.conversion_probability,
+                    "recommended_page_type": cluster.recommended_asset_type,
+                    "revenue_priority": opp.revenue_priority_score,
+                    "coverage_status": opp.notes[-1] if opp.notes and "Coverage:" in opp.notes[-1] else "pending",
                 })
-            if len([k for k in keywords if k["type"] == "high_intent"]) >= 10:
-                break
+        return results[:20]
 
-        # 5 competitor gap keywords
-        competitor_gaps = [
-            {"keyword": "Apollo.io alternatives", "gap_source": "Apollo.io", "type": "competitor_gap"},
-            {"keyword": "Clay alternatives for sales", "gap_source": "Clay", "type": "competitor_gap"},
-            {"keyword": "Outreach.io alternatives", "gap_source": "Outreach", "type": "competitor_gap"},
-            {"keyword": "Salesloft competitors", "gap_source": "Salesloft", "type": "competitor_gap"},
-            {"keyword": "sales engagement platform alternatives", "gap_source": "multiple", "type": "competitor_gap"},
-        ]
-        keywords.extend(competitor_gaps[:5])
+    def _load_existing_slugs(self) -> set[str]:
+        slugs: set[str] = set()
+        state_path = self._state_dir / "latest_snapshot.json"
+        if state_path.exists():
+            try:
+                data = json.loads(state_path.read_text(encoding="utf-8"))
+                for p in data.get("pages", []):
+                    url = p.get("url", "").rstrip("/")
+                    slug = url.split("/")[-1] if url else ""
+                    if slug:
+                        slugs.add(slug)
+            except Exception:
+                pass
+        return slugs
 
-        # 5 long-tail
-        long_tail = [
-            {"keyword": "how to build outbound sales system for B2B SaaS", "type": "long_tail", "funnel_stage": "awareness"},
-            {"keyword": "outbound sales automation for small sales teams", "type": "long_tail", "funnel_stage": "consideration"},
-            {"keyword": "what is managed outbound sales service", "type": "long_tail", "funnel_stage": "awareness"},
-            {"keyword": "how long does GTM implementation take", "type": "long_tail", "funnel_stage": "consideration"},
-            {"keyword": "outbound pipeline predictability metrics", "type": "long_tail", "funnel_stage": "awareness"},
-        ]
-        keywords.extend(long_tail[:5])
+    def _run_content_engine(self, diff: SiteDiff, run_id: str, keywords: list[dict] | None = None) -> list[dict]:
+        from core.blog_content_engine import BlogContentEngine
+        from core.content_engine import ContentEngine
+        from utils.models import KeywordCluster, KeywordOpportunity
 
-        return keywords[:20]
-
-    def _run_content_engine(self, diff: SiteDiff, run_id: str) -> list[dict]:
-        from modules.pipeleap_seo_engine.data.serp_strategy import CONTENT_PLAN
+        engine = ContentEngine(self.config, self.logger)
+        blog_engine = BlogContentEngine(self.config, self.logger)
 
         generated: list[dict] = []
 
-        # 1 NEPQ-style blog post
-        blog_brief = CONTENT_PLAN[0]
-        generated.append({
-            "type": "blog_post",
-            "style": "NEPQ",
-            "slug": blog_brief["slug"],
-            "title": blog_brief["title"],
-            "target_keyword": blog_brief["target_keyword"],
-            "structure": [
-                "H1: " + blog_brief["title"],
-                "Problem frame: What most teams get wrong about " + blog_brief["target_keyword"],
-                "Implication: What happens if this stays broken (pipeline, quota, headcount)",
-                "Solution reveal: How the right system changes the outcome",
-                "Evidence: Workflow architecture + outcome metrics",
-                "CTA: Internal link to /gtm-audit or /contact",
-            ],
-            "internal_links": blog_brief.get("internal_links", []),
-            "persona": blog_brief.get("persona", ""),
-            "eeat_notes": blog_brief.get("eeat_notes", []),
-            "status": "brief_ready",
-        })
+        # Generate blog posts from top keyword opportunities
+        kw_source = keywords or getattr(self, 'keyword_opportunities', []) or []
+        if kw_source:
+            top_kw = kw_source[0]
+            cluster = KeywordCluster(
+                cluster_name=top_kw.get("cluster", "general"),
+                primary_keyword=top_kw.get("keyword", ""),
+                intent=top_kw.get("type", "informational"),
+                recommended_asset_type="blog_post",
+                conversion_goal="Capture problem-aware pipeline",
+                opportunities=[
+                    KeywordOpportunity(
+                        keyword=top_kw.get("keyword", ""),
+                        topic_cluster=top_kw.get("cluster", "general"),
+                        intent=top_kw.get("type", "informational"),
+                        funnel_stage=top_kw.get("funnel_stage", "awareness"),
+                        source="seo_os",
+                    )
+                ],
+            )
+            try:
+                asset = engine.generate_blog_post(cluster)
+                generated.append({
+                    "type": "blog_post",
+                    "style": "NEPQ",
+                    "slug": asset.slug,
+                    "title": asset.title,
+                    "body_markdown": asset.body_markdown,
+                    "target_keyword": cluster.primary_keyword,
+                    "meta_description": asset.meta_description,
+                    "internal_links": [],
+                    "status": "generated" if asset.body_markdown else "brief_ready",
+                })
+            except Exception as exc:
+                self.logger.warning("Blog generation failed: %s", exc)
 
-        # 3 glossary pages
+        # 3 glossary pages (hardcoded stubs are acceptable — these are reference content)
         glossary_terms = [
             {
                 "type": "glossary_page",
@@ -491,9 +540,7 @@ class SEOOSAgent:
                 "title": "Outbound Sales Automation",
                 "definition": (
                     "Outbound sales automation is the use of software and AI to execute prospecting, "
-                    "lead enrichment, personalised outreach, and follow-up sequences without manual rep effort. "
-                    "An automated outbound system runs continuously, learns from reply signals, and routes "
-                    "qualified prospects into the CRM pipeline."
+                    "lead enrichment, personalised outreach, and follow-up sequences without manual rep effort."
                 ),
                 "related_terms": ["ICP scoring", "sales orchestration", "GTM audit"],
                 "internal_links": ["/", "/gtm-audit", "/glossary/icp-scoring"],
@@ -505,8 +552,7 @@ class SEOOSAgent:
                 "definition": (
                     "Sales orchestration is the coordination of every component in an outbound sales system — "
                     "lead sourcing, enrichment, personalisation, sequencing, reply handling, and CRM handoff — "
-                    "into a single governed workflow. Unlike point tools that automate one slice, "
-                    "an orchestrated system manages the entire motion as one continuous pipeline."
+                    "into a single governed workflow."
                 ),
                 "related_terms": ["outbound sales automation", "GTM implementation", "revenue operations"],
                 "internal_links": ["/about", "/", "/glossary/outbound-sales-automation"],
@@ -516,9 +562,8 @@ class SEOOSAgent:
                 "slug": "gtm-audit",
                 "title": "GTM Audit",
                 "definition": (
-                    "A GTM (go-to-market) audit is a structured review of a company's outbound sales motion, "
-                    "covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health. "
-                    "The output is a prioritised list of gaps and fixes that improve pipeline predictability."
+                    "A GTM audit is a structured review of a company's outbound sales motion, "
+                    "covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health."
                 ),
                 "related_terms": ["ICP scoring", "outbound sales automation", "GTM implementation"],
                 "internal_links": ["/gtm-audit", "/glossary/icp-scoring", "/glossary/outbound-sales-automation"],
@@ -672,14 +717,14 @@ class SEOOSAgent:
         self.logger.info("GA4 audit: %d insights", len(insights))
         return insights[:15]
 
-    def _run_gsc_performance_audit(self) -> list[dict]:
+    def _run_gsc_performance_audit(self) -> tuple[list[dict], list[dict]]:
         from connectors.gsc_connector import GoogleSearchConsoleConnector
         gsc = GoogleSearchConsoleConnector(self.config, self.logger)
         site_url = gsc.site_url or "unknown"
         current_rows, previous_rows = gsc.fetch_two_periods(days_per_period=28, row_limit=500)
         if not current_rows:
             self.logger.warning("GSC returned 0 rows for site_url=%s — check credentials and property", site_url)
-            return []
+            return [], []
 
         def _aggregate(rows: list[dict]) -> dict[str, dict]:
             agg: dict[str, dict] = {}
@@ -764,7 +809,7 @@ class SEOOSAgent:
                 })
 
         insights.sort(key=lambda x: (0 if x["severity"] == "High" else 1, -x.get("impressions", 0)))
-        return insights[:20]
+        return insights[:20], current_rows
 
     def _build_indexing_actions(self, diff: SiteDiff, snapshot: SiteSnapshot) -> list[dict]:
         from connectors.gsc_connector import GoogleSearchConsoleConnector

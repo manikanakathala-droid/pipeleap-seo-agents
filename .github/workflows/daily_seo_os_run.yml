@@ -118,6 +118,27 @@ jobs:
             exit 1
           fi
 
+      - name: Commit generated content to launchpad
+        run: |
+          cd pipeleap-launchpad
+          git config user.name  "pipeleap-seo-os"
+          git config user.email "seo-os@pipeleap.com"
+          git add -A 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No launchpad content changes."
+          else
+            git commit -m "seo(os): generated content $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            for attempt in 1 2 3; do
+              if git push; then
+                exit 0
+              fi
+              git pull --rebase --autostash origin main
+              sleep $((attempt * 10))
+            done
+            echo "Unable to push launchpad content after 3 attempts." >&2
+            exit 1
+          fi
+
       - name: Save SEO OS state cache
         uses: actions/cache@v5
         if: always()

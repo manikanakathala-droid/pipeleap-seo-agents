@@ -319,18 +319,30 @@ class SEOOrchestrator:
     def _validate_published_urls(self, assets: list) -> list[dict[str, Any]]:
         """
         Spot-checks a sample of published URLs to verify they return HTTP 200.
+        Handles all page types: blog, glossary, tool, landing, comparison, use-case.
         Logs failures — does not block the run.
         """
         import urllib.request
         site_url = self.site_url.rstrip("/")
+        _PAGE_PATH = {
+            "blog_post": "/blog/",
+            "glossary_term": "/glossary/",
+            "glossary_page": "/glossary/",
+            "tool": "/tools/",
+            "tool_category": "/tools/",
+            "landing_page": "/",
+            "comparison_page": "/blog/",
+            "use_case_page": "/",
+        }
         results: list[dict[str, Any]] = []
         checked = 0
         for asset in assets:
-            if checked >= 5:   # cap at 5 checks per run to avoid latency
+            if checked >= 5:
                 break
             if not asset.slug or asset.uniqueness_score == 0.0:
                 continue
-            url = f"{site_url}/blog/{asset.slug}"
+            prefix = _PAGE_PATH.get(getattr(asset, "page_type", ""), "/")
+            url = f"{site_url}{prefix}{asset.slug}"
             try:
                 req = urllib.request.Request(url, method="HEAD")
                 with urllib.request.urlopen(req, timeout=6) as resp:

@@ -21,9 +21,13 @@ from pathlib import Path
 from typing import Any
 
 
-SITEMAP_URL  = "https://www.pipeleap.com/sitemap.xml"
-SITE_URL     = "https://www.pipeleap.com"
 INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
+
+def _site_url_from_config(config: dict) -> str:
+    return config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
+
+def _sitemap_url_from_config(config: dict) -> str:
+    return _site_url_from_config(config) + "/sitemap.xml"
 
 
 class PostPublishHook:
@@ -40,6 +44,8 @@ class PostPublishHook:
     def __init__(self, config: dict, logger: Any) -> None:
         self.config = config
         self.logger = logger
+        self.site_url = _site_url_from_config(config)
+        self.sitemap_url = _sitemap_url_from_config(config)
         self._gsc      = self._build_gsc()
         self._indexnow = self._build_indexnow()
 
@@ -83,18 +89,19 @@ class PostPublishHook:
         else:
             report["signals"]["indexnow"] = {"ok": False, "error": "IndexNow not available"}
 
-        # ── 1b. All other search engines (Yandex, Seznam, Bing hub, WebSub) ───
+        # ── 1b. WebSub only (IndexNow covers Bing/Yandex/Seznam already above) ──
         try:
-            from connectors.search_engine_submitter import SearchEngineSubmitter
-            se = SearchEngineSubmitter(logger=self.logger)
-            se_report = se.submit_all(submit_urls)
-            report["signals"]["search_engines"] = se_report.get("summary", {})
+            import requests as _req
+            r = _req.post("https://pubsubhubbub.appspot.com/",
+                data={"hub.mode": "publish", "hub.url": self.sitemap_url}, timeout=10)
+            report["signals"]["websub"] = {"ok": r.status_code == 204, "status": r.status_code}
+            self.logger.info("WebSub: %s (%d)", "OK" if r.status_code == 204 else "FAIL", r.status_code)
         except Exception as exc:
-            report["signals"]["search_engines"] = {"ok": False, "error": str(exc)[:80]}
+            report["signals"]["websub"] = {"ok": False, "error": str(exc)[:80]}
 
         # ── 2. GSC sitemap submission ─────────────────────────────────────────
         if self._gsc:
-            result = self._gsc.submit_sitemap(SITEMAP_URL)
+            result = self._gsc.submit_sitemap(self.sitemap_url)
             report["signals"]["gsc_sitemap"] = result
             self.logger.info("PostPublish GSC sitemap: %s", result)
         else:
@@ -146,6 +153,21 @@ class PostPublishHook:
     # ── Helpers ───────────────────────────────────────────────────────────────
 
     def _slug_urls(self, slugs_or_assets: list[str | dict]) -> list[str]:
+        _PATH_MAP = {
+            "blog_post": "/blog/",
+            "glossary_term": "/glossary/",
+            "glossary_page": "/glossary/",
+            "tool": "/tools/",
+            "tool_category": "/tools/",
+            "landing_page": "/",
+            "comparison_page": "/blog/",
+            "use_case_page": "/",
+            "role_page": "/",
+            "integration_page": "/",
+            "workflow_page": "/",
+            "bofu_page": "/",
+            "objection_page": "/",
+        }
         urls: list[str] = []
         for item in slugs_or_assets:
             if isinstance(item, dict):
@@ -153,16 +175,10 @@ class PostPublishHook:
                 if not slug:
                     continue
                 ptype = item.get("page_type", "blog_post") or "blog_post"
-                if ptype == "blog_post":
-                    urls.append(f"{SITE_URL}/blog/{slug}")
-                elif ptype == "glossary_term":
-                    urls.append(f"{SITE_URL}/glossary/{slug}")
-                elif ptype.startswith("tool"):
-                    urls.append(f"{SITE_URL}/tools/{slug}")
-                else:
-                    urls.append(f"{SITE_URL}/{slug}")
+                prefix = _PATH_MAP.get(ptype, "/")
+                urls.append(f"{self.site_url}{prefix}{slug}")
             elif item:
-                urls.append(f"{SITE_URL}/blog/{item}")
+                urls.append(f"{self.site_url}/blog/{item}")
         return urls
 
     def _load_sitemap_urls(self, sitemap_path: str | Path) -> list[str]:
