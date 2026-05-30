@@ -105,3 +105,46 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 |---|---|---|
 | `pipeleap-seo-agents` | `.` | Workflows, agents, SEO content |
 | `pipeleap-launchpad-040053e5` | `temp_frontend_repo/` | Website frontend (Vercel deploy) |
+
+---
+
+## Anchored Summary (May 30, 2026)
+
+**Goal:** Build a content-aware keyword planning engine that reads live site data, detects keyword coverage gaps, and mines existing content for latent keyword opportunities.
+
+**Constraints:**
+- All fixes committed & pushed immediately (AGENTS.md §11).
+- Two repos: `pipeleap-seo-agents` (workflows/agents) and `pipeleap-launchpad-040053e5` (Vercel frontend at `temp_frontend_repo/`).
+- Content coverage reads from local `temp_frontend_repo/` data files on each SEO OS run.
+- `git pull --rebase` of `temp_frontend_repo/` before coverage build (added May 30).
+
+**Done:**
+- `core/content_coverage.py` — reads launchpad data files (blog-articles.ts, glossary-terms.ts, tools/*.ts) and builds a coverage map of **252 pages** (16 blogs, 87 glossary, 126 tools, 13 tool categories, 10 static pages).
+- Text extraction methods: `_extract_blog_text()`, `_extract_glossary_text()`, `_extract_tool_text()` — parse body content/definitions/descriptions from TypeScript data files.
+- `mine_latent_keywords(top_n=20)` — TF n-gram extraction (bigrams + trigrams), comprehensive stop word filtering, coverage dedup, intent scoring (1.5× bonus for commercial/transactional phrases).
+- Modified `core/keyword_engine.py` — `discover()` accepts `content_coverage` parameter, skips covered keywords, tags `coverage_status` on each `KeywordOpportunity`, adds `detect_content_gaps()` method.
+- Modified `agents/seo_os_agent.py` — **Step 4d** (content coverage analysis before Step 5 keyword engine), `_build_content_coverage()` with `git pull --rebase`, `_get_all_keyword_candidates()` method, content gaps + latent keywords output to daily briefing and `content_coverage.json` / `latent_keywords.json`.
+- Fixed blog article count from 12→16 (regex handles both `"slug":` and backtick-slug), tool file parsing from 9→126 (indentation bug), slug prefix matching (prefix length ≥ 3).
+- First SEO OS run with content coverage: 252 pages, 391 covered slugs, 2 gaps ("Apollo.io alternatives" from SERP clusters + competitor gaps).
+- Test of `mine_latent_keywords()` on 473K char corpus: 20 clean keywords — top results: "real time" (freq=113), "multi channel" (freq=105), "mid market" (freq=70), "crm sync" (freq=52), "conversation intelligence" (freq=50).
+- Commit `f4205a3` pushed with latent mining + git pull freshness.
+
+**In Progress:**
+- (none — waiting for next direction)
+
+**Key Decisions:**
+- Content coverage from local data files (fast, ~1s) over live HTTP crawl.
+- Title/slug/heading match for coverage checking; body text mining is separate extraction for latent keywords.
+- Coverage runs before keyword engine (Step 4d, not after) so engine can skip covered keywords.
+- Threshold of 0.4 confidence for gap detection.
+- Latent mining uses comprehensive stop word list (400+ terms: common English + domain-specific) to filter noise.
+
+**Relevant Files:**
+- `core/content_coverage.py` — ContentCoverage class, text extraction, n-gram mining, gap detection.
+- `core/keyword_engine.py` — KeywordEngine.discover() accepts coverage param.
+- `agents/seo_os_agent.py` — Step 4d, git pull, latent keywords in briefing.
+- `temp_frontend_repo/src/data/blog-articles.ts` — 16 blog articles source.
+- `temp_frontend_repo/src/data/glossary-terms.ts` — 87 glossary terms.
+- `temp_frontend_repo/src/data/tools/*.ts` — 126 tools + 13 categories.
+- `content/blogs/apollo-clay-pipeleap-comparison.md` — draft content brief (outline, not full article).
+- `content/glossary/outbound-sales-automation.md`, `sales-orchestration.md`, `gtm-audit.md` — glossary briefs with full definitions (publishable but deprioritized).
