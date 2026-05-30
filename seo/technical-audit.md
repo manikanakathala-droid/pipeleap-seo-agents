@@ -249,3 +249,22 @@ Labels: **SAFE TO APPLY** | **REQUIRES DEV REVIEW**
 ### REQUIRES DEV REVIEW
 
 - No dev-review items this run.
+
+---
+
+## Audit Run: 20260530T033742Z
+**Date:** 2026-05-30T03:37:44.952866+00:00  
+**SEO Score:** 52/100  
+| Technical | Content | Indexing | Authority |
+|---|---|---|---|
+| 92/100 | 0/100 | 100/100 | 0/100 |
+
+### SAFE TO APPLY
+
+- **[METADATA]** `https://www.pipeleap.com/` — Missing meta description
+- **[METADATA]** `https://www.pipeleap.com/` — Title too short (8 chars)
+- **[CANONICAL]** `https://www.pipeleap.com/` — Missing canonical
+
+### REQUIRES DEV REVIEW
+
+- No dev-review items this run.

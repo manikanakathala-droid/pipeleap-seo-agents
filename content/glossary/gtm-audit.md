@@ -398,3 +398,34 @@ A GTM (go-to-market) audit is a structured review of a company's outbound sales 
 
 ---
 *SEO OS glossary — run 20260529T143335Z — 2026-05-29T14:33:38.121522+00:00*
+
+<!-- UPDATED 20260530T033742Z -->
+
+---
+run_id: 20260530T033742Z
+generated_at: 2026-05-30T03:37:44.949406+00:00
+slug: gtm-audit
+title: "GTM Audit"
+status: draft
+---
+
+# GTM Audit
+
+## Definition
+
+A GTM (go-to-market) audit is a structured review of a company's outbound sales motion, covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health. The output is a prioritised list of gaps and fixes that improve pipeline predictability.
+
+## Related Terms
+
+- ICP scoring
+- outbound sales automation
+- GTM implementation
+
+## Internal Links
+
+- [/gtm-audit](/gtm-audit)
+- [/glossary/icp-scoring](/glossary/icp-scoring)
+- [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
+
+---
+*SEO OS glossary — run 20260530T033742Z — 2026-05-30T03:37:44.949406+00:00*

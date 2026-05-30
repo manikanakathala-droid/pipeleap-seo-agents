@@ -567,3 +567,47 @@ status: draft
 
 ---
 *SEO OS draft — run 20260529T143335Z — 2026-05-29T14:33:38.120656+00:00*
+
+<!-- NEW DRAFT 20260530T033742Z -->
+
+---
+run_id: 20260530T033742Z
+generated_at: 2026-05-30T03:37:44.948531+00:00
+slug: apollo-clay-pipeleap-comparison
+title: "Apollo.io vs Clay vs Pipeleap: What Is the Difference?"
+seo_title: "Apollo.io vs Clay vs Pipeleap: What Is the Difference?"
+meta_description: ""
+target_keyword: "Apollo.io alternatives"
+cluster: ""
+persona: "Head of Sales evaluating outbound tools"
+status: draft
+---
+
+# Apollo.io vs Clay vs Pipeleap: What Is the Difference?
+
+**Target keyword:** Apollo.io alternatives  
+**Persona:** Head of Sales evaluating outbound tools  
+**Pillar page:** [/](/)
+
+## Content Structure
+
+- H1: Apollo.io vs Clay vs Pipeleap: What Is the Difference?
+- Problem frame: What most teams get wrong about Apollo.io alternatives
+- Implication: What happens if this stays broken (pipeline, quota, headcount)
+- Solution reveal: How the right system changes the outcome
+- Evidence: Workflow architecture + outcome metrics
+- CTA: Internal link to /gtm-audit or /contact
+
+## Internal Links
+
+- [/glossary/icp-scoring](/glossary/icp-scoring)
+- [/gtm-audit](/gtm-audit)
+
+## E-E-A-T Requirements
+
+- Add feature comparison table
+- Include decision framework: who should pick which tool
+- Add outcome proof for Pipeleap managed service
+
+---
+*SEO OS draft — run 20260530T033742Z — 2026-05-30T03:37:44.948531+00:00*
