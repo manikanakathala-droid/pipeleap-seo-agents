@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from core.content_coverage import ContentCoverage, detect_content_gaps
 from core.snapshot_engine import SnapshotEngine, SiteSnapshot
 from core.diff_engine import DiffEngine, SiteDiff
 from core.adaptive_action_engine import AdaptiveActionEngine, ExecutionPlan
@@ -70,6 +71,7 @@ class SEOOSResult:
     competitor_insights: list[dict] = field(default_factory=list)
     indexing_actions: list[dict] = field(default_factory=list)
     gsc_insights: list[dict] = field(default_factory=list)
+    content_gaps: list[dict] = field(default_factory=list)
     risks_and_missed: list[dict] = field(default_factory=list)
     seo_score: SEOScore = field(default_factory=SEOScore)
     next_day_plan: list[str] = field(default_factory=list)
@@ -91,6 +93,7 @@ class SEOOSResult:
             "competitor_insights": self.competitor_insights,
             "indexing_actions": self.indexing_actions,
             "gsc_insights": self.gsc_insights,
+            "content_gaps": self.content_gaps,
             "risks_and_missed": self.risks_and_missed,
             "seo_score": self.seo_score.to_dict(),
             "next_day_plan": self.next_day_plan,
@@ -196,6 +199,16 @@ class SEOOSAgent:
             self._write_json(output_dir / "ga4_insights.json", ga4_insights)
         except Exception as exc:
             self.logger.warning("GA4 audit skipped: %s", exc)
+
+        # ── Step 4d: Content Coverage Analysis ───────────────────────────────
+        self.logger.info("Step 4d: Content coverage analysis")
+        try:
+            coverage = self._build_content_coverage()
+            if coverage:
+                result.content_gaps = coverage.get("gaps", [])
+                self._write_json(output_dir / "content_coverage.json", coverage.get("report", {}))
+        except Exception as exc:
+            self.logger.warning("Content coverage skipped: %s", exc)
 
         # ── Step 5: Keyword Engine ────────────────────────────────────────────
         self.logger.info("Step 5: Keyword engine")
@@ -330,6 +343,54 @@ class SEOOSAgent:
                 "safe_mode": not requires_dev,
             })
         return result
+
+    def _build_content_coverage(self) -> dict | None:
+        launchpad_dir = Path(__file__).resolve().parent.parent / "temp_frontend_repo"
+        if not launchpad_dir.exists():
+            self.logger.warning("Launchpad dir not found at %s — skipping content coverage", launchpad_dir)
+            return None
+        try:
+            coverage = ContentCoverage.build(str(launchpad_dir))
+            gaps = detect_content_gaps(self._get_all_keyword_candidates(), coverage, min_confidence=0.4)
+            return {
+                "gaps": gaps,
+                "report": {
+                    "total_pages": len(coverage.page_index),
+                    "total_keywords_checked": len(self._get_all_keyword_candidates()),
+                    "gaps_found": len(gaps),
+                    "by_type": {
+                        pt: len([p for p in coverage.page_index.values() if p.page_type == pt])
+                        for pt in {p.page_type for p in coverage.page_index.values()}
+                    },
+                },
+            }
+        except Exception as exc:
+            self.logger.warning("Content coverage build failed: %s", exc)
+            return None
+
+    def _get_all_keyword_candidates(self) -> list[dict]:
+        from modules.pipeleap_seo_engine.data.serp_strategy import SERP_KEYWORD_CLUSTERS
+        keywords: list[dict] = []
+        for cluster in SERP_KEYWORD_CLUSTERS:
+            for kw in cluster["keywords"][:3]:
+                keywords.append({"keyword": kw, "cluster": cluster["cluster_name"]})
+        competitor_gaps = [
+            {"keyword": "Apollo.io alternatives", "type": "competitor_gap"},
+            {"keyword": "Clay alternatives for sales", "type": "competitor_gap"},
+            {"keyword": "Outreach.io alternatives", "type": "competitor_gap"},
+            {"keyword": "Salesloft competitors", "type": "competitor_gap"},
+            {"keyword": "sales engagement platform alternatives", "type": "competitor_gap"},
+        ]
+        keywords.extend(competitor_gaps)
+        long_tail = [
+            {"keyword": "how to build outbound sales system for B2B SaaS"},
+            {"keyword": "outbound sales automation for small sales teams"},
+            {"keyword": "what is managed outbound sales service"},
+            {"keyword": "how long does GTM implementation take"},
+            {"keyword": "outbound pipeline predictability metrics"},
+        ]
+        keywords.extend(long_tail)
+        return keywords
 
     def _run_keyword_engine(self, diff: SiteDiff) -> list[dict]:
         from modules.pipeleap_seo_engine.data.serp_strategy import SERP_KEYWORD_CLUSTERS
@@ -930,6 +991,15 @@ class SEOOSAgent:
         for kw in result.keyword_opportunities[:10]:
             t = kw.get("type", "")
             lines.append(f"- [{t}] **{kw.get('keyword','')}** — cluster: {kw.get('cluster', kw.get('gap_source',''))}")
+
+        if result.content_gaps:
+            lines += ["", "---", "", "## 4b. Content Gaps (Uncovered Keywords)"]
+            for gap in result.content_gaps[:8]:
+                kw = gap.get("keyword", "")
+                diff_val = gap.get("difficulty", "?")
+                lines.append(f"- **{kw}** (difficulty: {diff_val})")
+            if len(result.content_gaps) > 8:
+                lines.append(f"- … and {len(result.content_gaps) - 8} more gaps — see content_coverage.json")
 
         lines += ["", "---", "", "## 5. Content Generated"]
         for item in result.content_generated:

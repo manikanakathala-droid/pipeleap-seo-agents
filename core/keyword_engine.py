@@ -4,6 +4,7 @@ from collections import defaultdict
 import re
 from typing import Any
 
+from core.content_coverage import ContentCoverage, detect_content_gaps
 from utils.intent_classifier import classify_intent, infer_page_type, infer_topic_cluster
 from utils.models import KeywordCluster, KeywordOpportunity, PageSnapshot
 from utils.ranking_model import (
@@ -39,8 +40,9 @@ class KeywordEngine:
         gsc_rows: list[dict[str, Any]],
         pages: list[PageSnapshot],
         existing_slugs: set[str] | None = None,
+        content_coverage: ContentCoverage | None = None,
     ) -> tuple[list[KeywordCluster], list[str]]:
-        keyword_records = self._collect_candidates(gsc_rows, pages, existing_slugs or set())
+        keyword_records = self._collect_candidates(gsc_rows, pages, existing_slugs or set(), content_coverage)
         use_estimated_metrics = self.seo_config.get("allow_estimated_keyword_metrics", True)
         integration_requests: list[str] = []
         opportunities: list[KeywordOpportunity] = []
@@ -106,6 +108,12 @@ class KeywordEngine:
             if record.get("sources"):
                 notes.append(f"Sources: {', '.join(sorted(record['sources']))}.")
 
+            coverage_status = "pending"
+            coverage_info: dict[str, Any] | None = None
+            if content_coverage is not None:
+                coverage_info = content_coverage.check_keyword(keyword)
+                coverage_status = coverage_info.get("status", "pending")
+
             opportunities.append(
                 KeywordOpportunity(
                     keyword=keyword,
@@ -133,7 +141,7 @@ class KeywordEngine:
                         position_value,
                     ),
                     semantic_expansions=semantic_terms,
-                    notes=notes,
+                    notes=notes + ([f"Coverage: {coverage_status}"] if coverage_info else []),
                 )
             )
 
@@ -145,6 +153,7 @@ class KeywordEngine:
         gsc_rows: list[dict[str, Any]],
         pages: list[PageSnapshot],
         existing_slugs: set[str],
+        content_coverage: ContentCoverage | None = None,
     ) -> dict[str, dict[str, Any]]:
         records: dict[str, dict[str, Any]] = {}
         # Stop words for semantic deduplication — strips these before comparing.
@@ -174,6 +183,13 @@ class KeywordEngine:
             if slugify(normalized_keyword) in existing_slugs:
                 self.logger.debug(f"Skipping existing slug: {slugify(normalized_keyword)}")
                 return
+
+            # Skip if content coverage says this keyword is already covered
+            if content_coverage is not None:
+                check = content_coverage.check_keyword(normalized_keyword)
+                if check["status"] == "covered" and check.get("confidence", 0) >= 0.7:
+                    self.logger.debug(f"Skipping covered keyword: '{normalized_keyword}' → {check.get('matched_slug', '?')}")
+                    return
 
             # Semantic Deduplication: avoid "how to X" and "best X tool" being different pages
             sk = semantic_key(normalized_keyword)
@@ -315,6 +331,19 @@ class KeywordEngine:
                 })
 
         return sorted(gaps, key=lambda x: x["opportunity_score"], reverse=True)
+
+    def detect_content_gaps(
+        self,
+        keywords: list[dict[str, Any]],
+        content_coverage: ContentCoverage,
+    ) -> list[dict[str, Any]]:
+        """
+        Cross-reference a keyword list (e.g. from the SEO OS agent's simplified
+        keyword engine) against existing site content. Returns only the keywords
+        that have no dedicated page covering them, sorted by difficulty ascending
+        (low-hanging fruit first).
+        """
+        return detect_content_gaps(keywords, content_coverage, min_confidence=0.4)
 
     def _cluster_opportunities(self, opportunities: list[KeywordOpportunity]) -> list[KeywordCluster]:
         # Include stage in the grouping key so stage variants get their own clusters
