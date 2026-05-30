@@ -1,0 +1,16 @@
+[
+  {
+    "action": "resubmit_sitemap",
+    "url": "https://www.pipeleap.com/sitemap.xml",
+    "reason": "Weekly sitemap submission to GSC",
+    "status": "skipped: Expecting value: line 2 column 1 (char 1)",
+    "priority": 3
+  },
+  {
+    "action": "refresh_index",
+    "url": "https://www.pipeleap.com/",
+    "reason": "Key SEO fields updated \u2014 re-crawl requested via Indexing API",
+    "status": "failed: Expecting value: line 2 column 1 (char 1)",
+    "priority": 2
+  }
+]

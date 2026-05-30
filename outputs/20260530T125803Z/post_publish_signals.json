@@ -1,0 +1,45 @@
+{
+  "fired_at": "2026-05-30T12:58:07.599114+00:00",
+  "signals": {
+    "indexnow": [
+      {
+        "ok": true,
+        "submitted": 4,
+        "status": 200,
+        "endpoint": "https://api.indexnow.org/indexnow"
+      },
+      {
+        "ok": true,
+        "submitted": 4,
+        "status": 200,
+        "endpoint": "https://www.bing.com/indexnow"
+      },
+      {
+        "ok": true,
+        "submitted": 4,
+        "status": 202,
+        "endpoint": "https://yandex.com/indexnow"
+      }
+    ],
+    "websub": {
+      "ok": true,
+      "status": 204
+    },
+    "gsc_sitemap": {
+      "ok": false,
+      "error": "Expecting value: line 2 column 1 (char 1)"
+    },
+    "google_indexing_api": {
+      "ok": false,
+      "submitted": 4,
+      "accepted": 0,
+      "errors": 4,
+      "api_disabled": false
+    }
+  },
+  "summary": {
+    "signals_ok": 1,
+    "signals_total": 3,
+    "urls_submitted": 4
+  }
+}
