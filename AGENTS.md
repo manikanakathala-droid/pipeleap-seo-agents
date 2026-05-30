@@ -132,9 +132,12 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - **Sitemap URL mismatch fix** — `connectors/post_publish_hook.py` and `connectors/search_engine_submitter.py` now use `https://www.pipeleap.com/sitemap.xml` (was missing `www.`, causing 301 redirect — Google silently dropped the sitemap).
 - **Self-diagnosing GSC failure** — `agents/seo_os_agent.py` now logs warning with `site_url` when GSC returns 0 rows.
 - Commit `079c9bb` pushed with all 4 GSC + sitemap fixes.
+- **Index verification** — GSC inspection confirmed: only homepage (`www.pipeleap.com/`) is PASS/indexed. All other www pages return "URL is unknown to Google". The non-www versions (`pipeleap.com/blog`, `pipeleap.com/glossary/*`) ARE indexed — Google picked non-www as canonical before the redirect was stable.
+- **Resubmitted** — Sitemap re-pushed to GSC (www URL, 20 pages sent to Indexing API, IndexNow+Bing hub notified). All 20/20 accepted.
+- Commit `093a681` pushed with all GSC + sitemap + resubmit fixes.
 
 **In Progress:**
-- (none — waiting for next direction)
+- **www canonicalization** — Google has indexed `pipeleap.com/*` (non-www) for most pages. The 301 redirect + sitemap resubmission + Indexing API should migrate them to `www.pipeleap.com/*` over time. Monitor in GSC.
 
 **Key Decisions:**
 - Content coverage from local data files (fast, ~1s) over live HTTP crawl.
