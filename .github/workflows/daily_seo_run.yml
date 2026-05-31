@@ -172,9 +172,6 @@ jobs:
             exit 1
           fi
 
-      - name: Trigger Vercel deploy
-        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
-
       - name: Submit sitemap URLs via IndexNow (Bing/Yandex/Seznam)
         run: |
           python -c "

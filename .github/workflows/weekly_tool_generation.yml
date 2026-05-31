@@ -124,9 +124,6 @@ jobs:
               print(f'  {r.get(\"endpoint\",\"?\")}: {status}')
           "
 
-      - name: Trigger Vercel deploy
-        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
-
       - name: Upload generation artifacts
         if: always()
         uses: actions/upload-artifact@v7

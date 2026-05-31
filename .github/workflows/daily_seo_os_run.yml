@@ -121,6 +121,9 @@ jobs:
             exit 1
           fi
 
+      - name: Trigger Vercel deploy
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+
       - name: Save SEO OS state cache
         uses: actions/cache@v5
         if: always()

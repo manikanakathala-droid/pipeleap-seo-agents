@@ -80,15 +80,15 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 **Files changed (8 workflow files total):**
 - `.github/workflows/daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`, `daily_seo_os_run.yml`, `daily_serp_run.yml`, `daily_scheduler_health.yml`, `validate.yml`, `deploy_dashboard.yml`
 
-### 10. Vercel deploy trigger added to SEO workflow (May 28)
-**Problem:** `daily_seo_run.yml` pushed content to the launchpad repo but never triggered a Vercel deploy — it depended entirely on the GEO agent (triggered by `workflow_run`). If GEO failed or was skipped, SEO-generated content would never reach production.
+### 10. Vercel deploy trigger consolidated to SEO OS (May 31)
+**Problem:** Three workflows (`daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`) each independently triggered a Vercel deploy after pushing to the launchpad repo. The SEO OS workflow (`daily_seo_os_run.yml`) also pushed content but had no trigger. Result: **2–3 deploys per day** instead of 1.
 
-**Fix:** Added `curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}` step to `daily_seo_run.yml` after the commit step. Each workflow now self-deploys immediately after pushing content.
+**Fix:** Removed the `curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}` step from `daily_seo_run.yml`, `daily_geo_run.yml`, and `weekly_tool_generation.yml`. Added it to `daily_seo_os_run.yml` (the last workflow in the daily chain, triggered by `workflow_run` on SEO Agent completion). Now exactly **1 deploy per content cycle**.
 
-**New deploy chain (no single point of failure):**
-1. SEO agent runs → pushes to launchpad → triggers Vercel deploy
-2. GEO agent runs → pushes to launchpad → triggers Vercel deploy (2nd build, harmless)
-3. Weekly tool gen runs → pushes to launchpad → triggers Vercel deploy
+**Deploy chain (consolidated):**
+1. SEO Agent runs → pushes to launchpad → no deploy
+2. SEO OS + GEO Agent run simultaneously → both push → SEO OS triggers **1 deploy** (GEO has no hook)
+3. Weekly tool gen (Monday standalone) → pushes to launchpad → no deploy (SEO OS handles deploy later)
 
 ### 11. Always push fixes immediately (May 30)
 **Rule:** Every fix or change must be committed and pushed immediately after applying. Unpushed changes are wasted work — they don't deploy, don't fix broken workflows, and don't improve the site.
