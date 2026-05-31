@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import requests
 
-from connectors.indexing_trigger import IndexingTrigger
+from connectors.indexnow_connector import IndexNowConnector
 
 if TYPE_CHECKING:
     from utils.models import ContentAsset
@@ -66,8 +66,8 @@ class GitHubPublisher:
                 url = f"https://www.pipeleap.com/blog/{slug}"
                 self.update_sitemap([(url, pub_date)])
                 try:
-                    trigger = IndexingTrigger()
-                    trigger.submit_urls([url])
+                    trigger = IndexNowConnector()
+                    trigger.submit_all_endpoints([url])
                 except Exception as e:
                     log.warning("Indexing trigger failed: %s", e)
             return success
@@ -95,8 +95,8 @@ class GitHubPublisher:
                 url = f"https://www.pipeleap.com/tools/{slug}"
                 self.update_sitemap([(url, pub_date)])
                 try:
-                    trigger = IndexingTrigger()
-                    trigger.submit_urls([url])
+                    trigger = IndexNowConnector()
+                    trigger.submit_all_endpoints([url])
                 except Exception as e:
                     log.warning("Indexing trigger failed: %s", e)
             return success
