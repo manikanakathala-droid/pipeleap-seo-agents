@@ -616,9 +616,24 @@ class SEOOSAgent:
     def _run_linking_engine(self, snapshot: SiteSnapshot, diff: SiteDiff) -> list[dict]:
         from modules.pipeleap_seo_engine.data.serp_strategy import LINKING_CLUSTERS
 
+        published = self._load_published_urls_from_launchpad()
+
+        def _slug(p: str) -> str:
+            raw = p.rstrip("/")
+            if not raw:
+                return "index"
+            seg = raw.rsplit("/", 1)[-1]
+            return seg if seg else "index"
+
+        def _url_exists(url: str) -> bool:
+            slug = _slug(url)
+            return slug in published
+
         suggestions: list[dict] = []
         for cluster_def in LINKING_CLUSTERS:
             for spoke in cluster_def["spoke_articles"]:
+                if not (_url_exists(spoke) and _url_exists(cluster_def["pillar_page"])):
+                    continue
                 suggestions.append({
                     "from_page": spoke,
                     "to_page": cluster_def["pillar_page"],
@@ -629,6 +644,8 @@ class SEOOSAgent:
                     "note": "Content-level link only — no structural changes needed.",
                 })
             for glossary in cluster_def.get("glossary_links", []):
+                if not (_url_exists(cluster_def["pillar_page"]) and _url_exists(glossary)):
+                    continue
                 suggestions.append({
                     "from_page": cluster_def["pillar_page"],
                     "to_page": glossary,
@@ -638,6 +655,32 @@ class SEOOSAgent:
                     "priority": "medium",
                 })
         return suggestions
+
+    def _load_published_urls_from_launchpad(self) -> set[str]:
+        import re
+        launchpad_root = Path(__file__).resolve().parent.parent / "temp_frontend_repo"
+        data_dir = launchpad_root / "src" / "data"
+        slugs: set[str] = set()
+
+        blog_path = data_dir / "blog-articles.ts"
+        if blog_path.exists():
+            slugs.update(re.findall(r'slug["`\']?\s*:\s*["`\']([a-z0-9-]+)["`\']', blog_path.read_text(encoding="utf-8")))
+
+        glossary_path = data_dir / "glossary-terms.ts"
+        if glossary_path.exists():
+            slugs.update(re.findall(r'slug:\s*["`]([a-z0-9-]+)["`]', glossary_path.read_text(encoding="utf-8")))
+
+        tools_dir = data_dir / "tools"
+        if tools_dir.is_dir():
+            for tf in tools_dir.iterdir():
+                if tf.suffix == ".ts":
+                    slugs.update(re.findall(r'slug["`\']?\s*:\s*["`\']([a-z0-9-]+)["`\']', tf.read_text(encoding="utf-8")))
+
+        slugs.update([
+            "index", "services", "how-it-works", "results",
+            "gtm-audit", "pricing", "about", "contact", "faq", "privacy",
+        ])
+        return slugs
 
     def _run_competitor_analysis(self) -> list[dict]:
         from modules.pipeleap_seo_engine.data.competitors import COMPETITORS
