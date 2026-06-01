@@ -5,6 +5,7 @@ Rebuilds and commits sub-sitemaps (public/sitemap-{pages,blog,tools,glossary}.xm
 - All existing blog, tools, and category URLs preserved
 """
 import base64, os, re, requests
+from datetime import datetime
 
 TOKEN  = os.getenv("GITHUB_TOKEN", "")
 REPO   = "manikanakathala-droid/pipeleap-launchpad-040053e5"
@@ -39,7 +40,7 @@ gt_content, _ = get_file("src/data/glossary-terms.ts")
 glossary_slugs = re.findall(r"slug:\s*[\"']([\w-]+)[\"']\s*,\s*term:", gt_content)
 print(f"  Found {len(glossary_slugs)} glossary terms")
 
-TODAY = "2026-05-24"
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
 SITEMAP = '''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
