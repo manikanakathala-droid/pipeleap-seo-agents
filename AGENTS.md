@@ -80,6 +80,13 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 **Files changed (8 workflow files total):**
 - `.github/workflows/daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`, `daily_seo_os_run.yml`, `daily_serp_run.yml`, `daily_scheduler_health.yml`, `validate.yml`, `deploy_dashboard.yml`
 
+### 9b. Weekly tool gen fixes (June 2)
+**Problem:** `weekly_tool_generation.yml` run #6 failed. Root cause: `npx tsc --noEmit` ran in a fresh launchpad checkout where `node_modules` is gitignored, so TypeScript couldn't resolve imports. Also, email body still said "Vercel Deploy: triggered" after deploy hook was removed.
+
+**Fixes:**
+- Added `Install npm dependencies for TypeScript validation` step — `npm ci` before `npx tsc --noEmit`
+- Removed `Vercel Deploy: triggered` from email body (weekly no longer deploys)
+
 ### 10. Vercel deploy trigger consolidated to SEO OS (May 31)
 **Problem:** Three workflows (`daily_seo_run.yml`, `daily_geo_run.yml`, `weekly_tool_generation.yml`) each independently triggered a Vercel deploy after pushing to the launchpad repo. The SEO OS workflow (`daily_seo_os_run.yml`) also pushed content but had no trigger. Result: **2–3 deploys per day** instead of 1.
 
