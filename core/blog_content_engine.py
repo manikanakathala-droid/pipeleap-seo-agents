@@ -548,8 +548,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("TOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -604,8 +602,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("TOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -661,8 +657,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("BOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -735,8 +729,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("MOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -823,8 +815,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("BOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -927,8 +917,6 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("MOFU"),
-            "",
-            self._disclosure(),
         ]
         return "\n".join(s for s in sections if s is not None)
 
@@ -1229,13 +1217,6 @@ class BlogContentEngine:
         url   = self.cta_cfg.get("primary_url", self.site_url)
         return f"[{label}]({url})"
 
-    def _disclosure(self) -> str:
-        return (
-            "\n---\n"
-            "*This content was produced with AI assistance and reviewed for factual accuracy. "
-            "For verified product details, workflow screenshots, and live examples, "
-            f"visit the [{self.brand} product page]({self.site_url}) or speak with a workflow specialist.*"
-        )
 
     @staticmethod
     def _ctr_editor_note(strategy: dict[str, Any]) -> str:

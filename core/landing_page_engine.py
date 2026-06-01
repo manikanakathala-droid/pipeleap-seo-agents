@@ -177,12 +177,6 @@ class LandingPageEngine:
             },
         ]
 
-        body += (
-            "\n\n---\n"
-            "*This content was produced with AI assistance and reviewed for factual accuracy. "
-            "For verified product details, workflow screenshots, and live examples, "
-            f"visit the [{brand} product page]({site_url}) or speak with a workflow specialist.*"
-        )
 
         return ContentAsset(
             slug=slug,

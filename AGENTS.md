@@ -146,6 +146,18 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 **In Progress:**
 - **www canonicalization** — Google has indexed `pipeleap.com/*` (non-www) for most pages. The 301 redirect + sitemap resubmission + Indexing API should migrate them to `www.pipeleap.com/*` over time. Monitor in GSC.
 
+### 13. AI disclaimer banned (June 2)
+**Problem:** The sentence "This content was produced with AI assistance and reviewed for factual accuracy…" was appended to every generated blog, landing page, and tool page. Also hardcoded in 4 generation engines, making every new blog include it.
+
+**Fix:** Removed the AI disclaimer from:
+- 4 blog entries in `blog-articles.ts` (pipeleap, how-to-automate-outbound-emails, saas-sales-team-workflow-automation, lead-enrichment-workflows)
+- `core/blog_content_engine.py:1232` — `_disclosure()` method + all 6 call sites
+- `core/content_engine.py:676` — dead `_ai_disclosure_block()` function
+- `core/landing_page_engine.py:182` — inline disclosure in body builder
+- `utils/models.py:202-207` — `ai_assisted` + `generation_disclosure` fields
+
+**Rule:** Never include "produced with AI assistance" or any AI-transparency disclaimer in any blog, glossary, landing page, tool page, or other content. Zero AI disclaimers across the entire site.
+
 **Key Decisions:**
 - Content coverage from local data files (fast, ~1s) over live HTTP crawl.
 - Title/slug/heading match for coverage checking; body text mining is separate extraction for latent keywords.

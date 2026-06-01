@@ -669,22 +669,6 @@ class ContentEngine:
 
 
     # ------------------------------------------------------------------ #
-    # AI disclosure                                                        #
-    # ------------------------------------------------------------------ #
-
-    @staticmethod
-    def _ai_disclosure_block() -> str:
-        return (
-            "\n\n---\n"
-            "*This content was drafted with AI assistance as part of Pipeleap's automated "
-            "content workflow. It was reviewed for factual accuracy by the Pipeleap team. "
-            "AI was used to accelerate the initial draft based on first-hand product knowledge "
-            "and operator experience documented internally. "
-            "For verified product details, workflow screenshots, and live examples, "
-            "visit the [Pipeleap product page](https://pipeleap.com/) or speak with a workflow specialist.*"
-        )
-
-    # ------------------------------------------------------------------ #
     # E-E-A-T notes                                                       #
     # ------------------------------------------------------------------ #
 
