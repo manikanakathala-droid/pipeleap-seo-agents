@@ -59,6 +59,11 @@ jobs:
           python run_growth_engine.py --tools-only
           echo "Tool page generation and glossary update complete"
 
+      - name: Install npm dependencies for TypeScript validation
+        run: |
+          cd pipeleap-launchpad
+          npm ci
+
       - name: Validate TypeScript compilation before commit
         run: |
           cd pipeleap-launchpad
@@ -150,4 +155,3 @@ jobs:
             Run: #${{ github.run_number }}
             Batch size: ${{ inputs.batch_size || '20' }}
             Glossary updated: see workflow log
-            Vercel Deploy: triggered
