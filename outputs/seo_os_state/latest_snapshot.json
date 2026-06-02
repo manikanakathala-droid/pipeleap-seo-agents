@@ -1,7 +1,7 @@
 {
-  "run_id": "20260602T041215Z",
+  "run_id": "20260602T155331Z",
   "site_url": "https://www.pipeleap.com",
-  "captured_at": "2026-06-02T04:12:15.571742+00:00",
+  "captured_at": "2026-06-02T15:53:31.317077+00:00",
   "total_pages": 1,
   "sitemap_urls": [
     "https://www.pipeleap.com/",
@@ -13,6 +13,7 @@
     "https://www.pipeleap.com/blog/best-workflow-orchestration-tools-for-saas-sales-teams",
     "https://www.pipeleap.com/blog/clay-sales-navigator",
     "https://www.pipeleap.com/blog/enterprise-saas-sales-workflow-governance",
+    "https://www.pipeleap.com/blog/gtm-strategy-saas-pipeleap",
     "https://www.pipeleap.com/blog/how-to-automate-outbound-emails",
     "https://www.pipeleap.com/blog/how-to-automate-sales-workflows",
     "https://www.pipeleap.com/blog/lead-enrichment-workflows",
@@ -259,15 +260,15 @@
       "word_count": 0,
       "internal_links": [],
       "external_links": [],
-      "canonical": "https://www.pipeleap.com/",
+      "canonical": "",
       "meta_robots": "index, follow",
       "has_schema": false,
       "schema_types": [],
       "in_sitemap": true,
       "status_code": 200,
-      "response_time_ms": 104,
+      "response_time_ms": 151,
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "captured_at": "2026-06-02T04:12:15.571742+00:00"
+      "captured_at": "2026-06-02T15:53:31.317077+00:00"
     }
   ],
   "errors": []
