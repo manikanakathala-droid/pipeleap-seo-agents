@@ -1,0 +1,167 @@
+name: Audit War Room
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  audit-warroom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout SEO Agents repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Checkout launchpad repo
+        uses: actions/checkout@v6
+        with:
+          repository: manikanakathala-droid/pipeleap-launchpad-040053e5
+          path: pipeleap-launchpad
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Write GSC credentials
+        run: |
+          mkdir -p credentials
+          echo '${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}' > credentials/gsc_service_account.json
+
+      - name: Run Audit War Room
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          python -u -c "
+import json, sys, os, yaml
+from pathlib import Path
+
+sys.path.insert(0, '.')
+
+# Load config
+with open('config.yaml') as f:
+    config = yaml.safe_load(f)
+
+launchpad_root = Path('pipeleap-launchpad')
+output_dir = Path('outputs/warroom')
+output_dir.mkdir(parents=True, exist_ok=True)
+
+# ── 1. Crawl ──────────────────────────────────────────────────────────
+from connectors.crawler import SiteCrawler
+crawler = SiteCrawler(config, None)
+site_url = config.get('site', {}).get('site_url', 'https://www.pipeleap.com')
+crawl = crawler.crawl(site_url, max_pages=15, max_depth=2)
+print(f'Crawled {len(crawl.pages)} pages')
+
+# ── 2. Audit ──────────────────────────────────────────────────────────
+from core.audit_engine import AuditEngine
+audit = AuditEngine(config, None)
+issues = audit.run(crawl)
+print(f'Audit: {len(issues)} issues found')
+critical = [i for i in issues if getattr(i, 'severity', '') in ('critical', 'high')]
+print(f'  Critical/High: {len(critical)}')
+
+# ── 3. Auto-fix auto-executable issues ──────────────────────────────────
+from core.auto_fixer import AutoFixer
+fixer = AutoFixer(launchpad_root, config)
+fixes = fixer.apply(issues)
+print(f'AutoFix: {len(fixes)} fixes applied')
+
+# ── 4. Indexing verification ──────────────────────────────────────────
+from core.indexing_verifier import IndexingVerifier
+from connectors.gsc_connector import GoogleSearchConsoleConnector
+from connectors.indexnow_connector import IndexNowConnector
+gsc = GoogleSearchConsoleConnector(config, None)
+indexnow = IndexNowConnector()
+verifier = IndexingVerifier(config, gsc=gsc, indexnow=indexnow)
+
+sitemap_path = str(launchpad_root / 'public' / 'sitemap.xml') if (launchpad_root / 'public' / 'sitemap.xml').exists() else None
+
+# Check for today's post_publish_signals reports
+signals_report = {}
+run_dirs = sorted(Path('outputs').glob('*/post_publish_signals.json'))
+if run_dirs:
+    latest = run_dirs[-1]
+    signals_report = json.loads(latest.read_text())
+    print(f'Indexing verification: loaded report from {latest}')
+
+verification = verifier.verify_post_publish(
+    post_publish_report=signals_report,
+    new_urls=[],
+    sitemap_path=sitemap_path,
+    output_dir=str(output_dir),
+)
+print(f'Indexing verification: overall_ok={verification.get(\"overall_ok\")}')
+
+# ── 5. War Room alerts ──────────────────────────────────────────────
+from core.war_room import WarRoom
+warroom = WarRoom(config)
+new_alerts = warroom.ingest_audit_issues(issues, source='audit_warroom')
+failure_alerts = warroom.ingest_indexing_failures(verification)
+archived = warroom.archive_stale(max_age_days=3)
+
+print(f'WarRoom: {len(new_alerts)} new alerts, {len(failure_alerts)} indexing failures, {archived} archived')
+
+all_new = new_alerts + failure_alerts
+warroom.notify_critical(all_new)
+warroom.notify_warnings(all_new)
+
+# Write summary
+summary = warroom.summary()
+summary['crawl_pages'] = len(crawl.pages)
+summary['audit_issues'] = len(issues)
+summary['fixes_applied'] = len(fixes)
+(output_dir / 'warroom_summary.json').write_text(json.dumps(summary, indent=2))
+
+print(f'WarRoom summary: {json.dumps(summary)}')
+"
+
+      - name: Commit war room outputs
+        if: always()
+        run: |
+          git config user.name 'SEO War Room'
+          git config user.email 'warroom@pipeleap.com'
+          git add outputs/warroom/ dashboard/alerts.json
+          git diff --cached --quiet || git commit -m 'chore(warroom): audit findings + alerts'
+          git push
+
+      - name: Commit launchpad auto-fixes
+        if: always()
+        working-directory: pipeleap-launchpad
+        run: |
+          git config user.name 'SEO War Room'
+          git config user.email 'warroom@pipeleap.com'
+          git add -A
+          git diff --cached --quiet || git commit -m 'chore(warroom): auto-fix robots.txt, metadata, sitemap'
+          git push
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: warroom-outputs
+          path: |
+            outputs/warroom/
+            dashboard/alerts.json

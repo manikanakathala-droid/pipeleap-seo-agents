@@ -175,6 +175,7 @@ class SEOOSAgent:
 
         # ── Step 4: Technical SEO ─────────────────────────────────────────────
         self.logger.info("Step 4: Technical SEO")
+        audit_issues: list = []
         try:
             technical_issues = self._run_technical_audit(current_snapshot, diff)
             for issue in technical_issues:
@@ -182,8 +183,21 @@ class SEOOSAgent:
                     result.dev_review_items.append(issue)
                 else:
                     result.safe_actions.append(issue)
+            audit_issues = technical_issues
         except Exception as exc:
             self.logger.warning("Technical audit skipped: %s", exc)
+
+        # ── Step 4e: Auto-fix applicable audit issues ─────────────────────────
+        self.logger.info("Step 4e: Auto-fix")
+        try:
+            from core.auto_fixer import AutoFixer
+            launchpad_path = Path(__file__).resolve().parent.parent / "temp_frontend_repo"
+            fixer = AutoFixer(launchpad_path, self.config, self.logger)
+            fixes = fixer.apply(audit_issues)
+            if fixes:
+                self.logger.info("Auto-fix: %d fixes applied", len(fixes))
+        except Exception as exc:
+            self.logger.warning("Auto-fix skipped: %s", exc)
 
         # ── Step 4b: GSC Performance Audit ───────────────────────────────────
         self.logger.info("Step 4b: GSC performance audit")
@@ -276,17 +290,47 @@ class SEOOSAgent:
             self.logger.warning("Indexing step skipped: %s", exc)
 
         # ── Post-Publish Signals (IndexNow, GSC, Indexing API) ────────────────
+        pp_report: dict | None = None
         try:
             from connectors.post_publish_hook import PostPublishHook
             hook = PostPublishHook(self.config, self.logger)
             launchpad_sitemap = Path(__file__).resolve().parent.parent / "temp_frontend_repo" / "public" / "sitemap.xml"
             new_slugs = [c.get("slug", "") for c in result.content_generated if c.get("slug")]
-            hook.run(sitemap_path=str(launchpad_sitemap) if launchpad_sitemap.exists() else None,
-                     new_slugs=new_slugs,
-                     output_dir=str(output_dir))
+            pp_report = hook.run(sitemap_path=str(launchpad_sitemap) if launchpad_sitemap.exists() else None,
+                                 new_slugs=new_slugs,
+                                 output_dir=str(output_dir))
             self.logger.info("Post-publish signals fired for %d new slugs", len(new_slugs))
         except Exception as exc:
             self.logger.warning("Post-publish signals skipped: %s", exc)
+
+        # ── Indexing verification ─────────────────────────────────────────────
+        try:
+            from core.indexing_verifier import IndexingVerifier
+            verifier = IndexingVerifier(self.config, self.logger)
+            if pp_report:
+                new_urls = [f"{self.site_url}/blog/{s}" for s in new_slugs]
+                verification = verifier.verify_post_publish(
+                    post_publish_report=pp_report,
+                    new_urls=new_urls,
+                    sitemap_path=str(launchpad_sitemap) if launchpad_sitemap.exists() else None,
+                    output_dir=str(output_dir),
+                )
+                self.logger.info("Indexing verification: overall_ok=%s", verification.get("overall_ok"))
+        except Exception as exc:
+            self.logger.warning("Indexing verification skipped: %s", exc)
+
+        # ── War Room: ingest audit issues + indexing failures ─────────────────
+        try:
+            from core.war_room import WarRoom
+            warroom = WarRoom(self.config, self.logger)
+            all_issues = []
+            if audit_issues:
+                all_issues.extend(warroom.ingest_audit_issues(audit_issues, source="seo_os"))
+            warroom.archive_stale(max_age_days=3)
+            summary = warroom.summary()
+            self.logger.info("WarRoom: %d active alerts (%d critical)", summary.get("active_count", 0), summary.get("critical_count", 0))
+        except Exception as exc:
+            self.logger.warning("WarRoom skipped: %s", exc)
 
         # ── GitHub publish (blog posts only — structured outputs handled by repo_writer) ──
         try:
@@ -372,6 +416,7 @@ class SEOOSAgent:
                 "title": issue.title,
                 "description": issue.description,
                 "fix_instructions": issue.fix_instructions,
+                "auto_fix_script": issue.auto_fix_script,
                 "impact_score": issue.impact_score,
                 "severity": issue.severity,
                 "requires_dev": requires_dev,

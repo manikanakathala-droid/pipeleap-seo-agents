@@ -172,18 +172,36 @@ jobs:
             exit 1
           fi
 
-      - name: Submit sitemap URLs via IndexNow (Bing/Yandex/Seznam)
+      - name: Verify indexing signals
         run: |
-          python -c "
+          python -u -c "
+          import json, yaml
+          from pathlib import Path
+          sys.path.insert(0, '.')
+          config = yaml.safe_load(Path('config.yaml').read_text())
+          from core.indexing_verifier import IndexingVerifier
+          from connectors.gsc_connector import GoogleSearchConsoleConnector
           from connectors.indexnow_connector import IndexNowConnector
-          idx = IndexNowConnector()
-          result = idx.submit_sitemap_urls('pipeleap-launchpad/public/sitemap.xml')
-          print(f'IndexNow: {result.get(\"urls_submitted\", 0)} URLs submitted to {result.get(\"endpoints_ok\", 0)}/{result.get(\"endpoints_total\", 3)} endpoints')
-          if not result.get('ok'):
-              print(f'  Errors: {result.get(\"error\", \"unknown\")}')
-          for r in result.get('results', []):
-              status = 'OK' if r.get('ok') else f'FAIL ({r.get(\"status\", r.get(\"error\", \"?\"))})'
-              print(f'  {r.get(\"endpoint\",\"?\")}: {status}')
+          gsc = GoogleSearchConsoleConnector(config, None)
+          inow = IndexNowConnector()
+          verifier = IndexingVerifier(config, gsc=gsc, indexnow=inow)
+          # Load latest post_publish_signals.json from this run
+          outputs_dir = Path('outputs')
+          reports = sorted(outputs_dir.glob('*/post_publish_signals.json'))
+          signals = {}
+          if reports:
+              signals = json.loads(reports[-1].read_text())
+              print('Loaded post_publish_signals from:', reports[-1])
+          result = verifier.verify_post_publish(
+              post_publish_report=signals,
+              new_urls=[],
+              sitemap_path='pipeleap-launchpad/public/sitemap.xml',
+              output_dir='outputs/indexing_verify',
+          )
+          print('Indexing verification:', json.dumps(result.get('channels', {}), indent=2))
+          print(f'Overall OK: {result.get(\"overall_ok\")}')
+          if not result.get('overall_ok'):
+              print('WARNING: Some indexing signals failed verification')
           "
 
       - name: Upload run artifacts

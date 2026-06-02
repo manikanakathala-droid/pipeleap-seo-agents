@@ -162,21 +162,6 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
         continue-on-error: true
 
-      - name: Submit sitemap URLs via IndexNow (Bing/Yandex/Seznam)
-        if: ${{ env.DRY_RUN != 'true' }}
-        run: |
-          python -c "
-          from connectors.indexnow_connector import IndexNowConnector
-          idx = IndexNowConnector()
-          result = idx.submit_sitemap_urls('pipeleap-launchpad/public/sitemap.xml')
-          print(f'IndexNow: {result.get(\"urls_submitted\", 0)} URLs submitted to {result.get(\"endpoints_ok\", 0)}/{result.get(\"endpoints_total\", 3)} endpoints')
-          if not result.get('ok'):
-              print(f'  Errors: {result.get(\"error\", \"unknown\")}')
-          for r in result.get('results', []):
-              status = 'OK' if r.get('ok') else f'FAIL ({r.get(\"status\", r.get(\"error\", \"?\"))})'
-              print(f'  {r.get(\"endpoint\",\"?\")}: {status}')
-          "
-
       - name: Upload GEO artifacts
         uses: actions/upload-artifact@v7
         if: always()

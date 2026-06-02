@@ -41,13 +41,14 @@ class PostPublishHook:
                  new_slugs=["outbound-automation-for-uk-saas", ...])
     """
 
-    def __init__(self, config: dict, logger: Any) -> None:
+    def __init__(self, config: dict, logger: Any, submitted_today: set[str] | None = None) -> None:
         self.config = config
         self.logger = logger
         self.site_url = _site_url_from_config(config)
         self.sitemap_url = _sitemap_url_from_config(config)
         self._gsc      = self._build_gsc()
         self._indexnow = self._build_indexnow()
+        self.submitted_today: set[str] = submitted_today or set()
 
     def run(
         self,
@@ -74,6 +75,11 @@ class PostPublishHook:
         new_urls = self._slug_urls(new_slugs) if new_slugs else []
         all_sitemap_urls = self._load_sitemap_urls(sitemap_path) if sitemap_path else []
         submit_urls = all_sitemap_urls or new_urls
+        # ── Dedup: filter out URLs already submitted today ─────────────────
+        fresh_new_urls = [u for u in new_urls if u not in self.submitted_today]
+        self.submitted_today.update(fresh_new_urls)
+        self.logger.info("PostPublish: %d new URLs after dedup (%d already submitted today)",
+                         len(fresh_new_urls), len(new_urls) - len(fresh_new_urls))
 
         # ── 1. IndexNow ──────────────────────────────────────────────────────
         if self._indexnow and sitemap_path:
@@ -110,7 +116,7 @@ class PostPublishHook:
         # ── 3. Google Indexing API ────────────────────────────────────────────
         # IMPORTANT: Only submit NEW urls to the Indexing API to avoid quota exhaustion (200/day).
         # General sitemap submission (step 2) covers the rest of the site eventually.
-        indexing_targets = new_urls if new_urls else submit_urls[:20]
+        indexing_targets = fresh_new_urls if fresh_new_urls else (submit_urls if not new_urls else [])[:20]
         if self._gsc and indexing_targets:
             batch = indexing_targets[:200]   # daily quota cap
             results = self._gsc.request_indexing(batch)
