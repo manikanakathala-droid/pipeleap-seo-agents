@@ -73,6 +73,7 @@ class SEOOSResult:
     indexing_actions: list[dict] = field(default_factory=list)
     gsc_insights: list[dict] = field(default_factory=list)
     content_gaps: list[dict] = field(default_factory=list)
+    content_gap_clusters: list[dict] = field(default_factory=list)
     latent_keywords: list[dict] = field(default_factory=list)
     risks_and_missed: list[dict] = field(default_factory=list)
     seo_score: SEOScore = field(default_factory=SEOScore)
@@ -96,6 +97,7 @@ class SEOOSResult:
             "indexing_actions": self.indexing_actions,
             "gsc_insights": self.gsc_insights,
             "content_gaps": self.content_gaps,
+            "content_gap_clusters": self.content_gap_clusters,
             "latent_keywords": self.latent_keywords,
             "risks_and_missed": self.risks_and_missed,
             "seo_score": self.seo_score.to_dict(),
@@ -221,6 +223,7 @@ class SEOOSAgent:
 
         # ── Step 4d: Content Coverage Analysis ───────────────────────────────
         self.logger.info("Step 4d: Content coverage analysis")
+        content_gap_clusters: list = []
         try:
             coverage = self._build_content_coverage()
             if coverage:
@@ -229,6 +232,29 @@ class SEOOSAgent:
                 self._write_json(output_dir / "content_coverage.json", coverage.get("report", {}))
                 if result.latent_keywords:
                     self._write_json(output_dir / "latent_keywords.json", result.latent_keywords)
+
+                # Cluster gaps by topic + intent for strategic prioritization
+                from core.content_gap_clustering import cluster_content_gaps
+                topic_map = self.config.get("seo", {}).get("topic_map", {})
+                content_gap_clusters = cluster_content_gaps(result.content_gaps, topic_map)
+                result.content_gap_clusters = [
+                    {
+                        "cluster_name": c.cluster_name,
+                        "intent": c.intent,
+                        "funnel_stage": c.funnel_stage,
+                        "recommended_asset_type": c.recommended_asset_type,
+                        "conversion_goal": c.conversion_goal,
+                        "keyword_count": c.count,
+                        "aggregate_difficulty": c.aggregate_difficulty,
+                        "aggregate_priority": c.aggregate_priority,
+                        "top_keywords": [g.get("keyword", "") for g in c.keywords[:5]],
+                        "strategic_rationale": c.strategic_rationale,
+                    }
+                    for c in content_gap_clusters
+                ]
+                self._write_json(output_dir / "content_gap_clusters.json", result.content_gap_clusters)
+                self.logger.info("Content gap clusters: %d clusters from %d gaps",
+                                 len(content_gap_clusters), len(result.content_gaps))
         except Exception as exc:
             self.logger.warning("Content coverage skipped: %s", exc)
 

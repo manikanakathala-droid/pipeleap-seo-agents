@@ -1,8 +1,6 @@
 """
-Rebuilds and commits sub-sitemaps (public/sitemap-{pages,blog,tools,glossary}.xml) with:
-- lastmod dates on all 11 core pages (updated today)
-- All glossary term URLs
-- All existing blog, tools, and category URLs preserved
+Full rebuild of all 5 sitemap files (index + 4 sub-sitemaps) from hardcoded URL data.
+Commits all 5 files to the launchpad repo, then re-submits to GSC + Yandex IndexNow.
 """
 import base64, os, re, requests
 from datetime import datetime
@@ -16,7 +14,112 @@ HEADERS = {
     "Accept": "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
 }
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
+NS = 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+
+def url(loc, lastmod, changefreq="monthly", priority="0.7"):
+    return f"  <url>\n    <loc>{loc}</loc>\n    <lastmod>{lastmod}</lastmod>\n    <changefreq>{changefreq}</changefreq>\n    <priority>{priority}</priority>\n  </url>"
+
+def url_inline(loc, lastmod, changefreq="monthly", priority="0.7"):
+    return f'  <url><loc>{loc}</loc><lastmod>{lastmod}</lastmod><changefreq>{changefreq}</changefreq><priority>{priority}</priority></url>'
+
+def urlset(entries):
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset {NS}>\n' + "\n".join(entries) + "\n</urlset>\n"
+
+def sitemap_entry(loc, lastmod):
+    return f'  <sitemap><loc>{loc}</loc><lastmod>{lastmod}</lastmod></sitemap>'
+
+# ── Fetch glossary slugs ──────────────────────────────────────────────
+print("Fetching glossary terms ...")
+r = requests.get(f"{API}/repos/{REPO}/contents/src/data/glossary-terms.ts", headers=HEADERS, params={"ref": BRANCH})
+r.raise_for_status()
+gt_content = base64.b64decode(r.json()["content"]).decode("utf-8")
+glossary_slugs = re.findall(r"slug:\s*[\"']([\w-]+)[\"']\s*,\s*term:", gt_content)
+print(f"  Found {len(glossary_slugs)} glossary terms")
+
+# ── Page data ─────────────────────────────────────────────────────────
+core_pages = [
+    ("https://www.pipeleap.com/", "weekly", "1.0"),
+    ("https://www.pipeleap.com/services", "monthly", "0.9"),
+    ("https://www.pipeleap.com/how-it-works", "monthly", "0.8"),
+    ("https://www.pipeleap.com/results", "monthly", "0.8"),
+    ("https://www.pipeleap.com/gtm-audit", "monthly", "0.9"),
+    ("https://www.pipeleap.com/pricing", "monthly", "0.8"),
+    ("https://www.pipeleap.com/about", "monthly", "0.7"),
+    ("https://www.pipeleap.com/contact", "monthly", "0.8"),
+    ("https://www.pipeleap.com/faq", "monthly", "0.7"),
+    ("https://www.pipeleap.com/blog", "weekly", "0.9"),
+    ("https://www.pipeleap.com/glossary", "monthly", "0.8"),
+    ("https://www.pipeleap.com/privacy", "monthly", "0.3"),
+]
+
+blog_posts = [
+    ("ai-outbound-sales-agents", "2026-05-17"),
+    ("automated-outbound", "2026-05-22"),
+    ("b2b-outbound-automation-stack", "2026-05-18"),
+    ("best-workflow-orchestration-tools-for-saas-sales-teams", "2026-05-18"),
+    ("clay-sales-navigator", "2026-05-22"),
+    ("enterprise-saas-sales-workflow-governance", "2026-05-18"),
+    ("how-to-automate-outbound-emails", "2026-05-26"),
+    ("how-to-automate-sales-workflows", "2026-05-08"),
+    ("lead-enrichment-workflows", "2026-05-26"),
+    ("pipeleap", "2026-05-26"),
+    ("pipeleap-vs-clay-which-is-better-for-outbound", "2026-05-18"),
+    ("revenue-automation-platform", "2026-05-18"),
+    ("saas-sales-team-workflow-automation", "2026-05-26"),
+    ("sales-ops-automation-guide", "2026-05-06"),
+    ("scale-sdr-efficiency-without-hiring", "2026-05-18"),
+    ("what-is-sales-automation", "2026-05-04"),
+]
+
+tool_categories = [
+    "ai-sdr-tools", "cold-email-tools", "sales-engagement-tools", "prospecting-tools",
+    "lead-enrichment-tools", "crm-tools", "call-recording-tools", "revenue-intelligence-tools",
+    "linkedin-automation-tools", "ai-outbound-agents", "workflow-automation-tools",
+    "sales-analytics-tools", "gtm-engineering-tools",
+]
+
+# Map category -> list of tool slugs
+tools_by_category = {
+    "ai-sdr-tools": ["artisan-ai", "11x-ai", "regie-ai", "ava-by-artisan", "sdrx-by-klenty", "exceed-ai", "conversica", "reply-io-ai-sdr", "piper-by-qualified", "outplay-ai"],
+    "cold-email-tools": ["instantly-ai", "lemlist", "smartlead", "mailshake", "woodpecker", "apollo-io-email", "reply-io", "saleshandy", "quickmail", "klenty"],
+    "sales-engagement-tools": ["outreach", "salesloft", "apollo-io-engagement", "hubspot-sales-hub", "groove", "klenty-engagement", "reply-io-engagement", "close-io", "mixmax", "yesware"],
+    "prospecting-tools": ["apollo-io-prospecting", "zoominfo", "cognism", "lusha", "hunter-io", "linkedin-sales-navigator", "clay-prospecting", "leadfeeder", "clearbit-prospecting", "bombora"],
+    "lead-enrichment-tools": ["clay", "clearbit", "zoominfo-enrich", "lusha-enrich", "apollo-io-enrich", "cognism-enrich", "hunter-io-enrich", "people-data-labs", "datagma", "leadmagic"],
+    "crm-tools": ["hubspot-crm", "salesforce", "pipedrive", "close-io-crm", "attio", "folk", "breakcold", "copper-crm", "monday-sales-crm", "streak"],
+    "call-recording-tools": ["gong", "chorus-zoominfo", "fireflies-ai", "tldv", "avoma", "wingman-clari", "leexi", "modjo", "grain", "otter-ai"],
+    "revenue-intelligence-tools": ["gong-revenue", "clari", "6sense", "bombora", "demandbase", "crayon", "g2-buyer-intent", "salesloft-revenue", "highspot", "seismic"],
+    "linkedin-automation-tools": ["dripify", "expandi", "meetalfred", "waalaxy", "phantombuster", "skylead", "lemlist-linkedin", "taplio", "linkedin-sales-navigator-auto", "lempod"],
+    "ai-outbound-agents": ["11x-ai-agent", "artisan-ai-agent", "regie-ai-agent", "ava-agent", "clay-agent", "instantly-ai-agent", "reply-io-agent", "outreach-ai-agent", "piper-agent"],
+    "workflow-automation-tools": ["zapier", "make-integromat", "n8n", "clay-workflow", "hubspot-workflows", "workato", "bardeen", "tray-io", "retool"],
+    "sales-analytics-tools": ["gong-analytics", "clari-analytics", "hubspot-analytics", "salesforce-einstein", "tableau", "looker", "ambition", "atrium", "chorus-analytics", "mixpanel-sales"],
+    "gtm-engineering-tools": ["clay-gtm", "segment", "census", "hightouch", "common-room", "warmly", "clearbit-gtm", "rb2b", "laudspeaker"],
+}
+
+# ── Build sub-sitemaps ────────────────────────────────────────────────
+pages_entries = [url(loc, TODAY, freq, pri) for loc, freq, pri in core_pages]
+pages_xml = urlset(pages_entries)
+
+blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", dt, "weekly" if dt >= "2026-05-26" else "monthly") for slug, dt in blog_posts]
+blog_xml = urlset(blog_entries)
+
+glossary_entries = [url_inline(f"https://www.pipeleap.com/glossary/{slug}", "2026-05-22", priority="0.6") for slug in glossary_slugs]
+glossary_xml = urlset(glossary_entries)
+
+tool_entries = [url(f"https://www.pipeleap.com/tools/{slug}", "2026-05-23", priority="0.8") for slug in tool_categories]
+for cat, tools in tools_by_category.items():
+    for tool_slug in tools:
+        tool_entries.append(url_inline(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}", "2026-05-23"))
+tools_xml = urlset(tool_entries)
+
+# ── Build sitemap index ───────────────────────────────────────────────
+index_xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex {NS}>\n'
+for sub in ["pages", "blog", "tools", "glossary"]:
+    index_xml += sitemap_entry(f"https://www.pipeleap.com/sitemap-{sub}.xml", TODAY) + "\n"
+index_xml += "</sitemapindex>\n"
+
+# ── Commit all 5 files ───────────────────────────────────────────────
 def get_file(path):
     r = requests.get(f"{API}/repos/{REPO}/contents/{path}", headers=HEADERS, params={"ref": BRANCH})
     r.raise_for_status()
@@ -34,343 +137,27 @@ def commit_file(path, content, sha, message):
     print(f"  [{'OK' if ok else 'FAIL'}] {path}" + ("" if ok else f": {r.status_code} {r.text[:120]}"))
     return ok
 
-# Fetch glossary slugs from repo
-print("Fetching glossary terms ...")
-gt_content, _ = get_file("src/data/glossary-terms.ts")
-glossary_slugs = re.findall(r"slug:\s*[\"']([\w-]+)[\"']\s*,\s*term:", gt_content)
-print(f"  Found {len(glossary_slugs)} glossary terms")
+files = [
+    ("public/sitemap-pages.xml", pages_xml, f"seo: rebuild sitemap-pages.xml — {len(core_pages)} core URL(s)"),
+    ("public/sitemap-blog.xml", blog_xml, f"seo: rebuild sitemap-blog.xml — {len(blog_posts)} blog URL(s)"),
+    ("public/sitemap-glossary.xml", glossary_xml, f"seo: rebuild sitemap-glossary.xml — {len(glossary_slugs)} glossary URL(s)"),
+    ("public/sitemap-tools.xml", tools_xml, f"seo: rebuild sitemap-tools.xml — {len(tool_entries)} tool URL(s)"),
+    ("public/sitemap.xml", index_xml, "seo: rebuild sitemap index -> 4 sub-sitemaps"),
+]
 
-TODAY = datetime.now().strftime("%Y-%m-%d")
+print("\nCommitting sitemap files ...")
+for path, content, msg in files:
+    try:
+        _, sha = get_file(path)
+        commit_file(path, content, sha, msg)
+    except Exception as e:
+        print(f"  [SKIP] {path}: {e}")
 
-SITEMAP = '''<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core pages -->
-  <url>
-    <loc>https://www.pipeleap.com/</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/services</loc>
-    <lastmod>2026-05-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/how-it-works</loc>
-    <lastmod>2026-05-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/results</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/gtm-audit</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/pricing</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/about</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/contact</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/faq</loc>
-    <lastmod>2026-05-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/glossary</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <!-- Blog posts -->
-  <url>
-    <loc>https://www.pipeleap.com/blog/clay-sales-navigator</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/automated-outbound</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/pipeleap-vs-clay-which-is-better-for-outbound</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/enterprise-saas-sales-workflow-governance</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/revenue-automation-platform</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/scale-sdr-efficiency-without-hiring</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/b2b-outbound-automation-stack</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/best-workflow-orchestration-tools-for-saas-sales-teams</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/ai-outbound-sales-agents</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/how-to-automate-sales-workflows</loc>
-    <lastmod>2026-05-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/sales-ops-automation-guide</loc>
-    <lastmod>2026-05-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.pipeleap.com/blog/what-is-sales-automation</loc>
-    <lastmod>2026-05-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <!-- Glossary terms ({count} terms) -->
-{glossary_entries}
-  <!-- Tools Directory -->
-  <url>
-    <loc>https://www.pipeleap.com/tools</loc>
-    <lastmod>2026-05-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <!-- Tool Categories -->
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <!-- AI SDR Tools -->
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/artisan-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/11x-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/regie-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/ava-by-artisan</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/sdrx-by-klenty</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/exceed-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/conversica</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/reply-io-ai-sdr</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/piper-by-qualified</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-sdr-tools/outplay-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Cold Email Tools -->
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/instantly-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/lemlist</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/smartlead</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/mailshake</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/woodpecker</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/apollo-io-email</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/reply-io</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/saleshandy</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/quickmail</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/cold-email-tools/klenty</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Sales Engagement Tools -->
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/outreach</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/salesloft</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/apollo-io-engagement</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/hubspot-sales-hub</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/groove</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/klenty-engagement</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/reply-io-engagement</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/close-io</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/mixmax</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-engagement-tools/yesware</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Prospecting Tools -->
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/apollo-io-prospecting</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/zoominfo</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/cognism</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/lusha</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/hunter-io</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/linkedin-sales-navigator</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/clay-prospecting</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/leadfeeder</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/clearbit-prospecting</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/prospecting-tools/bombora</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Lead Enrichment Tools -->
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/clay</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/clearbit</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/zoominfo-enrich</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/lusha-enrich</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/apollo-io-enrich</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/cognism-enrich</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/hunter-io-enrich</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/people-data-labs</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/datagma</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/lead-enrichment-tools/leadmagic</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- CRM Tools -->
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/hubspot-crm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/salesforce</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/pipedrive</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/close-io-crm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/attio</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/folk</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/breakcold</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/copper-crm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/monday-sales-crm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/crm-tools/streak</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Call Recording Tools -->
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/gong</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/chorus-zoominfo</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/fireflies-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/tldv</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/avoma</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/wingman-clari</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/leexi</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/modjo</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/grain</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/call-recording-tools/otter-ai</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Revenue Intelligence Tools -->
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/gong-revenue</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/clari</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/6sense</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/bombora</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/demandbase</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/crayon</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/g2-buyer-intent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/salesloft-revenue</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/highspot</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/revenue-intelligence-tools/seismic</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- LinkedIn Automation Tools -->
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/dripify</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/expandi</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/meetalfred</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/waalaxy</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/phantombuster</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/skylead</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/lemlist-linkedin</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/taplio</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/linkedin-sales-navigator-auto</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/linkedin-automation-tools/lempod</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- AI Outbound Agents -->
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/11x-ai-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/artisan-ai-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/regie-ai-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/ava-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/clay-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/instantly-ai-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/reply-io-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/outreach-ai-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/ai-outbound-agents/piper-agent</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Workflow Automation Tools -->
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/zapier</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/make-integromat</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/n8n</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/clay-workflow</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/hubspot-workflows</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/workato</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/bardeen</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/tray-io</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/workflow-automation-tools/retool</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Sales Analytics Tools -->
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/gong-analytics</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/clari-analytics</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/hubspot-analytics</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/salesforce-einstein</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/tableau</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/looker</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/ambition</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/atrium</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/chorus-analytics</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/sales-analytics-tools/mixpanel-sales</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- GTM Engineering Tools -->
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/clay-gtm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/segment</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/census</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/hightouch</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/common-room</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/warmly</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/clearbit-gtm</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/rb2b</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.pipeleap.com/tools/gtm-engineering-tools/laudspeaker</loc><lastmod>2026-05-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-</urlset>'''
+total = len(core_pages) + len(blog_posts) + len(glossary_slugs) + len(tool_entries)
+print(f"\nTotal: {total} URLs across 4 sub-sitemaps")
 
-# Build glossary entries block
-glossary_entries = "\n".join(
-    f'  <url><loc>https://www.pipeleap.com/glossary/{slug}</loc>'
-    f'<lastmod>2026-05-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>'
-    for slug in glossary_slugs
-)
-
-new_sitemap = SITEMAP.replace("{today}", TODAY)\
-                     .replace("{count}", str(len(glossary_slugs)))\
-                     .replace("{glossary_entries}", glossary_entries)
-
-total = new_sitemap.count("<url>")
-print(f"New sitemap: {total} URLs ({len(glossary_slugs)} glossary + existing)\n")
-
-# Commit
-print("Committing sitemap ...")
-_, sha = get_file("public/sitemap.xml")
-commit_file("public/sitemap.xml", new_sitemap, sha,
-    f"seo: expand sitemap to {total} URLs — add {len(glossary_slugs)} glossary terms + lastmod dates")
-
-# Re-submit to GSC
-print("\nRe-submitting updated sitemap to Google Search Console ...")
+# ── Re-submit to GSC ──────────────────────────────────────────────────
+print("\nRe-submitting sitemap index to Google Search Console ...")
 try:
     from google.oauth2 import service_account
     from googleapiclient.discovery import build
@@ -379,19 +166,25 @@ try:
         scopes=["https://www.googleapis.com/auth/webmasters"],
     )
     svc = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+    for sub in ["pages", "blog", "tools", "glossary"]:
+        url_sub = f"https://www.pipeleap.com/sitemap-{sub}.xml"
+        svc.sitemaps().submit(siteUrl="sc-domain:pipeleap.com", feedpath=url_sub).execute()
+        print(f"  OK sitemap-{sub}.xml submitted to GSC")
     svc.sitemaps().submit(siteUrl="sc-domain:pipeleap.com",
                           feedpath="https://www.pipeleap.com/sitemap.xml").execute()
-    print("  GSC sitemap re-submitted OK")
+    print("  OK sitemap index submitted to GSC")
 except Exception as e:
     print(f"  GSC error: {e}")
 
-# Re-submit to Yandex IndexNow
+# ── Re-submit to Yandex IndexNow ──────────────────────────────────────
 print("\nRe-submitting all URLs to Yandex IndexNow ...")
-all_urls = re.findall(r"<loc>(https://[^<]+)</loc>", new_sitemap)
+all_locs = []
+for xml in [pages_xml, blog_xml, glossary_xml, tools_xml]:
+    all_locs.extend(re.findall(r"<loc>(https://[^<]+)</loc>", xml))
 r = requests.post("https://yandex.com/indexnow",
     json={"host": "www.pipeleap.com", "key": "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55",
           "keyLocation": "https://www.pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt",
-          "urlList": all_urls}, timeout=20)
+          "urlList": all_locs}, timeout=20)
 print(f"  Yandex: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
 
-print(f"\nDone. Sitemap now has {total} URLs.")
+print(f"\nDone. {total} URLs across 4 sub-sitemaps + index.")
