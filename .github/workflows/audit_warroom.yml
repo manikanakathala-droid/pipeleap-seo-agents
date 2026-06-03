@@ -62,7 +62,7 @@ jobs:
           
           # Load config
           with open('config.yaml') as f:
-          config = yaml.safe_load(f)
+              config = yaml.safe_load(f)
           
           launchpad_root = Path('pipeleap-launchpad')
           output_dir = Path('outputs/warroom')
@@ -103,15 +103,15 @@ jobs:
           signals_report = {}
           run_dirs = sorted(Path('outputs').glob('*/post_publish_signals.json'))
           if run_dirs:
-          latest = run_dirs[-1]
-          signals_report = json.loads(latest.read_text())
-          print(f'Indexing verification: loaded report from {latest}')
+              latest = run_dirs[-1]
+              signals_report = json.loads(latest.read_text())
+              print(f'Indexing verification: loaded report from {latest}')
           
           verification = verifier.verify_post_publish(
-          post_publish_report=signals_report,
-          new_urls=[],
-          sitemap_path=sitemap_path,
-          output_dir=str(output_dir),
+              post_publish_report=signals_report,
+              new_urls=[],
+              sitemap_path=sitemap_path,
+              output_dir=str(output_dir),
           )
           print(f'Indexing verification: overall_ok={verification.get(\"overall_ok\")}')
           

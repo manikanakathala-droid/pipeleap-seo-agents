@@ -175,7 +175,7 @@ jobs:
       - name: Verify indexing signals
         run: |
           python -u -c "
-          import json, yaml
+          import json, sys, yaml
           from pathlib import Path
           sys.path.insert(0, '.')
           config = yaml.safe_load(Path('config.yaml').read_text())
