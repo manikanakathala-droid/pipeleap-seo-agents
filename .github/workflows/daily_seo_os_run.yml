@@ -82,8 +82,8 @@ jobs:
 
       - name: Commit repo outputs (structured + raw combined)
         run: |
-          git config user.name  "pipeleap-seo-os"
-          git config user.email "seo-os@pipeleap.com"
+          git config user.name  "Pipeleap SEO OS"
+          git config user.email "manik.anakathala@gmail.com"
           git add seo/ content/ outputs/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No repo changes to commit."
@@ -103,8 +103,8 @@ jobs:
       - name: Commit generated content to launchpad
         run: |
           cd pipeleap-launchpad
-          git config user.name  "pipeleap-seo-os"
-          git config user.email "seo-os@pipeleap.com"
+          git config user.name  "Pipeleap SEO OS"
+          git config user.email "manik.anakathala@gmail.com"
           git add -A 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No launchpad content changes."

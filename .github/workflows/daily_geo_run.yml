@@ -92,8 +92,8 @@ jobs:
         if: ${{ env.DRY_RUN != 'true' }}
         run: |
           cd pipeleap-launchpad
-          git config user.name "pipeleap-geo-bot"
-          git config user.email "geo-bot@pipeleap.com"
+          git config user.name "Pipeleap SEO OS"
+          git config user.email "manik.anakathala@gmail.com"
 
           PAGE_COUNT=$(find src/data/seo -name "metadata.json" 2>/dev/null | wc -l | tr -d ' ')
           TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')

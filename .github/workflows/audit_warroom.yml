@@ -141,8 +141,8 @@ jobs:
       - name: Commit war room outputs
         if: always()
         run: |
-          git config user.name 'SEO War Room'
-          git config user.email 'warroom@pipeleap.com'
+          git config user.name 'Pipeleap SEO OS'
+          git config user.email 'manik.anakathala@gmail.com'
           git add outputs/warroom/ dashboard/alerts.json
           git diff --cached --quiet || git commit -m 'chore(warroom): audit findings + alerts'
           git push
@@ -151,8 +151,8 @@ jobs:
         if: always()
         working-directory: pipeleap-launchpad
         run: |
-          git config user.name 'SEO War Room'
-          git config user.email 'warroom@pipeleap.com'
+          git config user.name 'Pipeleap SEO OS'
+          git config user.email 'manik.anakathala@gmail.com'
           git add -A
           git diff --cached --quiet || git commit -m 'chore(warroom): auto-fix robots.txt, metadata, sitemap'
           git push

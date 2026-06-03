@@ -75,8 +75,8 @@ jobs:
       - name: Commit glossary updates to launchpad
         run: |
           cd pipeleap-launchpad
-          git config user.name "pipeleap-seo-bot"
-          git config user.email "seo-bot@pipeleap.com"
+          git config user.name "Pipeleap SEO OS"
+          git config user.email "manik.anakathala@gmail.com"
           git add src/data/glossary-terms.ts 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No glossary changes to commit."
@@ -96,8 +96,8 @@ jobs:
       - name: Sync generated content to launchpad
         run: |
           cd pipeleap-launchpad
-          git config user.name "pipeleap-seo-bot"
-          git config user.email "seo-bot@pipeleap.com"
+          git config user.name "Pipeleap SEO OS"
+          git config user.email "manik.anakathala@gmail.com"
           # Copy research output from CMS publish dir to launchpad seo dir
           git add -f src/data/tools/ 2>/dev/null || true
           if git diff --staged --quiet; then
