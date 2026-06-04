@@ -13,8 +13,6 @@ from typing import TYPE_CHECKING, Any
 
 import requests
 
-from connectors.indexnow_connector import IndexNowConnector
-
 if TYPE_CHECKING:
     from utils.models import ContentAsset
     from modules.pipeleap_seo_engine.models import GrowthPage
@@ -65,11 +63,6 @@ class GitHubPublisher:
                 pub_date = getattr(asset, "date_published", "") or datetime.now(timezone.utc).strftime("%Y-%m-%d")
                 url = f"https://www.pipeleap.com/blog/{slug}"
                 self.update_sitemap([(url, pub_date)])
-                try:
-                    trigger = IndexNowConnector()
-                    trigger.submit_all_endpoints([url])
-                except Exception as e:
-                    log.warning("Indexing trigger failed: %s", e)
             return success
         except Exception as exc:
             log.warning("GitHub publish blog failed: %s", exc)
@@ -94,11 +87,6 @@ class GitHubPublisher:
                 pub_date = getattr(page, "date_published", "") or datetime.now(timezone.utc).strftime("%Y-%m-%d")
                 url = f"https://www.pipeleap.com/tools/{slug}"
                 self.update_sitemap([(url, pub_date)])
-                try:
-                    trigger = IndexNowConnector()
-                    trigger.submit_all_endpoints([url])
-                except Exception as e:
-                    log.warning("Indexing trigger failed: %s", e)
             return success
         except Exception as exc:
             log.warning("GitHub publish tool page failed: %s", exc)

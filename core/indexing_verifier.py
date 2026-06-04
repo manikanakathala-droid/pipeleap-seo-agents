@@ -18,6 +18,8 @@ from typing import Any
 
 log = logging.getLogger(__name__)
 
+SUBMITTED_TODAY_FILE = "outputs/submitted_today.json"
+
 
 class IndexingVerifier:
     def __init__(
@@ -32,7 +34,9 @@ class IndexingVerifier:
         self.site_url = config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
         self._gsc = gsc
         self._indexnow = indexnow
-        self.submitted_today: set[str] = set()
+        today_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        self.submitted_today: set[str] = self._load_submitted_today(today_key)
+        self._today_key = today_key
 
     def verify_post_publish(
         self,
@@ -58,39 +62,46 @@ class IndexingVerifier:
             "overall_ok": True,
         }
 
+        signals = post_publish_report.get("signals", {})
+        has_signals = bool(signals)
+
         # ── 1. Verify IndexNow ─────────────────────────────────────────────
         channel = "indexnow"
-        indexnow_result = post_publish_report.get("signals", {}).get("indexnow", {})
+        indexnow_result = signals.get("indexnow", {})
         indexnow_fixed = self._retry_channel(
             channel, indexnow_result,
             retry_fn=lambda: self._retry_indexnow(sitemap_path, new_urls),
+            allow_retry=has_signals,
         )
         report["channels"][channel] = indexnow_fixed
 
         # ── 2. Verify WebSub ───────────────────────────────────────────────
         channel = "websub"
-        websub_result = post_publish_report.get("signals", {}).get("websub", {})
+        websub_result = signals.get("websub", {})
         websub_fixed = self._retry_channel(
             channel, websub_result,
             retry_fn=lambda: self._retry_websub(),
+            allow_retry=has_signals,
         )
         report["channels"][channel] = websub_fixed
 
         # ── 3. Verify GSC Sitemap ──────────────────────────────────────────
         channel = "gsc_sitemap"
-        gsc_result = post_publish_report.get("signals", {}).get("gsc_sitemap", {})
+        gsc_result = signals.get("gsc_sitemap", {})
         gsc_fixed = self._retry_channel(
             channel, gsc_result,
             retry_fn=lambda: self._retry_gsc_sitemap(),
+            allow_retry=has_signals,
         )
         report["channels"][channel] = gsc_fixed
 
         # ── 4. Verify Google Indexing API ──────────────────────────────────
         channel = "google_indexing_api"
-        indexing_result = post_publish_report.get("signals", {}).get("google_indexing_api", {})
+        indexing_result = signals.get("google_indexing_api", {})
         indexing_fixed = self._retry_channel(
             channel, indexing_result,
             retry_fn=lambda: self._retry_indexing_api(new_urls),
+            allow_retry=has_signals,
         )
         report["channels"][channel] = indexing_fixed
 
@@ -115,10 +126,17 @@ class IndexingVerifier:
 
         # ── 6. Overall status ──────────────────────────────────────────────
         all_ok = True
+        any_failed = False
         for ch, res in report["channels"].items():
-            if isinstance(res, dict) and not res.get("ok", True):
+            ok = res.get("ok") if isinstance(res, dict) else None
+            if ok is False:
                 all_ok = False
-        report["overall_ok"] = all_ok
+                any_failed = True
+            elif ok is None:
+                all_ok = None
+        report["overall_ok"] = all_ok if all_ok is not None else (not any_failed if any_failed else None)
+
+        self._save_submitted_today()
 
         if output_dir:
             out = Path(output_dir)
@@ -129,12 +147,42 @@ class IndexingVerifier:
 
         return report
 
+    # ── Submitted-today persistence (shared with PostPublishHook) ────────
+
+    def _load_submitted_today(self, date_key: str) -> set[str]:
+        try:
+            p = Path(SUBMITTED_TODAY_FILE)
+            if p.exists():
+                data = json.loads(p.read_text(encoding="utf-8"))
+                return set(data.get(date_key, []))
+        except Exception:
+            pass
+        return set()
+
+    def _save_submitted_today(self) -> None:
+        try:
+            p = Path(SUBMITTED_TODAY_FILE)
+            p.parent.mkdir(parents=True, exist_ok=True)
+            data: dict[str, list[str]] = {}
+            if p.exists():
+                data = json.loads(p.read_text(encoding="utf-8"))
+            data[self._today_key] = sorted(self.submitted_today)
+            p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        except Exception as exc:
+            self.logger.warning("IndexingVerifier: failed to persist submitted_today: %s", exc)
+
     # ── Per-channel retry ─────────────────────────────────────────────────
 
-    def _retry_channel(self, name: str, initial_result: dict, retry_fn) -> dict:
+    def _retry_channel(self, name: str, initial_result: dict, retry_fn, allow_retry: bool = True) -> dict:
+        # Already succeeded — no retry needed
         if isinstance(initial_result, dict) and initial_result.get("ok", False):
             return {"ok": True, "source": "initial", **initial_result}
 
+        # No signal was attempted in this cycle — skip retry entirely
+        if not allow_retry or not initial_result:
+            return {"ok": None, "source": "not_attempted", "note": "no post-publish data to verify"}
+
+        # Initial failed — retry with exponential backoff (2s, 4s, 8s)
         delays = [2, 4, 8]
         for attempt, delay in enumerate(delays, 1):
             self.logger.info("Verifier retry %s attempt %d/%d (wait %ds)", name, attempt, len(delays), delay)
