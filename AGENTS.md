@@ -115,7 +115,7 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 
 ---
 
-## Anchored Summary (May 30, 2026)
+## Anchored Summary (June 4, 2026)
 
 **Goal:** Build a content-aware keyword planning engine that reads live site data, detects keyword coverage gaps, and mines existing content for latent keyword opportunities.
 
@@ -146,7 +146,39 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 **In Progress:**
 - **www canonicalization** — Google has indexed `pipeleap.com/*` (non-www) for most pages. The 301 redirect + sitemap resubmission + Indexing API should migrate them to `www.pipeleap.com/*` over time. Monitor in GSC.
 
-### 13. AI disclaimer banned (June 2)
+### 14. GSC retry fix + urgent indexing push (June 4)
+**Problem:** GSC API calls were failing with `"Expecting value: line 2 column 1 (char 1)"` — empty response body from discovery doc fetch. This caused ALL GSC operations (sitemap submit, Indexing API, URL inspection) to fail consistently since May 30. No indexing signals had been sent for 5 days. The previous `cache_discovery=True` fix didn't resolve it.
+
+**Root cause:** The `googleapiclient.discovery.build()` call itself was failing to fetch the discovery document (transient network/CI issue), returning an empty response that couldn't be JSON-decoded.
+
+**Fixes applied (`01625e9`):**
+- Added `_build_service()` helper — retries service construction 3x (2s/4s/8s) on `json.JSONDecodeError`, `HttpError`, `ConnectionError`
+- Added `_retry_api()` decorator for API-level retry on all methods
+- `request_indexing()` — explicit `json.JSONDecodeError` handling with per-URL retry
+- `submit_sitemap()` — full retry loop (was only catching the error once)
+- `fetch_coverage()`, `inspect_url()`, `fetch_page_performance()` — all use `_build_service` with retry
+- `_fetch_from_api()` — removed redundant `_get_credentials` + `build()` inline, uses `_build_service`
+
+**Urgent indexing run results (Jun 4, 23:00 UTC):**
+| Channel | Result |
+|---|---|
+| IndexNow (api.indexnow.org) | HTTP 200 — 244 URLs |
+| IndexNow (Bing) | HTTP 200 — 244 URLs |
+| IndexNow (Yandex) | HTTP 202 — 244 URLs |
+| WebSub | HTTP 204 |
+| GSC Sitemap | Accepted |
+| Google Indexing API | 20/20 accepted |
+| Homepage URL Inspection | PASS — `Submitted and indexed` |
+
+**Key inspection finding:** Google canonical = `www.pipeleap.com` ✅. Only 4 internal referring URLs (non-www glossary pages link to www homepage). **Zero external backlinks.**
+
+**Branded search diagnosis:** "pipeleap" not showing in direct search because the domain has **zero referring domains**. Even for branded queries, Google needs external authority signals. 244 URLs are now flowing through IndexNow and sitemap — indexing is not the bottleneck. Backlinks are.
+
+**New files:**
+- `scripts/urgent_index_all.py` — standalone script that fires ALL indexing signals without going through the full SEO OS agent. Run after any period of inactivity.
+- `content/backlinks/directory_submissions.md` — tracking checklist for manual directory submissions (target: 15 unique referring domains in 30 days)
+
+### 15. AI disclaimer banned (June 2)
 **Problem:** The sentence "This content was produced with AI assistance and reviewed for factual accuracy…" was appended to every generated blog, landing page, and tool page. Also hardcoded in 4 generation engines, making every new blog include it.
 
 **Fix:** Removed the AI disclaimer from:
@@ -164,6 +196,8 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - Coverage runs before keyword engine (Step 4d, not after) so engine can skip covered keywords.
 - Threshold of 0.4 confidence for gap detection.
 - Latent mining uses comprehensive stop word list (400+ terms: common English + domain-specific) to filter noise.
+- GSC API: `_build_service()` retries 3x (2s/4s/8s) on discovery doc fetch failure. All API methods retry individually.
+- Branded search "pipeleap" not ranking due to zero external backlinks — this is an authority problem, not indexing. Fix requires 15-20 unique referring domains.
 
 **Relevant Files:**
 - `core/content_coverage.py` — ContentCoverage class, text extraction, n-gram mining, gap detection.
