@@ -1,7 +1,6 @@
 """
 Backlink gap analysis connector.
-Uses Ahrefs or Majestic API to find domains that link to competitors but not Pipeleap.
-Set AHREFS_API_KEY in config or env vars.
+Uses Ahrefs API to find domains that link to competitors but not Pipeleap.
 When Moz API credentials are provided, enriches fallback targets with live Domain Authority.
 Falls back to a curated priority target list when API is not configured.
 """

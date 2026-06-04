@@ -533,7 +533,7 @@ class GrowthEngineOrchestrator:
             notes.append(f"{len(refresh)} pages flagged for refresh — see refresh_queue.json.")
         notes.append("Keyword volume powered by Google Trends + Autocomplete (free, no API key needed).")
         notes.append("Set PAGESPEED_API_KEY in config for Core Web Vitals monitoring.")
-        notes.append("Set AHREFS_API_KEY in config for live backlink gap analysis.")
+        
         return notes
 
     def _resolve_output_dir(self) -> Path:

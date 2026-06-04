@@ -664,7 +664,7 @@
       "sales workflow automation",
       "outbound automation platform"
     ],
-    "ahrefs_api_key": "${AHREFS_API_KEY}",
+    "ahrefs_api_key": "",
     "moz_api_access_id": "mozscape-xSC6gI3J2B",
     "moz_api_secret_key": "fF5ukc0XVtgFy1lO9E1RJQAbFL0OZyUd",
     "bing_api_key": "f2ce40b491c44f1282976da068df483c",
