@@ -67,15 +67,15 @@ class GrowthContentEngine:
 
     def problem_section(self, pain_points: list[str], context: str = "") -> str:
         intros = [
-            "SaaS outbound consistently underperforms because it is built on manual execution, fragmented tools, and no repeatable system.",
+            "SaaS sales execution consistently underperforms because it is built on manual data work, fragmented tools, and no repeatable system.",
             "The biggest bottleneck in modern SaaS pipeline generation isn't a lack of tools—it's a lack of orchestration.",
-            "Why do so many outbound campaigns fail to generate consistent meetings? The answer usually lies in fragmented execution.",
+            "Why do so many sales campaigns fail to generate consistent meetings? The answer usually lies in fragmented operations.",
             "Revenue teams are often trapped in a cycle of manual research and disjointed tools, preventing scalable pipeline growth.",
             "In the race for market share, the bottleneck is rarely the quantity of leads, but the quality of the orchestration layer.",
             "Modern sales teams need more than just tools; they need a governed system that connects signals to sequences automatically.",
-            "Fragmented outbound execution is the 'silent killer' of predictable revenue in B2B SaaS organizations.",
+            "Fragmented sales operations is the 'silent killer' of predictable revenue in B2B SaaS organizations.",
             "When every SDR runs their own process, scaling becomes a management nightmare rather than a growth lever.",
-            "The transition from manual outbound to orchestrated workflows is the hallmark of high-performance revenue teams.",
+            "The transition from manual operations to orchestrated workflows is the hallmark of high-performance revenue teams.",
             "Most SaaS companies are sitting on a goldmine of intent signals but lack the engine to turn them into meetings.",
         ]
         intro = context or random.choice(intros)
@@ -91,34 +91,34 @@ class GrowthContentEngine:
                 "individual rep effort rather than governed workflows, results vary wildly between quarters. "
                 "One strong quarter masks the structural problem until a top rep leaves or headcount lags demand."
             ),
-            "heavy reliance on manual outbound execution": (
-                "**Manual outbound execution** creates a ceiling. Every additional unit of pipeline requires "
+            "heavy reliance on manual data work": (
+                "**Manual data work** creates a ceiling. Every additional unit of pipeline requires "
                 "proportional manual effort — research, writing, sending, following up, logging. "
                 "This ceiling appears early and cannot be broken without automation."
             ),
             "fragmented tools with no unified workflow execution layer": (
-                "**Fragmented tooling** is the root cause most teams misdiagnose. The average SaaS outbound stack "
+                "**Fragmented tooling** is the root cause most teams misdiagnose. The average SaaS sales stack "
                 "runs across 6–8 disconnected tools. Data moves between them manually, errors compound at each "
                 "handoff, and RevOps spends more time maintaining integrations than building strategy."
             ),
-            "lack of workflow orchestration across outbound motions": (
-                "**No orchestration layer** means every outbound motion is a one-off project. "
+            "lack of workflow orchestration across revenue operations": (
+                "**No orchestration layer** means every revenue motion is a one-off project. "
                 "There is no system that governs signal intake, enrichment logic, sequencing rules, "
                 "CRM routing, and performance feedback in a single, repeatable execution model."
             ),
             "inconsistent execution across sales teams and territories": (
                 "**Inconsistent execution** is a people problem that looks like a people problem but is actually "
-                "a systems problem. When the best outbound process lives in one rep's head, it cannot be "
+                "a systems problem. When the best sales process lives in one rep's head, it cannot be "
                 "replicated. Every rep reinvents the wheel. Every territory runs a slightly different play."
             ),
-            "poor visibility into outbound workflow performance": (
+            "poor visibility into workflow performance": (
                 "**Poor visibility** prevents improvement. Teams cannot fix what they cannot measure. "
                 "Without workflow-level performance data — which stages convert, which sequences perform, "
                 "which segments respond — revenue teams optimize based on gut feel and activity metrics "
                 "that don't correlate to pipeline."
             ),
-            "inability to scale outbound without proportional headcount growth": (
-                "**The headcount trap** is the most expensive consequence of unorchestrated outbound. "
+            "inability to scale without proportional headcount growth": (
+                "**The headcount trap** is the most expensive consequence of unorchestrated operations. "
                 "Every pipeline target increase triggers a headcount request. Without automation, "
                 "the only lever is more people — more cost, more ramp time, more management overhead."
             ),
@@ -143,7 +143,7 @@ class GrowthContentEngine:
             "",
             f"It is not {is_not_list}. This distinction is important: Pipeleap does not replace your CRM, "
             f"your sequencer, or your enrichment tool. It sits above them — orchestrating how they work together "
-            f"into one governed, automated, end-to-end outbound execution system.",
+            f"into one governed, automated, end-to-end revenue execution system.",
             "",
             f"Specifically, {self.brand}:",
             "",
@@ -188,14 +188,14 @@ class GrowthContentEngine:
                 "list imports, or API triggers from any connected tool."
             ),
             2: (
-                "Every signal-qualified prospect is automatically enriched before any outbound step fires. "
+                "Every signal-qualified prospect is automatically enriched before any outreach step fires. "
                 "Pipeleap pulls company data, contact information, technographic signals, and firmographic "
                 "context from configured enrichment sources — then scores the prospect against your ICP "
                 "criteria. Only prospects that pass qualification thresholds enter the sequence stage. "
                 "Enrichment happens in real time, at intake, without any SDR research time."
             ),
             3: (
-                "Qualified prospects are entered into the appropriate outbound sequence automatically "
+                "Qualified prospects are entered into the appropriate workflow sequence automatically "
                 "based on their segment, intent signal, industry, or role. Pipeleap handles multi-step, "
                 "multi-channel sequences — email, LinkedIn, phone task creation — with full personalization "
                 "using the enriched data collected in step two. Sequence selection, timing, and suppression "
@@ -239,8 +239,8 @@ class GrowthContentEngine:
             "## Before Pipeleap vs. With Pipeleap",
             "",
             (
-                "The difference between manual outbound and orchestrated outbound is not incremental — "
-                "it is structural. The table below shows how the same outbound motion looks before "
+                "The difference between manual execution and orchestrated execution is not incremental — "
+                "it is structural. The table below shows how the same revenue motion looks before "
                 "workflow orchestration and after it. Every row represents a category where manual "
                 "execution creates a bottleneck, and where automation eliminates it."
             ),
@@ -254,7 +254,7 @@ class GrowthContentEngine:
             "",
             (
                 "The compounding effect of these improvements is what produces predictable pipeline. "
-                "When every dimension of outbound execution is governed by automated workflows, "
+                "When every dimension of revenue execution is governed by automated workflows, "
                 "the system performs consistently regardless of which rep runs it, which territory "
                 "it runs in, or how many prospects it runs against."
             ),
@@ -349,10 +349,10 @@ class GrowthContentEngine:
             "MOFU": (
                 "Most teams have the right instinct about automation but lack the workflow "
                 "architecture to make it consistent. Pipeleap provides the orchestration layer "
-                "that governs your entire outbound motion end-to-end."
+                "that governs your entire revenue motion end-to-end."
             ),
             "BOFU": (
-                "Every week that outbound runs on manual execution is a week of compounding "
+                "Every week that revenue runs on manual execution is a week of compounding "
                 "pipeline inefficiency. The GTM audit maps exactly where your workflow breaks "
                 "down and delivers a custom automation blueprint — within 48 hours."
             ),
@@ -380,7 +380,7 @@ class GrowthContentEngine:
 
     # ─── PAA block (People Also Ask) ─────────────────────────────────────────
 
-    def paa_section(self, topic: str = "outbound_automation", limit: int = 4) -> str:
+    def paa_section(self, topic: str = "workflow_orchestration", limit: int = 4) -> str:
         """
         Generates a People Also Ask section targeting common PAA questions for this topic.
         Placed near the bottom of the page, before the CTA section.
@@ -401,24 +401,24 @@ class GrowthContentEngine:
         ]
 
         answers = {
-            "What is outbound sales automation?": (
-                "Outbound sales automation uses workflow software to handle repetitive SDR tasks — "
-                "prospect research, enrichment, email sequences, follow-ups, and CRM logging — "
-                "so revenue teams generate pipeline consistently without proportional manual effort."
+            "What is sales workflow orchestration?": (
+                "Sales workflow orchestration uses governed automation to handle the non-selling work that "
+                "drains revenue teams — prospect research, enrichment, email sequences, follow-ups, and CRM logging — "
+                "so sellers spend their time on conversations, not clicks."
             ),
-            "How do you automate B2B outbound emails?": (
-                "B2B outbound email automation requires: (1) a signal trigger to identify the right "
+            "How do you automate B2B sales emails?": (
+                "B2B sales email automation requires: (1) a signal trigger to identify the right "
                 "prospect at the right time, (2) automated enrichment to personalise the message, "
-                "(3) a governed sequence that fires automatically, and (4) reply classification to "
+                "(3) a governed workflow that fires automatically, and (4) reply classification to "
                 "route interested responses without manual inbox monitoring."
             ),
-            "What is signal-based outbound?": (
-                "Signal-based outbound triggers prospecting and sequencing from real-time buying signals "
+            "What is signal-based outreach?": (
+                "Signal-based outreach triggers prospecting and sequencing from real-time buying signals "
                 "— website visits, intent data, job changes, funding events — rather than static lists. "
-                "It ensures outbound reaches the right account at the moment of highest intent."
+                "It ensures outreach reaches the right account at the moment of highest intent."
             ),
             "What is predictable pipeline generation?": (
-                "Predictable pipeline generation is a systematic outbound model where pipeline output "
+                "Predictable pipeline generation is a systematic model where pipeline output "
                 "is governed by automated workflows rather than individual rep effort. The same workflow "
                 "runs consistently every day, producing stable pipeline regardless of which rep manages it."
             ),
@@ -429,14 +429,14 @@ class GrowthContentEngine:
             ),
             "How does Pipeleap compare to Clay?": (
                 "Clay is a data enrichment and waterfall tool. Pipeleap is a workflow orchestration system "
-                "that governs the full outbound pipeline — including Clay as an enrichment data source. "
+                "that governs the full revenue pipeline — including Clay as an enrichment data source. "
                 "Clay enriches contacts; Pipeleap governs when, how, and to whom that enriched data flows."
             ),
         }
 
         for q in questions:
             answer = answers.get(q, (
-                f"See Pipeleap's full guide on [outbound automation](https://pipeleap.com/blog) "
+                f"See Pipeleap's full guide on [workflow orchestration](https://pipeleap.com/blog) "
                 f"for a detailed answer to this question with workflow examples."
             ))
             lines += [f"### {q}", "", answer, ""]
@@ -638,16 +638,16 @@ class GrowthContentEngine:
         return (
             f"> **What Pipeleap is not:** {is_not}. "
             f"{self.brand} is {POSITIONING['is']} — "
-            f"the orchestration layer that governs your outbound execution end-to-end.\n"
+            f"the operational layer that governs your revenue execution end-to-end.\n"
         )
 
     def statistics_section(self, stats: list[dict[str, str]] | None = None) -> str:
         default_stats = [
             {"stat": "65%", "context": "of SDR time is spent on manual tasks that workflow automation eliminates"},
-            {"stat": "3×", "context": "more pipeline generated by SaaS teams using workflow orchestration vs. manual outbound"},
-            {"stat": "82%", "context": "of B2B buyers accept meetings from well-timed, personalized outbound"},
-            {"stat": "6–8", "context": "disconnected tools in the average SaaS outbound stack — all replaceable by one orchestration layer"},
-            {"stat": "40%", "context": "increase in reply rates when outbound is triggered by real-time intent signals"},
+            {"stat": "3×", "context": "more pipeline generated by SaaS teams using workflow orchestration vs. manual execution"},
+            {"stat": "82%", "context": "of B2B buyers accept meetings from well-timed, personalized outreach"},
+            {"stat": "6–8", "context": "disconnected tools in the average SaaS sales stack — all replaceable by one operational layer"},
+            {"stat": "40%", "context": "increase in reply rates when outreach is triggered by real-time intent signals"},
             {"stat": "2.5x", "context": "faster ramp time for new SDRs when using governed workflow playbooks"},
         ]
         data = random.sample(stats or default_stats, min(len(stats or default_stats), 4))
@@ -678,7 +678,7 @@ class GrowthContentEngine:
             "Pipeleap tries to": "Pipeleap focuses on",
             "maybe Pipeleap": "Pipeleap",
             "if Pipeleap works": "when Pipeleap runs",
-            "broken outbound": "legacy outbound",
+            "broken outbound": "governed execution",
             "failing pipeline": "underperforming pipeline",
             "weak brand": "brand identity",
         }

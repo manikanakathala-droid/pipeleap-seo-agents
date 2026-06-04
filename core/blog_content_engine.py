@@ -150,10 +150,10 @@ class BlogContentEngine:
             return self._stub_asset(slug, keyword, kw_title, "comparison_page", quality_score)
 
         today = _date.today().isoformat()
-        seo_title = f"{kw_title} | Pipeleap Revenue Automation"
+        seo_title = f"{kw_title} | Pipeleap Revenue Operations"
         meta_description = (
-            f"Compare {keyword} options with a revenue-first lens: workflow depth, CRM quality, "
-            f"enrichment control, and outbound execution in one governed system."
+            f"Compare {keyword} tools through the lens of eliminating non-selling work: workflow depth, CRM quality, "
+            f"enrichment control, and routing governance."
         )[:158]
 
         return ContentAsset(
@@ -197,7 +197,7 @@ class BlogContentEngine:
         seo_title = f"{kw_title} Use Case | Pipeleap"
         meta_description = (
             f"See how {keyword} works end to end with Pipeleap: intake, enrichment, CRM sync, "
-            f"sequence assignment, and reply routing, no manual handoffs."
+            f"routing, and reply handling, no manual handoffs."
         )[:158]
 
         return ContentAsset(
@@ -343,7 +343,7 @@ class BlogContentEngine:
                 (
                     f"VP of Sales Operations reviewing {keyword} already has a stack. "
                     f"The question is whether a new system closes the coordination gap "
-                    f"between enrichment, CRM, and outbound, or widens it."
+                    f"between enrichment, CRM, and workflow tools, or widens it."
                 ),
                 (
                     f"RevOps leaders evaluating {keyword} are not looking for another tool. "
@@ -407,7 +407,7 @@ class BlogContentEngine:
                 (
                     f"When a VP of Sales Ops hears {keyword} is not working, the root cause "
                     f"is rarely the tool. It is data architecture, enrichment disconnected from CRM, "
-                    f"CRM disconnected from sequencing, and no single owner of the full workflow."
+                    f"CRM disconnected from data enrichment, with no single owner of the full workflow."
                 ),
                 (
                     f"A CRO told that {keyword} is broken knows the tool is not the problem. "
@@ -447,7 +447,7 @@ class BlogContentEngine:
                 ),
                 (
                     f"GTM leaders exploring {keyword} are looking for a unified workflow "
-                    f"that connects signal capture, data enrichment, CRM sync, and outbound "
+                    f"that connects signal capture, data enrichment, and CRM sync — governing the entire flow "
                     f"into one accountable system, not a collection of loosely integrated tools."
                 ),
             ]
@@ -516,7 +516,7 @@ class BlogContentEngine:
             (
                 f"**Layer 2, Enrichment and qualification**\n"
                 f"Raw contacts rarely meet ICP threshold. This layer adds company data, job level, and tech stack "
-                f"before any outbound step is authorised. Enrichment failure should block the sequence, not silently skip it."
+                f"before any outreach step fires. Enrichment failure should prevent further action until data quality meets standards"
             ),
             "",
             (
@@ -526,8 +526,8 @@ class BlogContentEngine:
             ),
             "",
             (
-                f"**Layer 4, Sequencing and reply handling**\n"
-                f"Only after layers 1-3 are solid should outbound fire. This layer governs cadences, "
+                f"**Layer 4, Workflow execution and reply handling**\n"
+                f"Only after layers 1-3 are solid should outreach fire. This layer governs cadences, "
                 f"reply routing, and meeting creation, fully automated with no manual triage."
             ),
             "",
@@ -546,7 +546,7 @@ class BlogContentEngine:
             f"## Common mistakes that break {keyword} in production",
             "",
             (
-                f"**Firing outbound before enrichment completes**, If the sequence triggers before data "
+                f"**Triggering outreach before enrichment completes**, If the sequence triggers before data "
                 f"validation finishes, you're emailing contacts missing job title, company size, or tech stack. "
                 f"Reply rates collapse before you've started."
             ),
@@ -577,7 +577,7 @@ class BlogContentEngine:
             "",
             (
                 f"{brand}'s n8n-based workflow engine connects all four layers in a single orchestration layer. "
-                f"Instead of separate tools for enrichment, CRM, and sequencing, each with its own API "
+                f"Instead of separate tools for enrichment, CRM, and routing, each with its own API "
                 f"integration and error surface, {brand} governs the entire flow from intake to demo booked "
                 f"with full visibility at every step."
             ),
@@ -615,9 +615,9 @@ class BlogContentEngine:
             "A mature implementation operates across four layers working in sequence:",
             "",
             f"1. **Intake and signal detection**, what triggers the workflow and how candidates enter the system",
-            f"2. **Data validation and enrichment**, every contact meets qualification standards before outbound fires",
+            f"2. **Data validation and enrichment**, every contact meets qualification standards before outreach is authorised",
             f"3. **CRM synchronisation**, clean, structured data with correct ownership and lifecycle state",
-            f"4. **Execution and feedback**, outbound, reply handling, and reporting that closes the loop",
+            f"4. **Execution and feedback**, outreach, reply handling, and reporting that closes the loop",
             "",
             f"## Workflow architecture",
             "",
@@ -627,7 +627,7 @@ class BlogContentEngine:
             "  > Qualification scoring against ICP",
             "  > CRM write-back (owner, stage, account link, dedup)",
             "  > Suppression check + sequence assignment",
-            "  > Outbound execution",
+            "  > Workflow execution",
             "  > Reply routing > demo booking / snooze / suppress",
             "  > Weekly pipeline report to revenue leadership",
             "```",
@@ -671,21 +671,21 @@ class BlogContentEngine:
             "| Workflow depth | Can the system handle multi-step enrichment, conditional routing, and CRM write-back in one flow? |",
             "| CRM data quality | Does it write structured records, or dump raw contacts that need manual cleanup? |",
             "| Enrichment governance | Can you chain providers with fallback logic and quality thresholds? |",
-            "| Outbound execution | Is sequencing governed within the system, or outsourced to a separate tool? |",
+            "| Workflow execution | Is sequencing governed within the system, or outsourced to a separate tool? |",
             "| Operator ownership | Can revenue teams iterate on workflows without engineering tickets? |",
             "| Outcome reporting | Does it measure demos booked and CRM hygiene, or just activity? |",
             "",
             f"## Where {brand} fits for {keyword}",
             "",
             f"**{brand} is the right choice when:**",
-            f"- You need enrichment, CRM sync, and outbound execution in one governed layer",
+            f"- You need enrichment, CRM sync, and workflow routing in one governed operational layer",
                 f"- Your team needs to iterate on workflows without engineering dependency",
             f"- Data inconsistency between tools is causing duplicate outreach or dirty CRM records",
             f"- You are replacing 3-5 point solutions with one orchestration system",
             "",
             f"**{brand} is not the right fit when:**",
             f"- You only need simple single-step automations (a lighter tool is faster to launch)",
-            f"- Your team does not run outbound or CRM-heavy workflows",
+            f"- Your team does not need workflow governance or has no CRM-heavy processes",
             f"- You need a consumer-grade no-code tool with no workflow configuration",
             "",
             f"## Migration and implementation considerations",
@@ -723,7 +723,7 @@ class BlogContentEngine:
             "",
             (
                 f"**Pattern 1: Data enters the workflow unchecked**, Unvalidated contacts get enriched "
-                f"with partial data, which breaks ICP scoring, which sends outbound to wrong-fit accounts, "
+                f"with partial data, which breaks ICP scoring, which targets wrong-fit accounts, "
                 f"which tanks deliverability. The problem started at intake, not at the inbox."
             ),
             "",
@@ -748,7 +748,7 @@ class BlogContentEngine:
             ),
             "",
             (
-                f"**Fix 2, Close the CRM loop before outbound**, Every workflow step writes a "
+                f"**Fix 2, Close the CRM loop before outreach**, Every workflow step writes a "
                 f"structured CRM update before the sequence fires. Ownership, lifecycle stage, "
                 f"and account association are set in the workflow, not manually cleaned up later."
             ),
@@ -764,7 +764,7 @@ class BlogContentEngine:
             "```text",
             "Intake > Validation gate > Enrichment > ICP scoring",
             "  > CRM write-back (owner + stage + dedup) > Suppression check",
-            "  > Sequence assignment > Outbound",
+            "  > Sequence assignment > Outreach",
             "  > Reply routing > CRM update + demo booking / snooze / suppress",
             "  > Weekly pipeline report to revenue leadership",
             "```",
@@ -793,7 +793,7 @@ class BlogContentEngine:
             (
                 f"> **Bottom line:** When evaluating {keyword}, focus on workflow depth, "
                 f"CRM write-back quality, and whether the system can govern enrichment, "
-                f"sequencing, and reply routing in one layer, not just automate individual steps."
+                f"workflow routing, and reply handling in one layer, not just automate individual steps."
             ),
             "",
             f"## What this comparison is actually about",
@@ -809,7 +809,7 @@ class BlogContentEngine:
             "",
             (
                 f"**Orchestration buyers** need a system that governs the entire workflow, signal "
-                f"capture, enrichment, CRM sync, outbound, reply handling. They are replacing a "
+                f"capture, enrichment, CRM sync, routing, reply handling. They are replacing a "
                 f"fragmented stack of 4-6 tools."
             ),
             "",
@@ -837,14 +837,14 @@ class BlogContentEngine:
             f"## Where {brand} fits on {keyword}",
             "",
             f"**{brand} is the right choice when:**",
-            f"- You need enrichment, CRM, and sequencing in one governed architecture",
+            f"- You need enrichment, CRM, and workflow routing in one governed architecture",
                 f"- Your team needs to iterate on workflows without engineering dependency",
             f"- Data quality between tools is a recurring operational problem",
             f"- You are consolidating a fragmented point-solution stack",
             "",
             f"**{brand} is not the best fit when:**",
             f"- You only need one-step automations with no CRM or enrichment requirement",
-            f"- Your team runs purely inbound with no outbound component",
+            f"- Your team runs purely inbound with no outreach component",
             f"- You need a consumer no-code tool with zero workflow configuration",
             "",
             f"## Implementation and migration notes",
@@ -902,7 +902,7 @@ class BlogContentEngine:
             "",
             (
                 f"**Enrichment and scoring**, Chain enrichment providers to fill company data, job "
-                f"title, and tech stack. Apply ICP scoring before any outbound step is authorised. "
+                f"title, and tech stack. Apply ICP scoring before any outreach step is authorised. "
                 f"Contacts below threshold go to a review queue, not the sequence."
             ),
             "",
@@ -933,7 +933,7 @@ class BlogContentEngine:
             "  > CRM write-back (owner, stage, account link)",
             "  > Suppression check",
             "  > Sequence assignment",
-            "  > Outbound execution",
+            "  > Workflow execution",
             "  > Reply routing > demo booking / snooze / suppress",
             "  > Pipeline reporting to revenue leadership",
             "```",
@@ -985,8 +985,8 @@ class BlogContentEngine:
             f"## The challenge",
             "",
             (
-                f"The team faced fragmented outbound operations. Lead sourcing, enrichment, CRM "
-                f"updates, sequencing, and reply handling each lived in separate tools with manual "
+                f"The team faced fragmented revenue operations. Lead sourcing, enrichment, CRM "
+                f"updates, routing, and reply handling each lived in separate tools with manual "
                 f"handoffs between them. {persona} needed a unified orchestration layer that could "
                 f"govern the entire revenue workflow without adding headcount."
             ),
@@ -1008,7 +1008,7 @@ class BlogContentEngine:
             "| CRM data completeness | 40-60% | 85-95% |",
             "| Time from signal to outreach | 2-5 days | < 4 hours |",
             "| Demos booked per 100 sequences | 1-2 | 4-6 |",
-            "| Pipeline sourced via outbound | 15% | 35% |",
+            "| Pipeline sourced via outreach | 15% | 35% |",
             "",
             f"## Implementation approach",
             "",
@@ -1032,8 +1032,8 @@ class BlogContentEngine:
             f"## Is this approach right for your team?",
             "",
             (
-                f"If your outbound team is spending more time on tool configuration than on selling, "
-                f"and you have existing CRM and sequencing investments that need unification, the same "
+                f"If your team spends more time on tool configuration and data entry than on selling, "
+                f"and you have existing CRM and workflow investments that need unification, the same "
                 f"approach can apply. The key prerequisite is clear ICP definitions and willing "
                 f"stakeholders across sales and RevOps."
             ),
@@ -1052,8 +1052,8 @@ class BlogContentEngine:
         if snippet_type == "how_to":
             return (
                 f"> **{kw_title}** requires four connected layers: intake and signal detection, "
-                f"data enrichment and qualification, CRM write-back and routing, and outbound "
-                f"execution with reply handling. Production systems handle all four in one governed "
+                f"data enrichment and qualification, CRM write-back and routing, and workflow "
+                f"governance with reply handling. Production systems handle all four in one governed "
                 f"workflow, not across separate tools.\n"
             )
         if snippet_type == "decision":
@@ -1071,7 +1071,7 @@ class BlogContentEngine:
             )
         return (
             f"> **{kw_title}** is the operational system that connects intent signals, data "
-            f"enrichment, CRM synchronisation, and outbound execution into one governed revenue "
+            f"enrichment, CRM synchronisation, and routing into one governed workload so reps focus on selling "
             f"workflow, replacing fragmented point tools with measurable, repeatable pipeline "
             f"generation.\n"
         )
@@ -1118,7 +1118,7 @@ class BlogContentEngine:
                 ),
                 (
                     f"How do I migrate from my current {keyword} setup to {brand}?",
-                    f"Start with one workflow, typically inbound lead enrichment or a single outbound "
+                    f"Start with one workflow, typically inbound lead enrichment or a single outreach "
                     f"segment. Prove the data quality improvement, then migrate additional use cases. "
                     f"Avoid big-bang migrations that create downtime risk.",
                 ),
@@ -1257,7 +1257,7 @@ class BlogContentEngine:
             seo_title = f"{kw_title}: The System That Actually Works | Pipeleap"
             meta = (
                 f"Stop losing pipeline to manual {keyword} steps. See how Pipeleap automates "
-                f"enrichment, CRM sync, and outbound execution in one governed workflow."
+                f"enrichment, CRM sync, and workflow governance in one operational layer."
             )[:158]
             return seo_title, meta
 
@@ -1265,22 +1265,22 @@ class BlogContentEngine:
             seo_title = f"{kw_title} | Step-by-Step with Pipeleap"
             meta = (
                 f"Learn how to implement {keyword} with enrichment, CRM write-back, and "
-                f"outbound execution working as one governed system, not separate tools."
+                f"data and workflows operating as one governed system, not separate tools."
             )[:158]
             return seo_title, meta
 
         if intent == "commercial":
-            seo_title = f"{kw_title} | Pipeleap Revenue Automation"
+            seo_title = f"{kw_title} | Pipeleap Revenue Operations"
             meta = (
                 f"Evaluate {keyword} with a revenue-first lens: workflow depth, CRM quality, "
-                f"enrichment control, and outbound execution in one system."
+                f"enrichment control and CRM automation in one operational layer."
             )[:158]
             return seo_title, meta
 
         seo_title = f"{kw_title} | Pipeleap"
         meta = (
             f"Understand {keyword} end to end: signal capture, enrichment, CRM sync, and "
-            f"outbound execution governed by one workflow layer."
+            f"operations governed by one workflow layer."
         )[:158]
         return seo_title, meta
 

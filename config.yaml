@@ -3,7 +3,7 @@
     "brand": "Pipeleap",
     "site_url": "https://www.pipeleap.com",
     "domain": "pipeleap.com",
-    "product_summary": "Pipeleap is the workflow orchestration system for SaaS organizations that increases revenue through predictable pipeline generation using structured, signal-based outbound sales automation. It automates signal capture, lead enrichment, multi-channel sequencing, reply routing, and CRM sync — eliminating manual SDR execution without replacing your existing CRM or sequencer.",
+    "product_summary": "Pipeleap is the operational layer that eliminates the non-selling work consuming 60-80% of a sales rep's time — CRM data entry, account research, contact enrichment, sequence management, reply routing, and moving data between disconnected systems. It sits above your CRM, enrichment, and sequencing tools, orchestrating them into one governed system so your team can focus on conversations, relationships, and closing opportunities.",
     "cta": {
       "primary_label": "Book a demo",
       "secondary_label": "See how it works",

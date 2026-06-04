@@ -94,20 +94,19 @@ class GrowthKeywordEngine:
 
     # Short-tail core terms (1-2 words) for broad commercial capture
     SHORT_TAIL_TERMS = [
-        "outbound automation",
-        "sales automation",
         "pipeline generation",
         "workflow orchestration",
         "lead enrichment",
         "crm automation",
-        "sdr automation",
         "revops automation",
-        "cold outreach",
-        "sales workflow",
+        "sales productivity",
         "revenue operations",
-        "signal based outbound",
-        "sales engagement",
+        "workflow governance",
         "gtm automation",
+        "sales workflow automation",
+        "revenue operations platform",
+        "non selling work elimination",
+        "sales operations platform",
     ]
 
     # Medium-tail patterns that expand core terms into natural 3-4 word phrases
@@ -126,8 +125,8 @@ class GrowthKeywordEngine:
         ("{term} guide",                  "informational",  "blog_post",       "problem-aware"),
     ]
 
-    # Local market keywords — positions pipeleap as the best global platform,
-    # while capturing local search intent (e.g. "best outbound automation in uk").
+    # Local market keywords — positions pipeleap globally
+    # while capturing local search intent for sales productivity & operations terms.
     LOCAL_MARKETS = [
         ("us",           ["in us", "for us businesses", "usa"]),
         ("europe",       ["in europe", "for european businesses", "europe"]),
@@ -145,27 +144,26 @@ class GrowthKeywordEngine:
         "pipeleap reviews",
         "pipeleap platform",
         "pipeleap gtm audit",
-        "pipeleap outbound automation",
+        "pipeleap revenue operations",
         "pipeleap workflow orchestration",
     ]
 
     # Core terms to generate question + long-tail variants from
     CORE_TERMS = [
-        "outbound sales automation",
-        "outbound automation",
-        "signal-based outbound",
-        "sales workflow automation",
         "pipeline generation",
         "workflow orchestration",
         "lead enrichment automation",
         "crm automation",
-        "sdr automation",
         "revenue operations automation",
-        "automated outbound emails",
-        "outbound without an sdr",
+        "sales productivity platform",
+        "revenue operations layer",
+        "signal-based outbound",
         "predictable pipeline",
-        "n8n sales automation",
-        "outbound sequencing automation",
+        "n8n workflow automation",
+        "workflow governance",
+        "non selling work elimination",
+        "sales operations platform",
+        "sales workflow automation",
     ]
 
     def build_matrix(self) -> list[dict[str, Any]]:
@@ -393,20 +391,20 @@ class GrowthKeywordEngine:
         # High-value individual questions not covered by the matrix
         specific_questions = [
             ("what is a workflow orchestration system",         "glossary_page"),
-            ("what is signal-based outbound sales",             "glossary_page"),
+            ("what is non selling work in sales",               "glossary_page"),
             ("what is predictable pipeline generation",         "glossary_page"),
-            ("why does outbound have low reply rates",          "blog_post"),
-            ("why is my outbound email reply rate low",         "blog_post"),
+            ("why do sales reps spend more time on admin than selling", "blog_post"),
+            ("how to eliminate non selling work for sales teams", "blog_post"),
             ("how do sdrs spend their time",                    "blog_post"),
-            ("how many outbound emails should an sdr send",     "blog_post"),
-            ("when should saas companies hire an sdr",          "blog_post"),
-            ("what is a good outbound conversion rate for saas","blog_post"),
-            ("how to build an outbound sales team from scratch","blog_post"),
-            ("what tools do revops teams use for outbound",     "blog_post"),
-            ("how to scale outbound without hiring more sdrs",  "blog_post"),
-            ("what is the best outbound stack for saas 2025",   "comparison_page"),
+            ("what is sales productivity and how to improve it", "blog_post"),
+            ("when should saas companies invest in sales operations", "blog_post"),
+            ("how to build a scalable revenue operations stack", "blog_post"),
+            ("what tools do revops teams use",                  "blog_post"),
+            ("how to scale pipeline without hiring more reps",  "blog_post"),
             ("how to automate lead enrichment for b2b sales",   "use_case_page"),
             ("what is the difference between zapier and n8n for sales", "comparison_page"),
+            ("what are the benefits of workflow governance",    "blog_post"),
+            ("how to reduce time spent on crm data entry",      "blog_post"),
         ]
         for kw, page_type in specific_questions:
             intent = "commercial" if page_type in ("comparison_page", "use_case_page") else "informational"
@@ -421,11 +419,11 @@ class GrowthKeywordEngine:
 
     # ─── Industry vertical keywords ───────────────────────────────────────────
     # Generates industry-specific variants of core terms.
-    # "outbound automation for fintech" etc. have near-zero competition.
+    # "workflow orchestration for healthcare" etc. have near-zero competition.
 
     def _industry_vertical_keywords(self) -> list[dict[str, Any]]:
         entries = []
-        top_terms = ["outbound automation", "pipeline generation", "sales workflow automation", "lead enrichment automation"]
+        top_terms = ["pipeline generation", "workflow orchestration", "sales workflow automation", "lead enrichment automation", "revenue operations"]
         for term in top_terms:
             for industry in self.INDUSTRY_VERTICALS:
                 kw = f"{term} for {industry}"
@@ -511,17 +509,17 @@ class GrowthKeywordEngine:
 
     # ─── Local market keywords ─────────────────────────────────────────────────
     # Positions pipeleap globally while capturing country-level search intent.
-    # "best outbound automation platform in uk" — not "uk-specific tool".
+    # "best pipeline generation platform in uk" — not "uk-specific tool".
 
     def _local_market_keywords(self) -> list[dict[str, Any]]:
         entries = []
         local_terms = [
-            "outbound automation platform",
-            "sales automation platform",
             "pipeline generation platform",
             "workflow orchestration platform",
             "lead enrichment platform",
-            "sdr automation platform",
+            "revenue operations platform",
+            "sales productivity platform",
+            "sales operations platform",
         ]
         for term in local_terms:
             entries.append({
@@ -552,11 +550,12 @@ class GrowthKeywordEngine:
         entries = []
         stage_patterns = [
             # (keyword_template, intent, page_type, funnel_stage)
-            ("outbound automation for {arr} arr saas",          "commercial", "use_case_page",    "solution-aware"),
-            ("{persona} outbound automation",                   "transactional", "role_page",     "decision"),
-            ("pipeline generation for {stage_label}",          "commercial", "use_case_page",    "solution-aware"),
-            ("outbound without {negative}",                    "commercial", "use_case_page",    "solution-aware"),
-            ("sales automation for {stage_label} companies",   "commercial", "use_case_page",    "solution-aware"),
+            ("pipeline generation for {arr} arr saas",                    "commercial", "use_case_page",    "solution-aware"),
+            ("{persona} revenue operations platform",                     "transactional", "role_page",     "decision"),
+            ("workflow orchestration for {stage_label}",                  "commercial", "use_case_page",    "solution-aware"),
+            ("pipeline without {negative}",                               "commercial", "use_case_page",    "solution-aware"),
+            ("sales operations for {stage_label} companies",             "commercial", "use_case_page",    "solution-aware"),
+            ("eliminate non selling work for {stage_label}",             "commercial", "use_case_page",    "solution-aware"),
         ]
         stage_fills = [
             {"arr": "0-1m", "stage_label": "early stage saas", "persona": "founder", "negative": "an sdr team"},

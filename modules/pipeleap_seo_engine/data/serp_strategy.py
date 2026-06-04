@@ -17,17 +17,17 @@ Covers all 7 pillars:
 META_TARGETS: list[dict] = [
     {
         "path": "/",
-        "title": "Outbound Sales Automation & GTM Implementation | Pipeleap",
+        "title": "Revenue Operations & Pipeline Automation | Pipeleap",
         "meta_description": (
-            "Pipeleap builds and runs your entire outbound engine - 11 connected modules "
+            "Pipeleap builds and runs your entire revenue engine - 11 connected modules "
             "covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup."
         ),
     },
     {
         "path": "/about",
-        "title": "About Pipeleap - End-to-End Outbound Built & Operated For You",
+        "title": "About Pipeleap - Revenue Operations Built & Operated For You",
         "meta_description": (
-            "We deploy your outbound system and run it as a managed service. "
+            "We deploy your revenue system and run it as a managed service. "
             "No tool sprawl, no setup Saturdays. One working engine that gets smarter over time."
         ),
     },
@@ -35,23 +35,23 @@ META_TARGETS: list[dict] = [
         "path": "/gtm-audit",
         "title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
         "meta_description": (
-            "Get a full audit of your outbound engine - targeting, messaging, workflows, and "
+            "Get a full audit of your revenue engine - targeting, messaging, workflows, and "
             "pipeline health. Identify what is broken and get a fix plan in under 2 weeks."
         ),
     },
     {
         "path": "/faq",
-        "title": "Outbound Sales Automation FAQ - Pipeleap",
+        "title": "Revenue Operations FAQ - Pipeleap",
         "meta_description": (
             "Answers to common questions about how Pipeleap builds, deploys, and operates "
-            "outbound sales systems for B2B revenue teams."
+            "revenue systems for B2B teams."
         ),
     },
     {
         "path": "/pricing",
-        "title": "Outbound Sales Automation Pricing | Pipeleap",
+        "title": "Revenue Operations Pricing | Pipeleap",
         "meta_description": (
-            "Pipeleap pricing for managed outbound sales automation and GTM implementation. "
+            "Pipeleap pricing for managed revenue operations and GTM implementation. "
             "Built and operated for B2B teams - no seat licences, no duct tape."
         ),
     },
@@ -59,24 +59,24 @@ META_TARGETS: list[dict] = [
 
 # 2. High-CTR headline variants
 CTR_VARIANTS: list[dict] = [
-    {"intent": "problem_aware",  "headline": "Why Your Outbound Stack Is Not Working (And How to Fix It)"},
-    {"intent": "comparison",     "headline": "Pipeleap vs. Hiring an SDR: What Actually Builds Pipeline"},
+    {"intent": "problem_aware",  "headline": "Why Your Sales Stack Is Not Working (And How to Fix It)"},
+    {"intent": "comparison",     "headline": "Pipeleap vs. Hiring a Sales Rep: What Actually Builds Pipeline"},
     {"intent": "outcome_driven", "headline": "How to Get 3x More Meetings Without Hiring More Reps"},
     {"intent": "urgency",        "headline": "Your Sales Reps Are Spending 65% of Their Day on Admin. Stop It."},
-    {"intent": "curiosity",      "headline": "The 11 Modules Every Outbound Engine Needs (Most Teams Have 3)"},
+    {"intent": "curiosity",      "headline": "The 11 Modules Every Revenue Engine Needs (Most Teams Have 3)"},
 ]
 
 # 3. FAQ topics for Google rich results
 FAQ_RICH_RESULT_TOPICS: list[str] = [
-    "What is outbound sales automation?",
-    "How long does it take to build a working outbound system?",
+    "What is revenue operations?",
+    "How long does it take to build a working revenue system?",
     "What is a GTM audit and why does it matter?",
-    "What is ICP scoring in outbound sales?",
+    "What is ICP scoring in sales?",
     "How does AI personalisation improve reply rates in cold outreach?",
-    "What is the difference between a sales engagement platform and a managed outbound service?",
+    "What is the difference between a sales engagement platform and a managed revenue service?",
     "How many touches does it take to book a B2B sales meeting?",
     "What does a GTM implementation partner do?",
-    "Can outbound sales be fully automated?",
+    "Can sales workflows be fully automated?",
     "How do I fix an unpredictable sales pipeline?",
 ]
 
@@ -91,11 +91,11 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
         "estimated_difficulty": 28.0,
         "speed_to_rank_score": 0.78,
         "keywords": [
-            "why is my outbound not working",
+            "why is my sales pipeline not working",
             "sales reps spending too much time on admin",
-            "outbound pipeline not predictable",
-            "how to fix outbound sales process",
-            "outbound sales not generating leads",
+            "pipeline not predictable",
+            "how to fix sales process",
+            "sales not generating leads",
         ],
     },
     {
@@ -107,12 +107,12 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
         "estimated_difficulty": 46.0,
         "speed_to_rank_score": 0.55,
         "keywords": [
-            "outbound sales automation platform",
-            "best AI outbound sales tools 2025",
+            "revenue operations platform",
+            "best AI sales tools 2026",
             "sales workflow automation software",
-            "managed outbound sales service",
+            "managed revenue operations service",
             "gtm implementation partner B2B",
-            "done for you outbound sales",
+            "done for you revenue operations",
         ],
     },
     {
@@ -141,7 +141,7 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
         "estimated_difficulty": 32.0,
         "speed_to_rank_score": 0.72,
         "keywords": [
-            "how to build an outbound sales system",
+            "how to build a revenue system",
             "how to automate B2B prospecting",
             "how to write cold outreach that gets replies",
             "how to do a GTM audit",
@@ -158,7 +158,7 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
         "estimated_difficulty": 65.0,
         "speed_to_rank_score": 0.35,
         "keywords": [
-            "outbound automation",
+            "sales productivity",
             "sales automation",
             "pipeline generation",
             "workflow orchestration",
@@ -192,16 +192,16 @@ CONTENT_PLAN: list[dict] = [
         "slug": "apollo-clay-pipeleap-comparison",
         "page_type": "blog_post",
         "title": "Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
-        "seo_title": "Apollo.io vs Clay vs Pipeleap: Which Outbound Tool Is Right for You?",
+        "seo_title": "Apollo.io vs Clay vs Pipeleap: Which Revenue Tool Is Right for You?",
         "meta_description": (
-            "Comparing Apollo.io, Clay, and Pipeleap for outbound sales. Learn what each does, "
+            "Comparing Apollo.io, Clay, and Pipeleap for revenue operations. Learn what each does, "
             "where each falls short, and which one actually builds predictable pipeline."
         ),
         "target_keyword": "Apollo.io alternatives",
         "cluster": "alternative_comparison",
         "pillar_link": "/gtm-audit",
         "internal_links": ["/glossary/icp-scoring", "/gtm-audit"],
-        "persona": "Head of Sales evaluating outbound tools",
+        "persona": "Head of Sales evaluating revenue tools",
         "eeat_notes": [
             "Add feature comparison table",
             "Include decision framework: who should pick which tool",
@@ -209,19 +209,19 @@ CONTENT_PLAN: list[dict] = [
         ],
     },
     {
-        "slug": "sdr-agency-vs-outbound-automation",
+        "slug": "sdr-agency-vs-revenue-automation",
         "page_type": "blog_post",
-        "title": "SDR Agency vs. Outbound Automation: What Is Better for Pipeline?",
-        "seo_title": "SDR Agency vs Outbound Automation | Pipeleap",
+        "title": "SDR Agency vs. Revenue Automation: What Is Better for Pipeline?",
+        "seo_title": "SDR Agency vs Revenue Automation | Pipeleap",
         "meta_description": (
-            "Weighing an SDR agency against outbound automation? This guide breaks down cost, "
+            "Weighing an SDR agency against revenue automation? This guide breaks down cost, "
             "speed, quality, and scale so you can pick the right model for your stage."
         ),
         "target_keyword": "SDR agency vs automation",
         "cluster": "alternative_comparison",
         "pillar_link": "/gtm-audit",
         "internal_links": ["/gtm-audit", "/"],
-        "persona": "B2B founder or VP Sales deciding how to staff outbound",
+        "persona": "B2B founder or VP Sales deciding how to staff revenue teams",
         "eeat_notes": [
             "Include real cost breakdown: agency retainer vs Pipeleap vs in-house SDR",
             "Add speed-to-pipeline comparison",
@@ -233,7 +233,7 @@ CONTENT_PLAN: list[dict] = [
         "title": "What Is Sales Orchestration? (And Why Point Tools Do Not Do It)",
         "seo_title": "What Is Sales Orchestration? Definition, Examples, and Tools",
         "meta_description": (
-            "Sales orchestration connects every outbound motion into one coordinated system. "
+            "Sales orchestration connects every revenue motion into one coordinated system. "
             "Learn what it is, how it differs from automation, and why it matters for pipeline."
         ),
         "target_keyword": "what is sales orchestration",
@@ -252,14 +252,14 @@ CONTENT_PLAN: list[dict] = [
         "title": "How to Run a GTM Audit in 5 Steps",
         "seo_title": "How to Run a GTM Audit: 5-Step Framework for B2B Sales Teams",
         "meta_description": (
-            "A GTM audit identifies exactly where your outbound is leaking. Follow this 5-step "
+            "A GTM audit identifies exactly where your pipeline is leaking. Follow this 5-step "
             "framework to audit targeting, messaging, workflows, and pipeline health."
         ),
         "target_keyword": "how to do a GTM audit",
         "cluster": "how_to",
         "pillar_link": "/gtm-audit",
         "internal_links": ["/gtm-audit", "/glossary/icp-scoring"],
-        "persona": "Head of Sales who suspects outbound is underperforming",
+        "persona": "Head of Sales who suspects pipeline is underperforming",
         "eeat_notes": [
             "Include inline audit checklist",
             "Add real signals that indicate an audit is overdue",
@@ -272,13 +272,13 @@ CONTENT_PLAN: list[dict] = [
         "seo_title": "How to Build Predictable Pipeline Without Hiring More SDRs | Pipeleap",
         "meta_description": (
             "Most companies hire SDRs to fix a pipeline problem that is actually a systems problem. "
-            "Here is how to build predictable outbound pipeline through automation instead."
+            "Here is how to build predictable pipeline through automation instead."
         ),
         "target_keyword": "predictable pipeline",
         "cluster": "solution_evaluation",
         "pillar_link": "/",
         "internal_links": ["/", "/gtm-audit"],
-        "persona": "Founder frustrated with SDR headcount not delivering results",
+        "persona": "Founder frustrated with headcount not delivering pipeline results",
         "eeat_notes": [
             "Open with cost of SDR hire vs automation ROI",
             "Include pipeline model showing how automation compounds over time",
@@ -287,17 +287,17 @@ CONTENT_PLAN: list[dict] = [
     {
         "slug": "outbound-stack-too-many-tools",
         "page_type": "blog_post",
-        "title": "Why Your Outbound Stack Has Too Many Tools and Not Enough Pipeline",
+        "title": "Why Your Sales Stack Has Too Many Tools and Not Enough Pipeline",
         "seo_title": "Too Many Sales Tools, Not Enough Pipeline | Pipeleap",
         "meta_description": (
-            "Adding more tools does not fix outbound. Here is why fragmented stacks fail and "
-            "what a unified outbound engine looks like instead."
+            "Adding more tools does not fix pipeline problems. Here is why fragmented stacks fail and "
+            "what a unified revenue engine looks like instead."
         ),
-        "target_keyword": "outbound sales stack",
+        "target_keyword": "sales stack",
         "cluster": "problem_pain",
         "pillar_link": "/",
         "internal_links": ["/", "/about"],
-        "persona": "VP Sales or RevOps leader drowning in tool sprawl",
+        "persona": "RevOps leader drowning in tool sprawl",
         "eeat_notes": [
             "Lead with stat: average B2B sales stack has 10+ tools",
             "Show the integration tax: each connector equals maintenance debt",
@@ -360,17 +360,17 @@ CONTENT_PLAN: list[dict] = [
     {
         "slug": "11-modules-outbound-engine",
         "page_type": "blog_post",
-        "title": "The 11 Modules Every Outbound Engine Needs",
-        "seo_title": "The 11 Modules of a Complete Outbound Engine | Pipeleap",
+        "title": "The 11 Modules Every Revenue Engine Needs",
+        "seo_title": "The 11 Modules of a Complete Revenue Engine | Pipeleap",
         "meta_description": (
-            "Most outbound stacks cover 3 of the 11 modules a complete engine needs. "
+            "Most revenue stacks cover 3 of the 11 modules a complete engine needs. "
             "Here is what the full system looks like and why each module matters."
         ),
-        "target_keyword": "outbound engine modules",
+        "target_keyword": "revenue engine modules",
         "cluster": "solution_evaluation",
         "pillar_link": "/about",
         "internal_links": ["/about", "/"],
-        "persona": "RevOps leader or Head of Sales architecting an outbound system",
+        "persona": "RevOps leader or Head of Sales architecting a revenue system",
         "eeat_notes": [
             "Use the actual Pipeleap 11-module framework as the structure",
         ],
@@ -379,16 +379,16 @@ CONTENT_PLAN: list[dict] = [
 
 # 6. Directory submission queue
 DIRECTORY_TARGETS: list[dict] = [
-    {"name": "G2",              "url": "https://www.g2.com",             "category": "Sales Engagement",         "priority": 1, "da": 90},
-    {"name": "Capterra",        "url": "https://www.capterra.com",       "category": "Sales Automation Software", "priority": 1, "da": 88},
+    {"name": "G2",              "url": "https://www.g2.com",             "category": "Revenue Operations",       "priority": 1, "da": 90},
+    {"name": "Capterra",        "url": "https://www.capterra.com",       "category": "Revenue Operations Software", "priority": 1, "da": 88},
     {"name": "Clutch.co",       "url": "https://clutch.co",              "category": "Sales Consulting / GTM",    "priority": 1, "da": 82},
     {"name": "AlternativeTo",   "url": "https://alternativeto.net",      "category": "Alt to Apollo/Clay",        "priority": 1, "da": 78},
     {"name": "Product Hunt",    "url": "https://www.producthunt.com",    "category": "Full product launch",       "priority": 1, "da": 90},
     {"name": "Trustpilot",      "url": "https://www.trustpilot.com",     "category": "Business Services",         "priority": 2, "da": 92},
-    {"name": "GetApp",          "url": "https://www.getapp.com",         "category": "Sales Automation Software", "priority": 2, "da": 84},
-    {"name": "Software Advice", "url": "https://www.softwareadvice.com", "category": "Sales Automation",          "priority": 2, "da": 80},
-    {"name": "Futurepedia",     "url": "https://www.futurepedia.io",     "category": "Sales Automation AI",       "priority": 2, "da": 55},
-    {"name": "SourceForge",     "url": "https://sourceforge.net",        "category": "Sales Software",            "priority": 3, "da": 82},
+    {"name": "GetApp",          "url": "https://www.getapp.com",         "category": "Revenue Operations Software", "priority": 2, "da": 84},
+    {"name": "Software Advice", "url": "https://www.softwareadvice.com", "category": "Revenue Operations",          "priority": 2, "da": 80},
+    {"name": "Futurepedia",     "url": "https://www.futurepedia.io",     "category": "Revenue Operations AI",       "priority": 2, "da": 55},
+    {"name": "SourceForge",     "url": "https://sourceforge.net",        "category": "Revenue Software",            "priority": 3, "da": 82},
     {"name": "Indie Hackers",   "url": "https://www.indiehackers.com",   "category": "Founder story",             "priority": 3, "da": 74},
 ]
 
@@ -398,21 +398,21 @@ GUEST_POST_TARGETS: list[dict] = [
         "publication": "Sales Hacker",
         "url": "https://www.saleshacker.com",
         "da": 76,
-        "pitch_angle": "The Death of the Point-Tool Stack: Why Managed Outbound Is Winning",
+        "pitch_angle": "The Death of the Point-Tool Stack: Why Managed Revenue Operations Is Winning",
         "contact": "contributors@saleshacker.com",
     },
     {
         "publication": "HubSpot Blog",
         "url": "https://blog.hubspot.com",
         "da": 93,
-        "pitch_angle": "How B2B Teams Are Using AI to Automate Outbound at Scale",
+        "pitch_angle": "How B2B Teams Are Using AI to Automate Revenue Operations at Scale",
         "contact": "https://blog.hubspot.com/marketing/guest-blogging-guidelines",
     },
     {
         "publication": "G2 Learning Hub",
         "url": "https://learn.g2.com",
         "da": 90,
-        "pitch_angle": "Outbound Sales Automation: A Practical Guide for Revenue Teams",
+        "pitch_angle": "Revenue Operations: A Practical Guide for B2B Teams",
         "contact": "content@g2.com",
     },
     {
@@ -426,14 +426,14 @@ GUEST_POST_TARGETS: list[dict] = [
         "publication": "Close.com Blog",
         "url": "https://www.close.com/blog",
         "da": 72,
-        "pitch_angle": "How to Automate Prospecting Without Losing the Human Touch",
+        "pitch_angle": "How to Automate Prospecting Without Losing the Human Element",
         "contact": "https://www.close.com/blog/write-for-us",
     },
     {
         "publication": "Predictable Revenue",
         "url": "https://predictablerevenue.com",
         "da": 66,
-        "pitch_angle": "Why Outbound Automation Compounds: The Case for a Managed Engine",
+        "pitch_angle": "Why Revenue Operations Compounds: The Case for a Managed Engine",
         "contact": "hello@predictablerevenue.com",
     },
 ]
@@ -441,7 +441,7 @@ GUEST_POST_TARGETS: list[dict] = [
 # 8. Internal linking cluster map
 LINKING_CLUSTERS: list[dict] = [
     {
-        "cluster": "Outbound Sales Automation",
+        "cluster": "Revenue Operations",
         "pillar_page": "/",
         "spoke_articles": [
             "/blog/ai-personalization-cold-email",
@@ -449,14 +449,14 @@ LINKING_CLUSTERS: list[dict] = [
             "/blog/outbound-stack-too-many-tools",
             "/blog/predictable-pipeline-without-sdrs",
         ],
-        "glossary_links": ["/glossary/outbound-sales", "/glossary/sales-automation"],
+        "glossary_links": ["/glossary/sales-automation"],
     },
     {
         "cluster": "GTM Implementation",
         "pillar_page": "/gtm-audit",
         "spoke_articles": [
             "/blog/how-to-run-gtm-audit",
-            "/blog/sdr-agency-vs-outbound-automation",
+            "/blog/sdr-agency-vs-revenue-automation",
             "/blog/apollo-clay-pipeleap-comparison",
         ],
         "glossary_links": ["/glossary/gtm-audit", "/glossary/icp-scoring"],
@@ -468,7 +468,7 @@ LINKING_CLUSTERS: list[dict] = [
             "/blog/what-is-sales-orchestration",
             "/blog/11-modules-outbound-engine",
         ],
-        "glossary_links": ["/glossary/sales-orchestration", "/glossary/outbound-sales"],
+        "glossary_links": ["/glossary/sales-orchestration"],
     },
 ]
 
@@ -481,9 +481,9 @@ LINKEDIN_CADENCE: dict = {
             "day": "Monday",
             "format": "insight",
             "prompt_template": (
-                "Share one non-obvious observation about outbound sales or GTM. "
+                "Share one non-obvious observation about revenue operations or GTM. "
                 "Open with a counter-intuitive statement. "
-                "End: We run this entire system for B2B sales teams at Pipeleap. Link in bio."
+                "End: We run this entire system for B2B teams at Pipeleap. Link in bio."
             ),
         },
         {
@@ -496,7 +496,7 @@ LINKEDIN_CADENCE: dict = {
             ),
         },
     ],
-    "newsletter_name": "The Outbound Letter",
+    "newsletter_name": "The Pipeline Letter",
     "newsletter_frequency": "weekly",
 }
 
@@ -518,7 +518,7 @@ AUTHORITY_TIERS: list[dict] = [
         "label": "Medium-effort, fast results",
         "tactics": [
             "HARO / Connectively daily responses for sales, AI, GTM queries",
-            "LinkedIn Newsletter: The Outbound Letter",
+            "LinkedIn Newsletter: The Pipeline Letter",
             "Partner co-marketing with Clay, Apollo, HubSpot for directory mentions",
         ],
     },
@@ -565,16 +565,16 @@ GSC_CTR_RULES: list[dict] = [
 BRAND_MONITORING_QUERIES: list[str] = [
     "Pipeleap",
     "pipeleap.com",
-    "outbound sales automation Pipeleap",
+    "revenue operations Pipeleap",
     "GTM implementation partner B2B",
-    "managed outbound service",
+    "managed revenue operations",
 ]
 
 BACKLINK_ANCHOR_VARIANTS: list[str] = [
-    "outbound sales automation",
+    "revenue operations",
     "GTM implementation partner",
-    "managed outbound service",
+    "managed revenue operations",
     "Pipeleap",
-    "outbound sales system",
-    "sales orchestration platform",
+    "revenue operations system",
+    "revenue orchestration platform",
 ]

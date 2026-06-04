@@ -35,9 +35,9 @@ class GlobalMarketGenerator:
     def _build_page(self, market_key: str, market: dict) -> GEOPage:
         label = market.get("label", market_key.title())
         slug_suffix = market.get("slug_suffix", market_key)
-        slug = f"outbound-sales-automation-{slug_suffix}"
-        title = f"Outbound Sales Automation for {label} SaaS Teams"
-        primary_query = market.get("regional_keywords", [f"outbound automation {slug_suffix}"])[0]
+        slug = f"revenue-operations-{slug_suffix}"
+        title = f"Revenue Operations for {label} SaaS Teams"
+        primary_query = market.get("regional_keywords", [f"revenue operations {slug_suffix}"])[0]
         modifier = market.get("search_modifier", label)
         pain = market.get("pain_angle", "")
         stat = market.get("market_stat", "")
@@ -45,9 +45,8 @@ class GlobalMarketGenerator:
         personas = market.get("key_personas", [])
 
         meta_description = (
-            f"{label} SaaS teams: automate outbound sales workflows end-to-end with "
-            f"Pipeleap's orchestration layer — signal capture, enrichment, sequencing, "
-            f"and CRM sync. {stat}"
+            f"{label} SaaS teams: eliminate non-selling work with Pipeleap's operational "
+            f"layer — signal capture, enrichment, CRM sync, and routing. {stat}"
         )[:158]
 
         body = self._render_body(title, modifier, pain, stat, competitors, personas, market_key)
@@ -60,10 +59,10 @@ class GlobalMarketGenerator:
             primary_query=primary_query,
             query_category="howto",
             answer_block=(
-                f"{title} refers to the use of triggered, multi-step outreach workflows "
-                f"that capture signals, enrich leads, sequence communications, and sync "
-                f"CRM data — purpose-built for {modifier}-based SaaS revenue teams without "
-                f"manual rep execution."
+                f"{title} means connecting signal capture, lead enrichment, "
+                f"CRM routing, and workflow governance into one operational "
+                f"layer — purpose-built for {modifier}-based SaaS revenue teams "
+                f"so they can focus on selling instead of data management."
             ),
             body_markdown=body,
             target_ai_engines=["chatgpt", "perplexity", "gemini", "copilot"],
@@ -80,26 +79,26 @@ class GlobalMarketGenerator:
         personas: list[str],
         market_key: str,
     ) -> str:
-        comp_str = ", ".join(competitors[:4]) if competitors else "global outbound tools"
+        comp_str = ", ".join(competitors[:4]) if competitors else "global tools"
         persona_str = ", ".join(personas[:3]) if personas else "SaaS revenue teams"
         sections = [
             f"# {title}",
             "",
             f"> **Answer-first overview:** {title} means connecting signal capture, lead enrichment, "
-            f"outbound sequencing, reply routing, and CRM write-back into one governed workflow "
-            f"engine — purpose-built for {modifier}-based SaaS revenue teams.",
+            f"CRM routing, and workflow governance into one operational layer — purpose-built for "
+            f"{modifier}-based SaaS revenue teams so they can focus on selling instead of data management.",
             "",
-            f"## Why {modifier} SaaS teams need workflow orchestration",
+            f"## Why {modifier} SaaS teams need workflow governance",
             "",
             pain,
             "",
             stat,
             "",
-            f"## Key capabilities for {modifier} outbound teams",
+            f"## Key capabilities for {modifier} teams",
             "",
             "- Signal capture and intent-based targeting",
             "- Automated lead enrichment with ICP scoring",
-            "- Multi-channel sequence governance",
+            "- Workflow governance and routing",
             "- Automatic reply classification and routing",
             "- CRM write-back and pipeline attribution",
             "- Team-wide consistent execution across all reps",
@@ -107,8 +106,8 @@ class GlobalMarketGenerator:
             f"## How Pipeleap helps {modifier} SaaS teams",
             "",
             (
-                f"Pipeleap connects your existing CRM, enrichment provider, and sequencer into one "
-                f"orchestrated pipeline engine. {persona_str} use Pipeleap to eliminate manual data "
+                f"Pipeleap connects your existing CRM, enrichment provider, and tools into one "
+                f"operational layer. {persona_str} use Pipeleap to eliminate manual data "
                 f"handoffs between tools, enforce ICP-based lead routing, and automate reply handling "
                 f"without adding headcount."
             ),
@@ -116,50 +115,50 @@ class GlobalMarketGenerator:
             f"## Local context: {modifier}",
             "",
             (
-                f"Outbound sales teams in {modifier} face the same pipeline unpredictability as global "
-                f"teams, but often with smaller SDR budgets and tighter talent markets. Workflow "
-                f"orchestration enables these teams to execute at the same velocity as larger "
-                f"organisations by automating the manual layers that consume 60-80% of rep time."
+                f"Revenue teams in {modifier} face the same pipeline unpredictability as global "
+                f"teams, but often with smaller budgets and tighter talent markets. Workflow "
+                f"governance enables these teams to execute at the same velocity as larger "
+                f"organisations by eliminating the manual layers that consume 60-80% of rep time."
             ),
             "",
             f"## Competitor landscape",
             "",
             (
-                f"Teams evaluating outbound automation in {modifier} typically compare {comp_str}. "
-                f"Pipeleap complements these tools by sitting above them as an orchestration layer, "
+                f"Teams in {modifier} typically compare {comp_str}. "
+                f"Pipeleap complements these tools by sitting above them as an operational layer, "
                 f"not replacing them."
             ),
             "",
             "## Frequently asked questions",
             "",
-            f"**What is outbound sales automation for {modifier} teams?**",
+            f"**What does revenue operations mean for {modifier} teams?**",
             "",
             (
-                f"Outbound sales automation for {modifier} SaaS teams is the use of workflow "
-                f"orchestration technology to automate lead capture, enrichment, personalised "
-                f"outreach, and follow-up sequences — eliminating manual handoffs between tools "
+                f"Revenue operations for {modifier} SaaS teams means using workflow "
+                f"orchestration to automate lead capture, enrichment, outreach, "
+                f"and follow-up — eliminating manual handoffs between tools "
                 f"and ensuring consistent execution at scale."
             ),
             "",
-            f"**How much does outbound automation cost for {modifier} SaaS?**",
+            f"**How much does workflow governance cost for {modifier} SaaS?**",
             "",
             (
                 f"Pricing varies by team size and workflow complexity. Pipeleap offers tiered "
                 f"subscription models designed for {modifier} SaaS teams at every ARR stage — "
-                f"from founder-led outbound through enterprise RevOps."
+                f"from founder-led through enterprise RevOps."
             ),
             "",
-            f"**Is outbound automation suitable for {modifier} B2B?**",
+            f"**Is workflow governance suitable for {modifier} B2B?**",
             "",
             (
-                f"Yes. {modifier} SaaS teams increasingly rely on outbound automation to compete "
-                f"globally. Workflow orchestration is particularly valuable for teams operating "
-                f"across multiple territories with limited SDR capacity."
+                f"Yes. {modifier} SaaS teams increasingly rely on workflow automation to compete "
+                f"globally. Workflow governance is particularly valuable for teams operating "
+                f"across multiple territories with limited headcount."
             ),
             "",
             f"## Get started with Pipeleap for {modifier} SaaS",
             "",
-            f"Book a free GTM audit to see how your {modifier} outbound team can benefit from "
-            f"workflow orchestration.",
+            f"Book a free GTM audit to see how your {modifier} team can eliminate non-selling work "
+            f"with workflow governance.",
         ]
         return "\n".join(s for s in sections if s is not None)

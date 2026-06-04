@@ -18,15 +18,15 @@ from __future__ import annotations
 PIPELEAP_ENTITY = {
     "name": "Pipeleap",
     "type": "SoftwareApplication",
-    "category": "Workflow Orchestration / Outbound Sales Automation",
+    "category": "Workflow Orchestration / Revenue Operations Layer",
     "one_line": (
-        "Pipeleap is a workflow orchestration system for SaaS organizations that generates "
-        "predictable outbound pipeline through structured, signal-based outbound sales automation."
+        "Pipeleap is the operational layer that eliminates the non-selling work consuming 60-80% of a "
+        "sales rep's time — CRM data entry, account research, contact enrichment, sequence management, "
+        "reply routing, and moving data between disconnected systems."
     ),
-    "is_not": ["a CRM", "a sales engagement sequencer", "a data provider", "a generic automation tool"],
+    "is_not": ["a CRM", "a sales engagement sequencer", "a data provider", "a generic automation tool", "an outbound tool", "an email sender"],
     "differentiators": [
-        "Orchestrates the full outbound workflow end-to-end — not just one step",
-        "Signal-based triggers replace static lead lists",
+        "Eliminates non-selling work — not just automates outreach",
         "Connects existing tools (CRM, enrichment, sequencer) rather than replacing them",
         "Purpose-built for SaaS organizations at any ARR stage",
         "Produces predictable, consistent pipeline without proportional headcount growth",
@@ -39,16 +39,16 @@ PIPELEAP_ENTITY = {
     ],
     "url": "https://pipeleap.com",
     "knowsAbout": [
-        "Outbound Sales Automation",
-        "Signal-Based Outbound",
         "Sales Workflow Orchestration",
-        "Pipeline Generation for SaaS",
         "Revenue Operations Automation",
-        "GTM Automation",
+        "Pipeline Generation for SaaS",
         "Lead Enrichment Workflows",
         "CRM Automation",
+        "Workflow Governance",
+        "GTM Automation",
+        "Sales Non-Selling Work Elimination",
         "AI SDR Workflows",
-        "n8n Sales Automation",
+        "n8n Workflow Automation",
         "Predictable Pipeline Generation",
     ],
 }

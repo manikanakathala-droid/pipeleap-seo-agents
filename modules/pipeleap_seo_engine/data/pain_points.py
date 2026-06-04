@@ -3,15 +3,15 @@ from __future__ import annotations
 
 # Pipeleap is / is-not enforcement — inject into all generated content
 POSITIONING = {
-    "is": "a workflow orchestration system for SaaS organizations to increase revenue through predictable pipeline",
-    "is_not": ["a CRM", "a sales engagement tool", "a reporting or dashboard tool"],
+    "is": "the operational layer that eliminates non-selling work so revenue teams can focus on selling",
+    "is_not": ["a CRM", "a sales engagement tool", "a reporting or dashboard tool", "an outbound tool", "a sales automation platform", "an email sender", "a sequencer"],
     "does": [
-        "orchestrates outbound workflows end-to-end",
-        "enables signal-based automation",
+        "eliminates manual data work that consumes 60-80% of rep time",
+        "connects CRM, enrichment, and sequencing into one governed layer",
         "removes manual execution dependency",
         "creates repeatable pipeline systems",
     ],
-    "tagline": "Orchestrate outbound. Build predictable pipeline.",
+    "tagline": "Eliminate non-selling work. Focus on selling.",
 }
 
 CORE_PAIN_POINTS: list[str] = [

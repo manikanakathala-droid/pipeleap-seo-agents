@@ -58,7 +58,7 @@ class LandingPageEngine:
 
         seo_title = f"{keyword_title} | Pipeleap Revenue Automation"
         meta_description = (
-            f"Launch {keyword} with Pipeleap's workflow automation stack for outbound, enrichment, "
+            f"Launch {keyword} with Pipeleap's operational layer for enrichment, CRM governance, and "
             f"CRM routing, and demo-driving execution."
         )[:158]
 
@@ -75,9 +75,9 @@ class LandingPageEngine:
             pain_items = "\n".join(f"- {p}" for p in stage_data["pain_points"][:4])
         else:
             pain_items = (
-                "- Manual enrichment and sequencing that doesn't scale.\n"
+                "- Manual enrichment and CRM data management that doesn't scale.\n"
                 "- Fragmented tools with no unified execution layer.\n"
-                "- No repeatable outbound playbook.\n"
+                "- No repeatable revenue operations playbook.\n"
                 "- Poor visibility into which workflows drive pipeline."
             )
 
@@ -99,7 +99,7 @@ class LandingPageEngine:
 
         direct_answer = (
             f"> **TL;DR — {keyword_title}:** A production-ready {keyword} system captures intent signals, "
-            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outbound "
+            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outreach "
             f"sequences automatically — replacing fragmented point tools with one governed revenue workflow.\n"
         )
 
@@ -115,13 +115,13 @@ class LandingPageEngine:
             pain_items,
             "",
             "## The Pipeleap solution",
-            f"Pipeleap gives teams a workflow layer built for outbound, enrichment, CRM automation, and pipeline acceleration — replacing fragmented point solutions with one governed execution system.",
+            f"Pipeleap gives teams a workflow layer built for enrichment, CRM automation, pipeline acceleration, and eliminating non-selling work — replacing fragmented point solutions with one governed execution system.",
             "",
             "## How Pipeleap works",
             "1. Capture the trigger or account signal.",
             "2. Enrich and score the account or contact.",
             "3. Sync clean data into the CRM with routing logic.",
-            "4. Trigger outbound or follow-up workflows.",
+            "4. Trigger outreach or follow-up workflows.",
             "5. Push replies, demos, and task states back into reporting.",
             "",
             before_after_block,
@@ -133,12 +133,12 @@ class LandingPageEngine:
             "",
             "## Why teams pick Pipeleap",
             "- n8n-based flexibility without losing revenue workflow structure.",
-            "- Built for outbound, CRM automation, and enrichment-heavy systems.",
+            "- Built for CRM automation, enrichment-heavy workflows, and sales operations.",
             "- Fast iteration for growth and RevOps teams.",
             "",
             "## FAQ",
             f"### Who should use {keyword}?",
-            "Teams that need a governed outbound and workflow system, not one-off automations.",
+            "Teams that need a governed operations and workflow system, not one-off automations.",
             "",
             f"### What makes Pipeleap different in {cluster.cluster_name}?",
             "It maps the keyword directly to the revenue workflow that has to execute after traffic converts.",
@@ -172,7 +172,7 @@ class LandingPageEngine:
                 "applicationCategory": "BusinessApplication",
                 "description": self.site.get(
                     "product_summary",
-                    "Workflow automation and outbound engine for revenue teams.",
+                    "Workflow automation engine for revenue teams — eliminating non-selling work.",
                 ),
             },
         ]

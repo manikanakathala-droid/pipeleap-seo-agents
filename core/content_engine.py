@@ -38,7 +38,7 @@ def _strip_formatting(text: str) -> str:
 _EXTRA_FAQS: list[tuple[str, str]] = [
     (
         "How long does implementation take?",
-        "Most teams are running their first workflow within 48 hours. The full orchestration layer, enrichment, CRM sync, routing, sequencing, typically goes live within one week, depending on CRM complexity.",
+        "Most teams are running their first workflow within 48 hours. The full operational layer — enrichment, CRM sync, routing, and workflow governance — typically goes live within one week, depending on CRM complexity.",
     ),
     (
         "Do I need technical skills to build workflows?",
@@ -46,7 +46,7 @@ _EXTRA_FAQS: list[tuple[str, str]] = [
     ),
     (
         "Can Pipeleap replace my existing CRM?",
-        "Pipeleap complements your CRM rather than replacing it. It acts as an orchestration layer on top, handling enrichment, routing, and sequencing while writing clean, structured data back into your CRM in real time.",
+        "Pipeleap complements your CRM rather than replacing it. It acts as an operational layer on top, handling enrichment, routing, and workflow governance while writing clean, structured data back into your CRM in real time.",
     ),
     (
         "What data sources does Pipeleap support?",
@@ -177,7 +177,7 @@ class ContentEngine:
     # the new engine has completed a full production cycle.
 
     def _render_blog_body(self, brief: ContentBrief, title: str) -> str:
-        secondary = ", ".join(brief.secondary_keywords[:2]) if brief.secondary_keywords else "automated outbound"
+        secondary = ", ".join(brief.secondary_keywords[:2]) if brief.secondary_keywords else "workflow orchestration"
         
         # Unique Intro Hooks
         intro_variations = [
@@ -190,7 +190,7 @@ class ContentEngine:
 
         # RevOps Pain Variations
         pain_variations = [
-            f"Most teams hit a ceiling when outbound and workflow operations live across spreadsheets, enrichment tools, point integrations, and manual CRM cleanup. {self.site.get('brand', 'Pipeleap')} positions this motion as one orchestrated revenue workflow.",
+            f"Most teams hit a ceiling when sales operations live across spreadsheets, enrichment tools, point integrations, and manual CRM cleanup. {self.site.get('brand', 'Pipeleap')} positions this motion as one orchestrated revenue workflow.",
             f"Scaling revenue operations is impossible when your data and execution layers are disconnected. {self.site.get('brand', 'Pipeleap')} solves the {brief.primary_keyword} bottleneck by unifying targeting, enrichment, and CRM sync into a single governed system.",
             f"Fragmented sales stacks create 'tool fatigue' and high operational drag. For teams looking at {brief.primary_keyword}, the goal isn't more software, it's a unified operating model that drives predictable pipeline."
         ]
@@ -199,14 +199,14 @@ class ContentEngine:
         # Section variations to reduce duplication
         gaps_variations = [
             [
-                "- Lead data arrives too late for fast outbound execution.",
+                "- Lead data arrives too late for fast revenue execution.",
                 "- CRM ownership and stage updates are inconsistent.",
                 "- Sequencing logic is brittle and hard to govern.",
                 "- RevOps cannot scale experiments without rebuilding workflows."
             ],
             [
                 "- Manual research slows down the sales cycle.",
-                "- Data decay leads to high bounce rates in outbound.",
+                "- Data decay leads to wasted effort and poor contact quality.",
                 "- Fragmented tools create data silos and poor reporting.",
                 "- SDRs spend more time clicking than having conversations."
             ],
@@ -232,7 +232,7 @@ class ContentEngine:
                 "- Automated signal capture from 1st and 3rd party sources.",
                 "- Account-level scoring and persona-based filtering.",
                 "- Real-time CRM syncing to prevent duplicate outreach.",
-                "- Multi-channel sequencing triggered by clean, enriched data."
+                "- Multi-channel outreach triggered by clean, enriched data."
             ],
             [
                 "- Governance layers to ensure data compliance and quality.",
@@ -247,9 +247,9 @@ class ContentEngine:
         sequence_variations = [
             [
                 "1. Define the signal that should trigger the workflow.",
-                "2. Add enrichment layers before any outbound step fires.",
+                "2. Add enrichment layers before any outreach step fires.",
                 "3. Write structured lifecycle data back into the CRM.",
-                "4. Route ready accounts into the right outbound play.",
+                "4. Route ready accounts into the right workflow.",
                 "5. Review reply, bounce, and demo-booking feedback weekly."
             ],
             [
@@ -296,7 +296,7 @@ class ContentEngine:
             "  -> Enrichment and validation",
             "  -> Account and contact scoring",
             "  -> CRM sync and ownership routing",
-            "  -> Sequencing and outbound execution",
+            "  -> Sequencing and workflow execution",
             "  -> Reply handling and meeting creation",
             "  -> Reporting back to RevOps and growth teams",
             "```",
@@ -312,7 +312,7 @@ class ContentEngine:
             f"### Is {brief.primary_keyword} only useful for large sales teams?",
             [
                 "No. The fastest ROI usually comes from small RevOps and founder-led teams that need more leverage without growing headcount.",
-                "While enterprise teams see massive efficiency gains, the system is designed to help growth-stage startups scale their outbound without the technical debt.",
+                "While enterprise teams see massive efficiency gains, the system is designed to help growth-stage startups scale their revenue operations without the technical debt.",
                 "It works for any team where manual data movement is slowing down the sales cycle. Small teams actually gain the most 'leverage' from this automation."
             ][len(brief.primary_keyword) % 3],
             "",
@@ -331,7 +331,7 @@ class ContentEngine:
     def _render_comparison_body(self, brief: ContentBrief) -> str:
         competitor_term = title_case_keyword(brief.primary_keyword)
         intro_variations = [
-            f"Teams evaluating **{brief.primary_keyword}** are usually comparing flexibility, speed to launch, governance, and whether the system can support actual outbound and revenue execution instead of generic task automation.",
+            f"Teams evaluating **{brief.primary_keyword}** are usually comparing flexibility, speed to launch, governance, and whether the system can eliminate non-selling work at scale instead of just automating individual tasks.",
             f"When you're looking at **{brief.primary_keyword}**, you aren't just looking for features; you're looking for a sustainable way to scale your revenue operations without the technical debt of a 'Franken-stack'.",
             f"The search for **{brief.primary_keyword}** often leads to two choices: stitch together 5+ different apps, or use a unified revenue operating system built for production-grade scale."
         ]
@@ -344,20 +344,20 @@ class ContentEngine:
                 intro,
                 "",
                 "## What buyers should compare",
-                "- Workflow flexibility for outbound and enrichment logic.",
+                "- Workflow flexibility for enrichment and routing logic.",
                 "- CRM depth and data integrity controls.",
-                "- Ability to support high-volume outbound motions.",
+                "- Ability to support high-volume revenue operations.",
                 "- Speed of building, iterating, and monitoring workflows.",
                 "",
                 f"## Where Pipeleap wins for {brief.target_persona}",
                 "- **Eliminates the 'Franken-stack'**: Replaces 4-5 different fragmented tools with one unified revenue operating system.",
                 "- Revenue-first workflow architecture instead of general automation alone.",
-                "- Native alignment with outbound, enrichment, CRM, and pipeline workflows.",
+                "- Native alignment with enrichment, CRM, and pipeline workflows.",
                 "- Faster iteration for RevOps teams building repeatable systems.",
                 "",
                 "## Where another tool may still fit",
                 "- Simpler one-step automation use cases.",
-                "- Teams that do not need outbound orchestration or CRM-heavy logic.",
+                "- Teams that do not need workflow governance or CRM-heavy logic.",
                 "",
                 "## How to evaluate the stack for your use case",
                 "1. Map the workflow from signal to meeting booked.",
@@ -446,7 +446,7 @@ class ContentEngine:
                             "name": f"What is the fastest way to operationalize {brief.primary_keyword}?",
                             "acceptedAnswer": {
                                 "@type": "Answer",
-                                "text": "Build the workflow end to end so enrichment, CRM sync, routing, and outbound execution share one operating model.",
+                                "text": "Build the workflow end to end so enrichment, CRM sync, and routing share one operating model.",
                             },
                         }
                     ],
@@ -478,11 +478,11 @@ class ContentEngine:
     def _unique_angle(self, cluster: KeywordCluster, page_type: str, stage: str = "") -> str:
         base = (
             f"Pipeleap solves the 'tool fatigue' problem for {cluster.cluster_name}. Instead of stitching together "
-            f"fragile point solutions for enrichment, sequencing, and CRM routing, teams use Pipeleap's unified n8n-powered "
+            f"fragile point solutions for enrichment and CRM routing, teams use Pipeleap's unified n8n-powered "
             f"engine to govern the entire revenue lifecycle in one place."
         )
         if "outbound" in cluster.primary_keyword.lower():
-            base = f"Traditional outbound is broken by fragmentation. Pipeleap solves this for {cluster.cluster_name} by unifying signal capture and execution in a single n8n-powered engine."
+            base = f"Non-selling work is the hidden tax on revenue teams. Pipeleap solves this for {cluster.cluster_name} by unifying signal capture and execution in a single n8n-powered engine."
         elif "enrichment" in cluster.primary_keyword.lower():
             base = f"Enrichment without execution is just more noise. Pipeleap ensures that {cluster.cluster_name} results in actual CRM-ready pipeline by connecting data directly to automated workflows."
         
@@ -555,7 +555,7 @@ class ContentEngine:
         if page_type == "comparison_page":
             return (
                 f"> **TL;DR , {keyword.title()}:** Evaluate options on workflow flexibility, "
-                f"CRM depth, enrichment control, and outbound execution speed. "
+                f"CRM depth, enrichment control, and workflow governance speed. "
                 f"Pipeleap unifies these into a single governed revenue layer rather than requiring "
                 f"separate tools for each step.\n"
             )
@@ -568,7 +568,7 @@ class ContentEngine:
         # blog_post default
         return (
             f"> **TL;DR , {keyword.title()}:** A production-ready {keyword} system captures intent signals, "
-            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outbound "
+            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outreach "
             f"sequences automatically , replacing fragmented point tools with one governed revenue workflow.\n"
         )
 

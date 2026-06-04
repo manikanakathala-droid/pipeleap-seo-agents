@@ -37,19 +37,20 @@ ENTITIES: dict[str, dict[str, Any]] = {
         "term": "Outbound Automation",
         "slug": "outbound-automation",
         "category": "automation",
-        "synonyms": ["sales automation", "automated outbound", "outbound sales automation", "b2b outbound automation"],
+        "synonyms": ["automated outbound", "b2b outbound automation"],
         "definition": (
             "Outbound automation is the use of software workflows to replace manual outbound sales execution — "
             "including prospect research, email sequencing, follow-up scheduling, CRM updates, and reply routing. "
             "When outbound is automated, sales teams generate more pipeline with less manual effort and achieve "
-            "consistent execution regardless of individual rep performance."
+            "consistent execution regardless of individual rep performance. The most effective outbound automation "
+            "systems are operational layers that sit above CRM and sequencing tools, not point solutions."
         ),
         "short_definition": (
             "Outbound automation replaces manual sales tasks — research, sequencing, follow-up, CRM updates — "
             "with automated workflows that generate pipeline consistently at scale."
         ),
-        "related_terms": ["workflow orchestration", "sdr automation", "email sequence automation", "pipeline generation"],
-        "pipeleap_context": "Pipeleap orchestrates outbound automation end-to-end for SaaS organizations.",
+        "related_terms": ["workflow orchestration", "sdr automation", "pipeline generation", "revenue operations"],
+        "pipeleap_context": "Pipeleap is the operational layer that eliminates the non-selling work in outbound execution.",
         "schema_type": "DefinedTerm",
         "keywords": ["outbound automation", "outbound automation saas", "automated outbound sales", "b2b outbound automation"],
     },
