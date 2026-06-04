@@ -2,10 +2,8 @@ name: Daily SEO Agent Run
 
 on:
   schedule:
-    # 5:30 PM IST = 12:00 UTC daily (primary)
+    # 5:30 PM IST = 12:00 UTC daily (primary; backup handled by daily_scheduler_health.yml)
     - cron: "0 12 * * *"
-    # 5:30 AM IST = 00:00 UTC daily (backup — catches missed primary)
-    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       disable_crawl:
