@@ -3,17 +3,20 @@ from __future__ import annotations
 import csv
 import json
 import os
+import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 try:  # pragma: no cover
     from google.oauth2 import service_account  # type: ignore
     from googleapiclient.discovery import build  # type: ignore
+    from googleapiclient.errors import HttpError  # type: ignore
     import google.auth as _google_auth  # type: ignore
     GOOGLE_LIBS_AVAILABLE = True
 except Exception:  # pragma: no cover
     service_account = None
     build = None
+    HttpError = Exception
     _google_auth = None  # type: ignore
     GOOGLE_LIBS_AVAILABLE = False
 
@@ -25,6 +28,47 @@ except Exception:  # pragma: no cover
 _GSC_SCOPES          = ["https://www.googleapis.com/auth/webmasters"]
 _GSC_READONLY_SCOPES = ["https://www.googleapis.com/auth/webmasters.readonly"]
 _INDEXING_SCOPES     = ["https://www.googleapis.com/auth/indexing"]
+_MAX_RETRIES         = 3
+_RETRY_DELAYS        = [2, 4, 8]
+
+
+def _retry_api(max_retries: int = _MAX_RETRIES, delays: list[int] | None = None) -> Callable:
+    """Decorator: retry GSC API calls with exponential backoff on JSON/HTTP errors."""
+    delays = delays or _RETRY_DELAYS
+
+    def decorator(func: Callable) -> Callable:
+        def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+            last_error: Exception | None = None
+            for attempt in range(max_retries):
+                try:
+                    return func(self, *args, **kwargs)
+                except json.JSONDecodeError as exc:
+                    last_error = exc
+                    self.logger.warning(
+                        "GSC JSON decode error (attempt %d/%d): %s", attempt + 1, max_retries, exc
+                    )
+                except HttpError as exc:
+                    last_error = exc
+                    status = getattr(exc, "status_code", "?")
+                    self.logger.warning(
+                        "GSC HTTP error %s (attempt %d/%d)", status, attempt + 1, max_retries
+                    )
+                except ConnectionError as exc:
+                    last_error = exc
+                    self.logger.warning(
+                        "GSC connection error (attempt %d/%d): %s", attempt + 1, max_retries, exc
+                    )
+                except Exception as exc:
+                    # Catch-all: don't retry on non-API errors (e.g. credential issues)
+                    self.logger.warning("GSC API error: %s", exc)
+                    raise
+
+                if attempt < max_retries - 1:
+                    delay = delays[attempt] if attempt < len(delays) else delays[-1]
+                    time.sleep(delay)
+            raise RuntimeError(f"GSC API failed after {max_retries} attempts") from last_error
+        return wrapper
+    return decorator
 
 
 class GoogleSearchConsoleConnector:
@@ -76,6 +120,22 @@ class GoogleSearchConsoleConnector:
             "No credentials available. Set GSC_SERVICE_ACCOUNT_JSON, place a key file at "
             f"{self.credentials_path!r}, or run: gcloud auth application-default login"
         )
+
+    def _build_service(self, api_name: str, api_version: str, scopes: list[str]) -> Any:
+        """Build a Google API service with retry on discovery document fetch."""
+        credentials = self._get_credentials(scopes)
+        last_error: Exception | None = None
+        for attempt in range(_MAX_RETRIES):
+            try:
+                return build(api_name, api_version, credentials=credentials, cache_discovery=True)
+            except (json.JSONDecodeError, HttpError, ConnectionError) as exc:
+                last_error = exc
+                self.logger.warning(
+                    "build('%s') attempt %d/%d failed: %s", api_name, attempt + 1, _MAX_RETRIES, exc
+                )
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+        raise RuntimeError(f"Failed to build GSC service '{api_name}' after {_MAX_RETRIES} attempts") from last_error
 
     def _is_auth_available(self) -> bool:
         if not GOOGLE_LIBS_AVAILABLE:
@@ -141,134 +201,181 @@ class GoogleSearchConsoleConnector:
     # ── Sitemap submission ────────────────────────────────────────────────────
 
     def submit_sitemap(self, sitemap_url: str | None = None) -> dict[str, Any]:
-        """Submit sitemap to GSC. Works with key file or ADC."""
+        """Submit sitemap to GSC. Uses _build_service with retry."""
         if not self._is_auth_available():
             return {"ok": False, "error": "no credentials — run: gcloud auth application-default login"}
         url = sitemap_url or f"{self.plain_site_url}/sitemap.xml"
-        try:
-            credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
-            service.sitemaps().submit(siteUrl=self.site_url, feedpath=url).execute()
-            self.logger.info("Sitemap submitted to GSC: %s", url)
-            return {"ok": True, "sitemap_url": url}
-        except json.JSONDecodeError:
-            self.logger.warning("GSC sitemap submission failed: JSON decode error (empty API response)")
-            return {"ok": False, "error": "GSC API returned empty response"}
-        except Exception as exc:
-            self.logger.warning("GSC sitemap submission failed: %s", exc)
-            return {"ok": False, "error": str(exc)}
+        for attempt in range(_MAX_RETRIES):
+            try:
+                service = self._build_service("searchconsole", "v1", _GSC_SCOPES)
+                service.sitemaps().submit(siteUrl=self.site_url, feedpath=url).execute()
+                self.logger.info("Sitemap submitted to GSC: %s", url)
+                return {"ok": True, "sitemap_url": url}
+            except RuntimeError as exc:
+                self.logger.warning("GSC sitemap submission failed (attempt %d/%d): %s",
+                                     attempt + 1, _MAX_RETRIES, exc)
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                else:
+                    return {"ok": False, "error": str(exc)}
+            except json.JSONDecodeError:
+                self.logger.warning("GSC sitemap: JSON decode error (attempt %d/%d)", attempt + 1, _MAX_RETRIES)
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                else:
+                    return {"ok": False, "error": "GSC API returned empty response after retries"}
+            except Exception as exc:
+                self.logger.warning("GSC sitemap submission failed: %s", exc)
+                return {"ok": False, "error": str(exc)[:200]}
+        return {"ok": False, "error": "unexpected fallthrough"}
 
     # ── Index coverage ────────────────────────────────────────────────────────
 
     def fetch_coverage(self) -> dict[str, Any]:
-        """Returns index coverage via URL Inspection API."""
+        """Returns index coverage via URL Inspection API. Uses _build_service with retry."""
         if not self._is_auth_available():
             return {"ok": False, "error": "no credentials"}
-        try:
-            credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
-            result = (
-                service.urlInspection()
-                .index()
-                .inspect(body={"inspectionUrl": self.plain_site_url, "siteUrl": self.site_url})
-                .execute()
-            )
-            return {"ok": True, "inspection": result}
-        except Exception as exc:
-            self.logger.warning("GSC coverage fetch failed: %s", exc)
-            return {"ok": False, "error": str(exc)}
+        for attempt in range(_MAX_RETRIES):
+            try:
+                service = self._build_service("searchconsole", "v1", _GSC_SCOPES)
+                result = (
+                    service.urlInspection()
+                    .index()
+                    .inspect(body={"inspectionUrl": self.plain_site_url, "siteUrl": self.site_url})
+                    .execute()
+                )
+                return {"ok": True, "inspection": result}
+            except Exception as exc:
+                self.logger.warning("GSC coverage fetch attempt %d/%d failed: %s",
+                                     attempt + 1, _MAX_RETRIES, exc)
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                else:
+                    return {"ok": False, "error": str(exc)[:200]}
+        return {"ok": False, "error": "unexpected fallthrough"}
 
     # ── Indexing API — request indexing for new / updated pages ──────────────
 
     def request_indexing(self, page_urls: list[str]) -> list[dict[str, Any]]:
-        """Signal new/updated URLs via the Google Indexing API. Works with key file or ADC."""
+        """Signal new/updated URLs via the Google Indexing API. Uses _build_service with retry."""
         if not self._is_auth_available():
             return [{"url": u, "ok": False, "error": "no credentials"} for u in page_urls]
-        results: list[dict[str, Any]] = []
+        if not page_urls:
+            return []
         try:
-            credentials = self._get_credentials(_INDEXING_SCOPES)
-            service = build("indexing", "v3", credentials=credentials, cache_discovery=True)
-            for url in page_urls:
+            service = self._build_service("indexing", "v3", _INDEXING_SCOPES)
+        except RuntimeError as exc:
+            self.logger.warning("Indexing API service build failed after retries: %s", exc)
+            return [{"url": u, "ok": False, "error": str(exc)[:200]} for u in page_urls]
+
+        results: list[dict[str, Any]] = []
+        for url in page_urls:
+            for attempt in range(_MAX_RETRIES):
                 try:
                     resp = service.urlNotifications().publish(
                         body={"url": url, "type": "URL_UPDATED"}
                     ).execute()
                     results.append({"url": url, "ok": True, "response": resp})
                     self.logger.info("Indexing API: requested %s", url)
+                    break
+                except json.JSONDecodeError as exc:
+                    self.logger.warning("Indexing API JSON decode for %s (attempt %d/%d): %s",
+                                         url, attempt + 1, _MAX_RETRIES, exc)
+                    if attempt < _MAX_RETRIES - 1:
+                        time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                    else:
+                        results.append({"url": url, "ok": False, "error": "empty API response after retries"})
+                except HttpError as exc:
+                    status = getattr(exc, "status_code", "?")
+                    self.logger.warning("Indexing API HTTP %s for %s", status, url)
+                    results.append({"url": url, "ok": False, "error": f"HTTP {status}"})
+                    break
                 except Exception as exc:
                     self.logger.warning("Indexing API failed for %s: %s", url, exc)
-                    results.append({"url": url, "ok": False, "error": str(exc)})
-        except Exception as exc:
-            self.logger.warning("Indexing API setup failed: %s", exc)
-            return [{"url": u, "ok": False, "error": str(exc)} for u in page_urls]
+                    if attempt < _MAX_RETRIES - 1 and "timeout" in str(exc).lower():
+                        time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                    else:
+                        results.append({"url": url, "ok": False, "error": str(exc)[:200]})
+                        break
         return results
 
     # ── URL Inspection ────────────────────────────────────────────────────────
 
     def inspect_url(self, page_url: str) -> dict[str, Any]:
-        """Run URL Inspection for a single page. Works with key file or ADC."""
+        """Run URL Inspection for a single page. Uses _build_service with retry."""
         if not self._is_auth_available():
             return {"ok": False, "error": "no credentials"}
-        try:
-            credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
-            result = (
-                service.urlInspection()
-                .index()
-                .inspect(body={"inspectionUrl": page_url, "siteUrl": self.site_url})
-                .execute()
-            )
-            verdict = result.get("inspectionResult", {}).get("indexStatusResult", {})
-            self.logger.info(
-                "URL inspection %s → coverageState=%s indexState=%s",
-                page_url,
-                verdict.get("coverageState", "unknown"),
-                verdict.get("indexingState", "unknown"),
-            )
-            return {"ok": True, "url": page_url, "result": result}
-        except Exception as exc:
-            self.logger.warning("URL inspection failed for %s: %s", page_url, exc)
-            return {"ok": False, "url": page_url, "error": str(exc)}
+        for attempt in range(_MAX_RETRIES):
+            try:
+                service = self._build_service("searchconsole", "v1", _GSC_SCOPES)
+                result = (
+                    service.urlInspection()
+                    .index()
+                    .inspect(body={"inspectionUrl": page_url, "siteUrl": self.site_url})
+                    .execute()
+                )
+                verdict = result.get("inspectionResult", {}).get("indexStatusResult", {})
+                self.logger.info(
+                    "URL inspection %s → coverageState=%s indexState=%s",
+                    page_url,
+                    verdict.get("coverageState", "unknown"),
+                    verdict.get("indexingState", "unknown"),
+                )
+                return {"ok": True, "url": page_url, "result": result}
+            except Exception as exc:
+                self.logger.warning("URL inspection attempt %d/%d for %s: %s",
+                                     attempt + 1, _MAX_RETRIES, page_url, exc)
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                else:
+                    return {"ok": False, "url": page_url, "error": str(exc)[:200]}
+        return {"ok": False, "url": page_url, "error": "unexpected fallthrough"}
 
     # ── Performance data with extended dimensions ─────────────────────────────
 
     def fetch_page_performance(
         self, start_date: str, end_date: str, row_limit: int = 500
     ) -> list[dict[str, Any]]:
-        """Fetch page-level performance (impressions, clicks, position) without query dimension."""
+        """Fetch page-level performance (impressions, clicks, position) without query dimension.
+        Uses _build_service with retry."""
         if not self._is_auth_available():
             return []
-        try:
-            credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
-            response = (
-                service.searchanalytics()
-                .query(
-                    siteUrl=self.site_url,
-                    body={
-                        "startDate": start_date,
-                        "endDate": end_date,
-                        "dimensions": ["page"],
-                        "rowLimit": row_limit,
-                        "dataState": "all",
-                    },
+        for attempt in range(_MAX_RETRIES):
+            try:
+                service = self._build_service("searchconsole", "v1", _GSC_SCOPES)
+                response = (
+                    service.searchanalytics()
+                    .query(
+                        siteUrl=self.site_url,
+                        body={
+                            "startDate": start_date,
+                            "endDate": end_date,
+                            "dimensions": ["page"],
+                            "rowLimit": row_limit,
+                            "dataState": "all",
+                        },
+                    )
+                    .execute()
                 )
-                .execute()
-            )
-            rows = []
-            for row in response.get("rows", []):
-                keys = row.get("keys", [])
-                rows.append({
-                    "page": keys[0] if keys else "",
-                    "clicks": row.get("clicks", 0),
-                    "impressions": row.get("impressions", 0),
-                    "ctr": row.get("ctr", 0.0),
-                    "position": row.get("position", 0.0),
-                })
-            return rows
-        except Exception as exc:
-            self.logger.warning("GSC page performance fetch failed: %s", exc)
-            return []
+                rows = []
+                for row in response.get("rows", []):
+                    keys = row.get("keys", [])
+                    rows.append({
+                        "page": keys[0] if keys else "",
+                        "clicks": row.get("clicks", 0),
+                        "impressions": row.get("impressions", 0),
+                        "ctr": row.get("ctr", 0.0),
+                        "position": row.get("position", 0.0),
+                    })
+                return rows
+            except Exception as exc:
+                self.logger.warning("GSC page performance fetch attempt %d/%d: %s",
+                                     attempt + 1, _MAX_RETRIES, exc)
+                if attempt < _MAX_RETRIES - 1:
+                    time.sleep(_RETRY_DELAYS[attempt] if attempt < len(_RETRY_DELAYS) else _RETRY_DELAYS[-1])
+                else:
+                    return []
+        return []
 
     # ── Decay detection: fetch two periods and compare ────────────────────────
 
@@ -328,8 +435,7 @@ class GoogleSearchConsoleConnector:
         return {"current_rows": len(current), "previous_rows": len(previous)}
 
     def _fetch_from_api(self, start_date: str, end_date: str, row_limit: int) -> list[dict[str, Any]]:
-        credentials = self._get_credentials(_GSC_READONLY_SCOPES)
-        service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)  # type: ignore[misc]
+        service = self._build_service("searchconsole", "v1", _GSC_READONLY_SCOPES)
         request = {
             "startDate": start_date,
             "endDate": end_date,
@@ -337,7 +443,7 @@ class GoogleSearchConsoleConnector:
             "rowLimit": row_limit,
         }
         response = (
-            service.searchanalytics()  # type: ignore[union-attr]
+            service.searchanalytics()
             .query(siteUrl=self.site_url, body=request)
             .execute()
         )
