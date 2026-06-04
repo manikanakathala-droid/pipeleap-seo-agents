@@ -115,27 +115,6 @@ jobs:
             exit 1
           fi
 
-      - name: Fire indexing signals (IndexNow + GSC + Indexing API)
-        run: |
-          python -c "
-          import sys, yaml
-          from pathlib import Path
-          sys.path.insert(0, '.')
-          config = yaml.safe_load(Path('config.yaml').read_text())
-          from connectors.post_publish_hook import PostPublishHook
-          hook = PostPublishHook(config, None)
-          sitemap_path = 'pipeleap-launchpad/public/sitemap.xml'
-          report = hook.run(sitemap_path=sitemap_path, output_dir='outputs')
-          for name, result in report.get('signals', {}).items():
-              ok = result.get('ok', False) if isinstance(result, dict) else False
-              print(f'  {name}: {\"OK\" if ok else \"FAIL\"}  {result}')
-          print(f'Summary: {report.get(\"summary\", {})}')
-          # Write report for IndexingVerifier
-          (Path('outputs') / 'post_publish_signals.json').write_text(
-              __import__('json').dumps(report, indent=2)
-          )
-          "
-
       - name: Upload generation artifacts
         if: always()
         uses: actions/upload-artifact@v7

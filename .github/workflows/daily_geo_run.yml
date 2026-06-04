@@ -121,47 +121,6 @@ jobs:
             exit 1
           fi
 
-      - name: Fire indexing signals
-        if: ${{ env.DRY_RUN != 'true' }}
-        run: |
-          python - <<'PYEOF'
-          import json
-          import pathlib
-          import sys
-
-          sys.path.insert(0, ".")
-          from connectors.post_publish_hook import PostPublishHook
-          from utils.config_loader import load_config
-          from utils.logger import configure_logger
-
-          config = load_config("config_geo.yaml")
-          logger = configure_logger()
-          hook = PostPublishHook(config, logger)
-
-          new_slugs = []
-          reports = sorted(pathlib.Path("outputs/geo-agent").glob("*/geo_report.json"))
-          if reports:
-              data = json.loads(reports[-1].read_text(encoding="utf-8"))
-              new_slugs = [p.get("slug") for p in data.get("pages_generated", []) if p.get("slug")]
-
-          report = hook.run(
-              sitemap_path="pipeleap-launchpad/public/sitemap.xml",
-              new_slugs=new_slugs,
-              output_dir="outputs/post_publish",
-          )
-          sigs = report.get("signals", {})
-          print(
-              "IndexNow: {0} | GSC sitemap: {1} | Indexing API: {2}".format(
-                  "OK" if sigs.get("indexnow", {}).get("ok") else "FAIL",
-                  "OK" if sigs.get("gsc_sitemap", {}).get("ok") else "FAIL",
-                  "OK" if sigs.get("google_indexing_api", {}).get("ok") else "FAIL",
-              )
-          )
-          PYEOF
-        env:
-          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
-        continue-on-error: true
-
       - name: Upload GEO artifacts
         uses: actions/upload-artifact@v7
         if: always()
@@ -190,4 +149,4 @@ jobs:
             Status: ${{ job.status }}
             Run: #${{ github.run_number }}
             Dry run: ${{ env.DRY_RUN }}
-            Indexing signals: fired (see workflow log for details)
+            Indexing signals: handled by GEO agent (auto-deduplicated)

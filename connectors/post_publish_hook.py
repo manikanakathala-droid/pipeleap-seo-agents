@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 
+SUBMITTED_TODAY_FILE = "outputs/submitted_today.json"
 INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 
 def _site_url_from_config(config: dict) -> str:
@@ -48,7 +49,12 @@ class PostPublishHook:
         self.sitemap_url = _sitemap_url_from_config(config)
         self._gsc      = self._build_gsc()
         self._indexnow = self._build_indexnow()
-        self.submitted_today: set[str] = submitted_today or set()
+        today_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        if submitted_today is not None:
+            self.submitted_today = submitted_today
+        else:
+            self.submitted_today = self._load_submitted_today(today_key)
+        self._today_key = today_key
 
     def run(
         self,
@@ -146,7 +152,10 @@ class PostPublishHook:
             "urls_submitted": len(submit_urls),
         }
 
-        # ── 5. Write report ───────────────────────────────────────────────────
+        # ── 5. Persist submitted_today for cross-workflow dedup ────────────
+        self._save_submitted_today()
+
+        # ── 6. Write report ───────────────────────────────────────────────────
         if output_dir:
             out = Path(output_dir)
             out.mkdir(parents=True, exist_ok=True)
@@ -214,6 +223,28 @@ class PostPublishHook:
             return urls
         except Exception:
             return []
+
+    def _load_submitted_today(self, date_key: str) -> set[str]:
+        try:
+            p = Path(SUBMITTED_TODAY_FILE)
+            if p.exists():
+                data = json.loads(p.read_text(encoding="utf-8"))
+                return set(data.get(date_key, []))
+        except Exception:
+            pass
+        return set()
+
+    def _save_submitted_today(self) -> None:
+        try:
+            p = Path(SUBMITTED_TODAY_FILE)
+            p.parent.mkdir(parents=True, exist_ok=True)
+            data: dict[str, list[str]] = {}
+            if p.exists():
+                data = json.loads(p.read_text(encoding="utf-8"))
+            data[self._today_key] = sorted(self.submitted_today)
+            p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        except Exception as exc:
+            self.logger.warning("PostPublish: failed to persist submitted_today: %s", exc)
 
     def _build_gsc(self) -> Any:
         try:

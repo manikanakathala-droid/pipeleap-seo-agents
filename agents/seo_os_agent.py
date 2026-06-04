@@ -333,6 +333,7 @@ class SEOOSAgent:
         try:
             from core.indexing_verifier import IndexingVerifier
             verifier = IndexingVerifier(self.config, self.logger)
+            verifier.submitted_today = hook.submitted_today if pp_report else set()
             if pp_report:
                 new_urls = [f"{self.site_url}/blog/{s}" for s in new_slugs]
                 verification = verifier.verify_post_publish(
@@ -930,28 +931,7 @@ class SEOOSAgent:
         gsc = GoogleSearchConsoleConnector(self.config, self.logger)
         actions: list[dict] = []
 
-        # Submit new pages to Indexing API immediately
-        if diff.new_pages:
-            urls_to_index = [p.url for p in diff.new_pages[:5]]
-            indexing_results = gsc.request_indexing(urls_to_index)
-            for res in indexing_results:
-                actions.append({
-                    "action": "submit_url",
-                    "url": res["url"],
-                    "reason": "New page detected — submitted via Google Indexing API",
-                    "status": "submitted" if res.get("ok") else f"failed: {res.get('error', '')}",
-                    "priority": 1,
-                })
-
-        # Re-submit sitemap to GSC
-        sitemap_result = gsc.submit_sitemap()
-        actions.append({
-            "action": "resubmit_sitemap",
-            "url": self.site_url + "/sitemap.xml",
-            "reason": "Weekly sitemap submission to GSC",
-            "status": "submitted" if sitemap_result.get("ok") else f"skipped: {sitemap_result.get('error', '')}",
-            "priority": 3,
-        })
+        # (new-pages Indexing API + GSC sitemap removed — handled by PostPublishHook)
 
         # Pages missing from sitemap — flag for manual addition
         for url in diff.missing_from_sitemap[:5]:
