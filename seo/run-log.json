@@ -586,5 +586,33 @@
       "outputs/20260604T041541Z/seo_os_report.json",
       "outputs/20260604T041541Z/daily_briefing.md"
     ]
+  },
+  {
+    "run_id": "20260604T142845Z",
+    "generated_at": "2026-06-04T14:29:33.153565+00:00",
+    "seo_score": 54,
+    "mode": "change_response",
+    "website_changes": {
+      "run_id": "20260604T142845Z",
+      "previous_run_id": "20260604T041541Z",
+      "new_pages": 0,
+      "updated_pages": 1,
+      "deleted_pages": 0,
+      "unchanged_pages": 0,
+      "broken_links": 0,
+      "orphan_pages": 0,
+      "missing_from_sitemap": 0,
+      "has_changes": true
+    },
+    "safe_actions": 4,
+    "dev_review_items": 0,
+    "content_generated": 8,
+    "keywords_researched": 20,
+    "indexing_actions": 0,
+    "errors": [],
+    "output_files": [
+      "outputs/20260604T142845Z/seo_os_report.json",
+      "outputs/20260604T142845Z/daily_briefing.md"
+    ]
   }
 ]

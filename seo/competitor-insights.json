@@ -1216,5 +1216,63 @@
         "best_for": "Simple one-step automations between apps that don't require revenue workflow logic"
       }
     ]
+  },
+  {
+    "run_id": "20260604T142845Z",
+    "generated_at": "2026-06-04T14:29:33.152208+00:00",
+    "insights": [
+      {
+        "competitor": "Clay",
+        "category": "enrichment",
+        "their_strength": "Clay is a data enrichment and workflow building platform that connects to multiple enrichment sources via a waterfall model.",
+        "pipeleap_wins": [
+          "Unified enrichment + sequencing + CRM routing in one workflow engine",
+          "Signal-based triggering without manual recipe building",
+          "Governed CRM write-back on every workflow trigger",
+          "Predictable pricing that scales with outbound volume, not credits"
+        ],
+        "limitations": [
+          "No native outbound sequencing — requires Smartlead or Instantly integration",
+          "Waterfall enrichment requires manual recipe configuration and ongoing maintenance",
+          "No CRM write-back governance layer — data routing is manual",
+          "Pricing scales sharply with enrichment credits at volume",
+          "Primarily a data tool — outbound execution requires additional tools"
+        ],
+        "keyword_gaps_to_target": [
+          "Clay alternatives",
+          "Clay vs Pipeleap",
+          "better than Clay",
+          "Clay competitors 2025"
+        ],
+        "content_to_outrank": "Publish 'Clay vs Pipeleap' comparison page targeting transactional intent. Lead with concrete outcome differentials.",
+        "best_for": "Teams that need waterfall enrichment but already have sequencing and CRM tools configured"
+      },
+      {
+        "competitor": "Zapier",
+        "category": "automation",
+        "their_strength": "Zapier is a general-purpose automation platform that connects apps via triggers and actions.",
+        "pipeleap_wins": [
+          "Purpose-built for outbound workflow orchestration — not generic automation",
+          "Native outbound logic: signal detection, enrichment, sequencing, routing",
+          "Governed execution with audit trails and workflow performance tracking",
+          "Designed for revenue teams, not IT departments"
+        ],
+        "limitations": [
+          "General-purpose automation — not built for revenue workflow execution",
+          "No native understanding of sales sequences, CRM routing, or outbound logic",
+          "Brittle multi-step workflows break under high volume",
+          "No governance layer for outbound execution",
+          "Pricing escalates sharply with task volume"
+        ],
+        "keyword_gaps_to_target": [
+          "Zapier alternatives",
+          "Zapier vs Pipeleap",
+          "better than Zapier",
+          "Zapier competitors 2025"
+        ],
+        "content_to_outrank": "Publish 'Zapier vs Pipeleap' comparison page targeting transactional intent. Lead with concrete outcome differentials.",
+        "best_for": "Simple one-step automations between apps that don't require revenue workflow logic"
+      }
+    ]
   }
 ]
