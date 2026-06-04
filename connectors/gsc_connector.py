@@ -147,10 +147,13 @@ class GoogleSearchConsoleConnector:
         url = sitemap_url or f"{self.plain_site_url}/sitemap.xml"
         try:
             credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
+            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
             service.sitemaps().submit(siteUrl=self.site_url, feedpath=url).execute()
             self.logger.info("Sitemap submitted to GSC: %s", url)
             return {"ok": True, "sitemap_url": url}
+        except json.JSONDecodeError:
+            self.logger.warning("GSC sitemap submission failed: JSON decode error (empty API response)")
+            return {"ok": False, "error": "GSC API returned empty response"}
         except Exception as exc:
             self.logger.warning("GSC sitemap submission failed: %s", exc)
             return {"ok": False, "error": str(exc)}
@@ -163,7 +166,7 @@ class GoogleSearchConsoleConnector:
             return {"ok": False, "error": "no credentials"}
         try:
             credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
+            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
             result = (
                 service.urlInspection()
                 .index()
@@ -184,7 +187,7 @@ class GoogleSearchConsoleConnector:
         results: list[dict[str, Any]] = []
         try:
             credentials = self._get_credentials(_INDEXING_SCOPES)
-            service = build("indexing", "v3", credentials=credentials, cache_discovery=False)
+            service = build("indexing", "v3", credentials=credentials, cache_discovery=True)
             for url in page_urls:
                 try:
                     resp = service.urlNotifications().publish(
@@ -208,7 +211,7 @@ class GoogleSearchConsoleConnector:
             return {"ok": False, "error": "no credentials"}
         try:
             credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
+            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
             result = (
                 service.urlInspection()
                 .index()
@@ -237,7 +240,7 @@ class GoogleSearchConsoleConnector:
             return []
         try:
             credentials = self._get_credentials(_GSC_SCOPES)
-            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)
+            service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)
             response = (
                 service.searchanalytics()
                 .query(
@@ -326,7 +329,7 @@ class GoogleSearchConsoleConnector:
 
     def _fetch_from_api(self, start_date: str, end_date: str, row_limit: int) -> list[dict[str, Any]]:
         credentials = self._get_credentials(_GSC_READONLY_SCOPES)
-        service = build("searchconsole", "v1", credentials=credentials, cache_discovery=False)  # type: ignore[misc]
+        service = build("searchconsole", "v1", credentials=credentials, cache_discovery=True)  # type: ignore[misc]
         request = {
             "startDate": start_date,
             "endDate": end_date,
