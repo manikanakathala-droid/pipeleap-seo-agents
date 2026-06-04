@@ -54,63 +54,35 @@ core_pages = [
     ("https://www.pipeleap.com/privacy", "monthly", "0.3"),
 ]
 
-blog_posts = [
-    ("ai-outbound-sales-agents", "2026-05-17"),
-    ("automated-outbound", "2026-05-22"),
-    ("b2b-outbound-automation-stack", "2026-05-18"),
-    ("best-workflow-orchestration-tools-for-saas-sales-teams", "2026-05-18"),
-    ("clay-sales-navigator", "2026-05-22"),
-    ("enterprise-saas-sales-workflow-governance", "2026-05-18"),
-    ("how-to-automate-outbound-emails", "2026-05-26"),
-    ("how-to-automate-sales-workflows", "2026-05-08"),
-    ("lead-enrichment-workflows", "2026-05-26"),
-    ("pipeleap", "2026-05-26"),
-    ("pipeleap-vs-clay-which-is-better-for-outbound", "2026-05-18"),
-    ("revenue-automation-platform", "2026-05-18"),
-    ("saas-sales-team-workflow-automation", "2026-05-26"),
-    ("sales-ops-automation-guide", "2026-05-06"),
-    ("scale-sdr-efficiency-without-hiring", "2026-05-18"),
-    ("what-is-sales-automation", "2026-05-04"),
+blog_slugs = [
+    "ai-outbound-sales-agents",
+    "automated-outbound",
+    "b2b-outbound-automation-stack",
+    "best-workflow-orchestration-tools-for-saas-sales-teams",
+    "clay-sales-navigator",
+    "enterprise-saas-sales-workflow-governance",
+    "how-to-automate-outbound-emails",
+    "how-to-automate-sales-workflows",
+    "lead-enrichment-workflows",
+    "pipeleap",
+    "pipeleap-vs-clay-which-is-better-for-outbound",
+    "revenue-automation-platform",
+    "saas-sales-team-workflow-automation",
+    "sales-ops-automation-guide",
+    "scale-sdr-efficiency-without-hiring",
+    "what-is-sales-automation",
 ]
 
-tool_categories = [
-    "ai-sdr-tools", "cold-email-tools", "sales-engagement-tools", "prospecting-tools",
-    "lead-enrichment-tools", "crm-tools", "call-recording-tools", "revenue-intelligence-tools",
-    "linkedin-automation-tools", "ai-outbound-agents", "workflow-automation-tools",
-    "sales-analytics-tools", "gtm-engineering-tools",
-]
-
-# Map category -> list of tool slugs
-tools_by_category = {
-    "ai-sdr-tools": ["artisan-ai", "11x-ai", "regie-ai", "ava-by-artisan", "sdrx-by-klenty", "exceed-ai", "conversica", "reply-io-ai-sdr", "piper-by-qualified", "outplay-ai"],
-    "cold-email-tools": ["instantly-ai", "lemlist", "smartlead", "mailshake", "woodpecker", "apollo-io-email", "reply-io", "saleshandy", "quickmail", "klenty"],
-    "sales-engagement-tools": ["outreach", "salesloft", "apollo-io-engagement", "hubspot-sales-hub", "groove", "klenty-engagement", "reply-io-engagement", "close-io", "mixmax", "yesware"],
-    "prospecting-tools": ["apollo-io-prospecting", "zoominfo", "cognism", "lusha", "hunter-io", "linkedin-sales-navigator", "clay-prospecting", "leadfeeder", "clearbit-prospecting", "bombora"],
-    "lead-enrichment-tools": ["clay", "clearbit", "zoominfo-enrich", "lusha-enrich", "apollo-io-enrich", "cognism-enrich", "hunter-io-enrich", "people-data-labs", "datagma", "leadmagic"],
-    "crm-tools": ["hubspot-crm", "salesforce", "pipedrive", "close-io-crm", "attio", "folk", "breakcold", "copper-crm", "monday-sales-crm", "streak"],
-    "call-recording-tools": ["gong", "chorus-zoominfo", "fireflies-ai", "tldv", "avoma", "wingman-clari", "leexi", "modjo", "grain", "otter-ai"],
-    "revenue-intelligence-tools": ["gong-revenue", "clari", "6sense", "bombora", "demandbase", "crayon", "g2-buyer-intent", "salesloft-revenue", "highspot", "seismic"],
-    "linkedin-automation-tools": ["dripify", "expandi", "meetalfred", "waalaxy", "phantombuster", "skylead", "lemlist-linkedin", "taplio", "linkedin-sales-navigator-auto", "lempod"],
-    "ai-outbound-agents": ["11x-ai-agent", "artisan-ai-agent", "regie-ai-agent", "ava-agent", "clay-agent", "instantly-ai-agent", "reply-io-agent", "outreach-ai-agent", "piper-agent"],
-    "workflow-automation-tools": ["zapier", "make-integromat", "n8n", "clay-workflow", "hubspot-workflows", "workato", "bardeen", "tray-io", "retool"],
-    "sales-analytics-tools": ["gong-analytics", "clari-analytics", "hubspot-analytics", "salesforce-einstein", "tableau", "looker", "ambition", "atrium", "chorus-analytics", "mixpanel-sales"],
-    "gtm-engineering-tools": ["clay-gtm", "segment", "census", "hightouch", "common-room", "warmly", "clearbit-gtm", "rb2b", "laudspeaker"],
-}
-
-# ── Build sub-sitemaps ────────────────────────────────────────────────
-pages_entries = [url(loc, TODAY, freq, pri) for loc, freq, pri in core_pages]
-pages_xml = urlset(pages_entries)
-
-blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", dt, "weekly" if dt >= "2026-05-26" else "monthly") for slug, dt in blog_posts]
+blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", TODAY, "weekly") for slug in blog_slugs]
 blog_xml = urlset(blog_entries)
 
-glossary_entries = [url_inline(f"https://www.pipeleap.com/glossary/{slug}", "2026-05-22", priority="0.6") for slug in glossary_slugs]
+glossary_entries = [url_inline(f"https://www.pipeleap.com/glossary/{slug}", TODAY, priority="0.6") for slug in glossary_slugs]
 glossary_xml = urlset(glossary_entries)
 
-tool_entries = [url(f"https://www.pipeleap.com/tools/{slug}", "2026-05-23", priority="0.8") for slug in tool_categories]
+tool_entries = [url(f"https://www.pipeleap.com/tools/{slug}", TODAY, priority="0.8") for slug in tool_categories]
 for cat, tools in tools_by_category.items():
     for tool_slug in tools:
-        tool_entries.append(url_inline(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}", "2026-05-23"))
+        tool_entries.append(url_inline(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}", TODAY))
 tools_xml = urlset(tool_entries)
 
 # ── Build sitemap index ───────────────────────────────────────────────
