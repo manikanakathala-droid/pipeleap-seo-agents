@@ -177,6 +177,7 @@ class PostPublishHook:
             "landing_page": "/",
             "comparison_page": "/blog/",
             "use_case_page": "/",
+            "case_study": "/case-studies/",
             "role_page": "/",
             "integration_page": "/",
             "workflow_page": "/",

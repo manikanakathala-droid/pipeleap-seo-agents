@@ -84,6 +84,7 @@ class ContentEngine:
             "landing_page": ["WebPage", "SoftwareApplication", "FAQPage"],
             "comparison_page": ["WebPage", "FAQPage"],
             "use_case_page": ["WebPage", "FAQPage"],
+            "case_study": ["Article", "FAQPage"],
         }.get(page_type, ["WebPage"])
 
         internal_targets = [page["url"] for page in self.conversion_pages[:3] if isinstance(page, dict) and page.get("url")]
@@ -150,6 +151,17 @@ class ContentEngine:
         asset = self._blog_engine.generate_use_case(cluster)
         if self._is_near_duplicate(asset.body_markdown):
             self.logger.warning("Near-duplicate detected , suppressing use-case: %s", cluster.primary_keyword)
+            asset.uniqueness_score = 0.0
+            return asset
+        asset.cta_variants = []
+        asset.hreflang_hints = self._hreflang_hints(asset.slug)
+        asset.body_markdown = _strip_formatting(asset.body_markdown)
+        return asset
+
+    def generate_case_study_page(self, cluster: KeywordCluster) -> ContentAsset:
+        asset = self._blog_engine.generate_case_study(cluster)
+        if self._is_near_duplicate(asset.body_markdown):
+            self.logger.warning("Near-duplicate detected, suppressing case-study: %s", cluster.primary_keyword)
             asset.uniqueness_score = 0.0
             return asset
         asset.cta_variants = []

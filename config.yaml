@@ -40,6 +40,7 @@
     "blog_posts_per_run": 10,
     "comparison_pages_per_run": 5,
     "use_case_pages_per_run": 5,
+    "case_studies_per_run": 3,
     "output_dir": "outputs",
     "memory_db": "outputs/pipeleap_seo_memory.sqlite",
     "log_level": "INFO",
@@ -200,6 +201,70 @@
         "revenue automation",
         "revops",
         "pipeline automation"
+      ],
+      "email deliverability": [
+        "email deliverability",
+        "email warmup",
+        "sender reputation",
+        "spf dkim dmarc",
+        "inbox placement"
+      ],
+      "lead scoring": [
+        "lead scoring",
+        "predictive scoring",
+        "bant scoring",
+        "lead qualification",
+        "scoring models"
+      ],
+      "sales analytics": [
+        "sales analytics",
+        "forecasting",
+        "pipeline analytics",
+        "revenue intelligence"
+      ],
+      "pipeline management": [
+        "pipeline generation",
+        "pipeline velocity",
+        "deal stages",
+        "sales pipeline"
+      ],
+      "sales methodologies": [
+        "meddic",
+        "challenger sale",
+        "sandler method",
+        "value selling",
+        "sales methodology"
+      ],
+      "cold email copywriting": [
+        "cold email copywriting",
+        "email subject lines",
+        "sales personalization",
+        "a b testing email"
+      ],
+      "abm strategies": [
+        "account based marketing",
+        "abm strategy",
+        "intent data",
+        "account selection",
+        "1 to 1 abm"
+      ],
+      "industry guides": [
+        "saas sales",
+        "agency outbound",
+        "b2b sales for ecommerce",
+        "enterprise sales"
+      ],
+      "crm deep dives": [
+        "salesforce automation",
+        "pipedrive workflows",
+        "hubspot sales hub",
+        "close crm"
+      ],
+      "sales ops hiring": [
+        "sdr hiring",
+        "sales team ramp time",
+        "sdr team structure",
+        "sales ops roles"
       ]
     },
     "semantic_expansions": {
@@ -232,6 +297,56 @@
         "revenue operations automation",
         "pipeline workflow system",
         "go to market automation"
+      ],
+      "email deliverability": [
+        "email deliverability best practices",
+        "improve sender reputation",
+        "email authentication setup guide"
+      ],
+      "lead scoring": [
+        "predictive lead scoring models",
+        "b2b lead qualification framework",
+        "automated lead routing rules"
+      ],
+      "sales analytics": [
+        "sales forecasting techniques",
+        "pipeline analytics dashboard",
+        "revenue intelligence platforms"
+      ],
+      "pipeline management": [
+        "accelerate pipeline velocity",
+        "deal stage progression guide",
+        "sales pipeline generation strategies"
+      ],
+      "sales methodologies": [
+        "meddic qualification framework",
+        "challenger sales model implementation",
+        "value selling techniques for saas"
+      ],
+      "cold email copywriting": [
+        "cold email personalization at scale",
+        "a b test email subject lines",
+        "sales email sequence optimization"
+      ],
+      "abm strategies": [
+        "account based marketing for saas",
+        "intent data powered targeting",
+        "1 to 1 abm campaign playbook"
+      ],
+      "industry guides": [
+        "b2b saas sales playbook",
+        "agency outbound automation guide",
+        "enterprise sales workflow orchestration"
+      ],
+      "crm deep dives": [
+        "salesforce workflow automation",
+        "hubspot sales hub configuration",
+        "pipedrive pipeline management"
+      ],
+      "sales ops hiring": [
+        "sdr hiring and onboarding framework",
+        "sales team ramp time reduction",
+        "revops team structure best practices"
       ]
     },
     "conversion_pages": [
@@ -514,6 +629,7 @@
     "publish_via_cms": true,
     "role_pages_per_run": 5,
     "use_case_pages_per_run": 5,
+    "case_studies_per_run": 3,
     "problem_pages_per_run": 2,
     "competitor_vs_pages_per_run": 5,
     "competitor_alt_pages_per_run": 5,
@@ -548,7 +664,7 @@
       "sales workflow automation",
       "outbound automation platform"
     ],
-    "ahrefs_api_key": "",
+    "ahrefs_api_key": "${AHREFS_API_KEY}",
     "moz_api_access_id": "mozscape-xSC6gI3J2B",
     "moz_api_secret_key": "fF5ukc0XVtgFy1lO9E1RJQAbFL0OZyUd",
     "bing_api_key": "f2ce40b491c44f1282976da068df483c",

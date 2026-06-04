@@ -28,6 +28,7 @@ class ExecutionConfig(BaseModel):
     blog_posts_per_run: int = Field(4, ge=0, le=50)
     comparison_pages_per_run: int = Field(2, ge=0, le=50)
     use_case_pages_per_run: int = Field(2, ge=0, le=50)
+    case_studies_per_run: int = Field(0, ge=0, le=50)
     output_dir: str = "outputs"
     memory_db: str = "outputs/pipeleap_seo_memory.sqlite"
     log_level: str = Field("INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
@@ -137,6 +138,7 @@ class AppConfig(BaseModel):
             + v.blog_posts_per_run
             + v.comparison_pages_per_run
             + v.use_case_pages_per_run
+            + v.case_studies_per_run
         )
         if total_per_run > v.max_pages:
             raise ValueError(

@@ -13,7 +13,7 @@ Runs in SAFE MODE: never modifies core website code.
   Step 3:  Adaptive action engine
   Step 4:  Technical SEO (safe mode)
   Step 5:  Keyword engine (20 keywords: 10 high-intent, 5 competitor gaps, 5 long-tail)
-  Step 6:  Content engine (1 NEPQ blog + 3 glossary pages)
+   Step 6:  Content engine (respects config per-run limits: blog_posts, comparison_pages, use_case_pages + 3 glossary stubs)
   Step 7:  On-page optimisation (3 pages: titles, meta, headers)
   Step 8:  Internal linking strategy
   Step 9:  Competitor analysis (2 competitors, keyword gaps)
@@ -375,6 +375,44 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("GitHub publish skipped: %s", exc)
 
+        # ── Step 4f: Backlink Execution ──────────────────────────────────────
+        backlink_urls: list[str] = []
+        try:
+            from connectors.backlink_executor import BacklinkExecutor
+            for item in result.content_generated:
+                slug = item.get("slug", "")
+                ptype = item.get("type", "blog_post")
+                if slug:
+                    if ptype == "blog_post":
+                        backlink_urls.append(f"{self.site_url}/blog/{slug}")
+                    elif ptype in ("glossary_term", "glossary_page"):
+                        backlink_urls.append(f"{self.site_url}/glossary/{slug}")
+                    elif ptype == "tool":
+                        backlink_urls.append(f"{self.site_url}/tools/{slug}")
+                    elif ptype in ("landing_page", "use_case_page"):
+                        backlink_urls.append(f"{self.site_url}/{slug}")
+                    elif ptype == "comparison_page":
+                        backlink_urls.append(f"{self.site_url}/blog/{slug}")
+                    elif ptype == "case_study":
+                        backlink_urls.append(f"{self.site_url}/case-studies/{slug}")
+                    else:
+                        backlink_urls.append(f"{self.site_url}/blog/{slug}")
+            if backlink_urls:
+                be = BacklinkExecutor(output_dir=str(output_dir / "backlinks"))
+                be.run_all(backlink_urls)
+                self.logger.info("BacklinkExecutor: %d URLs submitted to archive/ping services", len(backlink_urls))
+        except Exception as exc:
+            self.logger.warning("Backlink execution skipped: %s", exc)
+
+        # ── Step 4g: Outreach Brief Generation ──────────────────────────────
+        try:
+            from core.outreach_engine import OutreachEngine
+            oe = OutreachEngine(self.config, output_dir=str(output_dir / "outreach"))
+            briefs = oe.generate(competitor_gaps=result.content_gaps)
+            self.logger.info("OutreachEngine: %d briefs generated", len(briefs))
+        except Exception as exc:
+            self.logger.warning("Outreach brief generation skipped: %s", exc)
+
         # ── Step 11: Self-Improvement Loop ────────────────────────────────────
         self.logger.info("Step 11: Self-improvement loop")
         result.risks_and_missed = self._identify_risks(diff, current_snapshot, result)
@@ -559,50 +597,85 @@ class SEOOSAgent:
         return slugs
 
     def _run_content_engine(self, diff: SiteDiff, run_id: str, keywords: list[dict] | None = None) -> list[dict]:
+        from agents.content_agent import ContentAgent
         from core.blog_content_engine import BlogContentEngine
         from core.content_engine import ContentEngine
-        from utils.models import KeywordCluster, KeywordOpportunity
+        from utils.models import ContentAsset, KeywordCluster, KeywordOpportunity
 
         engine = ContentEngine(self.config, self.logger)
         blog_engine = BlogContentEngine(self.config, self.logger)
 
         generated: list[dict] = []
 
-        # Generate blog posts from top keyword opportunities
+        # ── Build clusters from all keyword opportunities ──────────────────
         kw_source = keywords or getattr(self, 'keyword_opportunities', []) or []
-        if kw_source:
-            top_kw = kw_source[0]
+        clusters: list[KeywordCluster] = []
+        for i, kw in enumerate(kw_source):
+            intent = kw.get("type", "informational")
+            kw_lower = kw.get("keyword", "").lower()
+            if intent in ("commercial", "transactional"):
+                recommended = "blog_post"
+            elif "comparison" in kw_lower:
+                recommended = "comparison_page"
+            elif ("use case" in kw_lower
+                  or "for" in kw_lower.split()[:1]):
+                recommended = "use_case_page"
+            elif any(term in kw_lower for term in ("case study", "client story", "success story", "how x", "how we", "roi of")):
+                recommended = "case_study"
+            else:
+                recommended = "blog_post"
             cluster = KeywordCluster(
-                cluster_name=top_kw.get("cluster", "general"),
-                primary_keyword=top_kw.get("keyword", ""),
-                intent=top_kw.get("type", "informational"),
-                recommended_asset_type="blog_post",
+                cluster_name=kw.get("cluster", "general"),
+                primary_keyword=kw.get("keyword", ""),
+                intent=intent,
+                recommended_asset_type=recommended,
                 conversion_goal="Capture problem-aware pipeline",
                 opportunities=[
                     KeywordOpportunity(
-                        keyword=top_kw.get("keyword", ""),
-                        topic_cluster=top_kw.get("cluster", "general"),
-                        intent=top_kw.get("type", "informational"),
-                        funnel_stage=top_kw.get("funnel_stage", "awareness"),
+                        keyword=kw.get("keyword", ""),
+                        topic_cluster=kw.get("cluster", "general"),
+                        intent=intent,
+                        funnel_stage=kw.get("funnel_stage", "awareness"),
                         source="seo_os",
                     )
                 ],
             )
-            try:
-                asset = engine.generate_blog_post(cluster)
-                generated.append({
-                    "type": "blog_post",
-                    "style": "NEPQ",
-                    "slug": asset.slug,
-                    "title": asset.title,
-                    "body_markdown": asset.body_markdown,
-                    "target_keyword": cluster.primary_keyword,
-                    "meta_description": asset.meta_description,
-                    "internal_links": [],
-                    "status": "generated" if asset.body_markdown else "brief_ready",
-                })
-            except Exception as exc:
-                self.logger.warning("Blog generation failed: %s", exc)
+            clusters.append(cluster)
+
+        self.logger.info(
+            "ContentEngine: %d keyword opportunities available in %d clusters",
+            len(kw_source), len(clusters),
+        )
+
+        # ── Delegate to ContentAgent which respects config per-run limits ──
+        agent = ContentAgent(self.config, engine, self.logger)
+        assets: list[ContentAsset] = agent.generate(clusters)
+        limit_b = self.config.get("execution", {}).get("blog_posts_per_run", 4)
+        limit_c = self.config.get("execution", {}).get("comparison_pages_per_run", 2)
+        limit_u = self.config.get("execution", {}).get("use_case_pages_per_run", 2)
+        self.logger.info(
+            "ContentAgent produce config limits: blog=%d comparison=%d use_case=%d | actual=%d assets",
+            limit_b, limit_c, limit_u, len(assets),
+        )
+
+        for asset in assets:
+            generated.append({
+                "type": asset.page_type,
+                "style": "NEPQ" if asset.page_type == "blog_post" else "standard",
+                "slug": asset.slug,
+                "title": asset.title,
+                "body_markdown": asset.body_markdown,
+                "target_keyword": "",
+                "meta_description": asset.meta_description or "",
+                "internal_links": [],
+                "status": "generated" if asset.body_markdown else "brief_ready",
+            })
+
+        # Log asset-type breakdown
+        type_counts: dict[str, int] = {}
+        for a in assets:
+            type_counts[a.page_type] = type_counts.get(a.page_type, 0) + 1
+        self.logger.info("ContentEngine output breakdown: %s", type_counts)
 
         # 3 glossary pages (hardcoded stubs are acceptable — these are reference content)
         glossary_terms = [
@@ -643,6 +716,11 @@ class SEOOSAgent:
         ]
         generated.extend(glossary_terms)
 
+        # Final summary
+        self.logger.info(
+            "_run_content_engine total: %d assets (%d non-glossary + 3 glossary stubs)",
+            len(generated), len(generated) - 3,
+        )
         return generated
 
     def _run_onpage_optimizer(self, snapshot: SiteSnapshot, diff: SiteDiff) -> list[dict]:

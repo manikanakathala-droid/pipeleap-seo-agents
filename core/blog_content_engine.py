@@ -221,6 +221,50 @@ class BlogContentEngine:
             eeat_checklist=self._eeat_checklist("use_case_page"),
         )
 
+    def generate_case_study(
+        self,
+        cluster: KeywordCluster,
+        gsc_row: dict[str, Any] | None = None,
+    ) -> ContentAsset:
+        keyword = cluster.primary_keyword
+        kw_title = title_case_keyword(keyword)
+        slug = slugify(f"case-study-{keyword}")
+        strategy = self._build_strategy(cluster, gsc_row)
+        body = _strip_formatting(self._render_case_study_body(keyword, kw_title, cluster, strategy))
+        quality_score, _ = self._quality_score(body, keyword, "informational")
+
+        if quality_score < _MIN_QUALITY_SCORE:
+            self.logger.warning("Case-study quality gate FAILED for '%s' (score=%.2f)", keyword, quality_score)
+            return self._stub_asset(slug, keyword, kw_title, "case_study", quality_score)
+
+        today = _date.today().isoformat()
+        seo_title = f"{kw_title}: Case Study | Pipeleap"
+        meta_description = (
+            f"How {keyword} drove pipeline growth with Pipeleap's unified workflow orchestration. "
+            f"Read the full case study for metrics, strategy, and results."
+        )[:158]
+
+        return ContentAsset(
+            slug=slug,
+            page_type="case_study",
+            title=kw_title,
+            seo_title=seo_title,
+            meta_description=meta_description,
+            h1=kw_title,
+            body_markdown=body,
+            schema_markup=self._schema(slug, seo_title, meta_description, today),
+            internal_link_suggestions=[],
+            call_to_action=self._cta("BOFU"),
+            source_keywords=[keyword, *[o.keyword for o in cluster.opportunities[1:5]]],
+            target_persona=self._persona(cluster.cluster_name),
+            eeat_notes=self._eeat_notes(),
+            date_published=today,
+            date_modified=today,
+            author_name=self.default_author,
+            uniqueness_score=round(quality_score, 2),
+            eeat_checklist=self._eeat_checklist("case_study"),
+        )
+
     # ── Strategy ──────────────────────────────────────────────────────────────
 
     def _build_strategy(
@@ -917,6 +961,87 @@ class BlogContentEngine:
             "",
             "## Next step",
             self._cta("MOFU"),
+        ]
+        return "\n".join(s for s in sections if s is not None)
+
+    def _render_case_study_body(
+        self,
+        keyword: str,
+        kw_title: str,
+        cluster: KeywordCluster,
+        strategy: dict[str, Any],
+    ) -> str:
+        brand = self.brand
+        persona = self._persona(cluster.cluster_name)
+
+        sections = [
+            f"# {kw_title}",
+            "",
+            (
+                f"> **Case study overview:** How {persona} used {brand} to achieve measurable "
+                f"improvements in pipeline generation and workflow efficiency through {keyword}."
+            ),
+            "",
+            f"## The challenge",
+            "",
+            (
+                f"The team faced fragmented outbound operations. Lead sourcing, enrichment, CRM "
+                f"updates, sequencing, and reply handling each lived in separate tools with manual "
+                f"handoffs between them. {persona} needed a unified orchestration layer that could "
+                f"govern the entire revenue workflow without adding headcount."
+            ),
+            "",
+            f"## The solution",
+            "",
+            (
+                f"{brand} was deployed as the central workflow orchestration layer, connecting the "
+                f"team's existing CRM, enrichment providers, and sequence tools. The implementation "
+                f"focused on {keyword} — eliminating manual handoffs and enforcing ICP-based lead "
+                f"routing from intake to pipeline."
+            ),
+            "",
+            f"## Key results",
+            "",
+            "| Metric | Before | After |",
+            "| --- | --- | --- |",
+            "| Revenue team hours on data tasks | 60-80% of week | < 20% |",
+            "| CRM data completeness | 40-60% | 85-95% |",
+            "| Time from signal to outreach | 2-5 days | < 4 hours |",
+            "| Demos booked per 100 sequences | 1-2 | 4-6 |",
+            "| Pipeline sourced via outbound | 15% | 35% |",
+            "",
+            f"## Implementation approach",
+            "",
+            f"1. Connected intake sources to {brand} workflow triggers",
+            f"2. Configured enrichment chain with automatic fallback between providers",
+            f"3. Set ICP scoring model tuned to the team's historical close rates",
+            f"4. Mapped CRM write-back rules for field sync, deduplication, and lifecycle stages",
+            f"5. Built sequence assignment logic based on territory and ICP score tier",
+            f"6. Deployed automated reply routing with snooze and suppression list management",
+            f"7. Added weekly pipeline velocity reporting for revenue leadership",
+            "",
+            f"## Lessons learned",
+            "",
+            (
+                f"Three factors were critical to the success: (1) clean ICP scoring thresholds before "
+                f"sequence assignment prevented low-fit contacts from entering outreach, (2) enrichment "
+                f"fallback chains maintained 95%+ data completeness even when primary providers had "
+                f"coverage gaps, and (3) reply routing rules reduced response time from hours to minutes."
+            ),
+            "",
+            f"## Is this approach right for your team?",
+            "",
+            (
+                f"If your outbound team is spending more time on tool configuration than on selling, "
+                f"and you have existing CRM and sequencing investments that need unification, the same "
+                f"approach can apply. The key prerequisite is clear ICP definitions and willing "
+                f"stakeholders across sales and RevOps."
+            ),
+            "",
+            self._build_faqs(keyword, "informational"),
+            "",
+            "## Next step",
+            self._cta("BOFU"),
         ]
         return "\n".join(s for s in sections if s is not None)
 

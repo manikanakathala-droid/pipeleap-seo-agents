@@ -27,10 +27,12 @@ class ContentAgent:
         blog_limit = self.execution.get("blog_posts_per_run", 4)
         comparison_limit = self.execution.get("comparison_pages_per_run", 2)
         use_case_limit = self.execution.get("use_case_pages_per_run", 2)
+        case_study_limit = self.execution.get("case_studies_per_run", 2)
 
         blog_clusters = [c for c in clusters if c.recommended_asset_type == "blog_post"][:blog_limit]
         comparison_clusters = [c for c in clusters if c.recommended_asset_type == "comparison_page"][:comparison_limit]
         use_case_clusters = [c for c in clusters if c.recommended_asset_type == "use_case_page"][:use_case_limit]
+        case_study_clusters = [c for c in clusters if c.recommended_asset_type == "case_study"][:case_study_limit]
 
         raw: list[ContentAsset] = []
         for cluster in blog_clusters:
@@ -50,6 +52,12 @@ class ContentAgent:
                 raw.append(self.content_engine.generate_use_case_page(cluster))
             except Exception as exc:
                 self.logger.error("Use-case generation failed for '%s': %s", cluster.primary_keyword, exc)
+
+        for cluster in case_study_clusters:
+            try:
+                raw.append(self.content_engine.generate_case_study_page(cluster))
+            except Exception as exc:
+                self.logger.error("Case-study generation failed for '%s': %s", cluster.primary_keyword, exc)
 
         # Log quality signals and filter out quality-gate failures
         passed: list[ContentAsset] = []

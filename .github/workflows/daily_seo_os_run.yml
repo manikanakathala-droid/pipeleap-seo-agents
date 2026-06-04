@@ -121,6 +121,11 @@ jobs:
             exit 1
           fi
 
+      - name: Refresh sitemap lastmod dates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: python scripts/regenerate_sitemap.py
+
       - name: Trigger Vercel deploy
         run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
 

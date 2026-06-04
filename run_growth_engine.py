@@ -107,6 +107,17 @@ def main() -> int:
         new_slugs=[p.slug for p in report.pages_generated],
         output_dir="outputs/post_publish",
     )
+
+    # Backlink execution — archive newly published pages
+    from connectors.backlink_executor import BacklinkExecutor
+    site_url = config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
+    backlink_urls = [p.url for p in report.pages_generated if hasattr(p, "url") and p.url]
+    if not backlink_urls:
+        backlink_urls = [f"{site_url}/tools/{p.slug}" for p in report.pages_generated if hasattr(p, "slug") and p.slug]
+    if backlink_urls:
+        be = BacklinkExecutor(output_dir="outputs/backlinks")
+        be.run_all(backlink_urls)
+        print(f"BacklinkExecutor: {len(backlink_urls)} URLs submitted")
     return 0
 
 

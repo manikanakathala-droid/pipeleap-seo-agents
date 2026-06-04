@@ -333,6 +333,7 @@ class SEOOrchestrator:
             "landing_page": "/",
             "comparison_page": "/blog/",
             "use_case_page": "/",
+            "case_study": "/case-studies/",
         }
         results: list[dict[str, Any]] = []
         checked = 0

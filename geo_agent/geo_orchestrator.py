@@ -137,7 +137,12 @@ class GEOOrchestrator:
         eligible_blocks = sum(1 for b in answer_blocks if b.get("eligible_for_ai_overview"))
         self._log(f"  Answer blocks: {len(answer_blocks)} ({eligible_blocks} AIO-eligible)")
 
-        geo_pages: list[GEOPage] = []
+        # ── 6. Global market page generation ──────────────────────────────────
+        from geo_agent.generators.global_market_generator import GlobalMarketGenerator
+        from modules.pipeleap_seo_engine.data.global_markets import GLOBAL_MARKETS
+        gm_generator = GlobalMarketGenerator(site_url=self.site_url)
+        geo_pages = gm_generator.generate_all(GLOBAL_MARKETS)
+        self._log(f"  GEO pages:     {len(geo_pages)} global market pages generated")
 
         # ── 7. Comparison optimization ────────────────────────────────────────
         comp_schemas = self.comparison_engine.all_comparison_schemas()

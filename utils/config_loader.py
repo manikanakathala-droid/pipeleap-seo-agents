@@ -50,6 +50,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "blog_posts_per_run": 4,
         "comparison_pages_per_run": 2,
         "use_case_pages_per_run": 2,
+        "case_studies_per_run": 0,
         "output_dir": "outputs",
         "memory_db": "outputs/pipeleap_seo_memory.sqlite",
         "log_level": "INFO",
