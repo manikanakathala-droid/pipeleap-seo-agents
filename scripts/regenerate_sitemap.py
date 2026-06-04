@@ -46,34 +46,14 @@ class SitemapRegenerator:
         log.warning("GitHub commit failed %s: %s %s", path, resp.status_code, resp.text[:200])
         return False
 
-    def _get_commit_date(self, path: str) -> str:
-        url = f"{API}/repos/{self.repo}/commits"
-        params = {"path": path, "sha": self.branch, "per_page": 1}
-        resp = requests.get(url, headers=self._headers(), params=params, timeout=15)
-        if resp.status_code == 200:
-            data = resp.json()
-            if data and len(data) > 0:
-                date_str = data[0]["commit"]["committer"]["date"]
-                # Parse ISO8601 to YYYY-MM-DD
-                return date_str.split("T")[0]
-        return datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
     def run(self):
         try:
             content, sha = self._get_file("public/sitemap.xml")
-            
-            blog_date = self._get_commit_date("src/data/blog-articles.ts")
-            tools_date = self._get_commit_date("src/data/tools-data.ts")
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             
             def replacer(match):
-                url = match.group(1)
                 old_lastmod = match.group(2)
-                new_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-                if "/blog/" in url:
-                    new_date = blog_date
-                elif "/tools/" in url:
-                    new_date = tools_date
-                return match.group(0).replace(old_lastmod, new_date)
+                return match.group(0).replace(old_lastmod, today)
 
             updated_content = re.sub(r"<url>\s*<loc>(.*?)</loc>\s*<lastmod>(.*?)</lastmod>", replacer, content)
             
