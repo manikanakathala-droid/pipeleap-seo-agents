@@ -217,9 +217,32 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - GSC API: `_build_service()` retries 3x (2s/4s/8s) on discovery doc fetch failure. All API methods retry individually.
 - Branded search "pipeleap" not ranking due to zero external backlinks — this is an authority problem, not indexing. Fix requires 15-20 unique referring domains.
 
+### 17. `/ghost` command — humanize generated content (June 5)
+**Toggle:** `config.yaml` → `growth_engine.ghost_mode` (default: `false`)
+
+When enabled, template-built content passes through `core/humanize.py` transforms after rendering:
+
+| Transform | What it does |
+|---|---|
+| Contractions | `do not` → `don't`, `it is` → `it's` (60% rate) |
+| Sentence variation | Breaks long sentences, adds conversational connectors ("So", "But", "Here's the thing") |
+| Opinionated language | Inserts expert-perspective phrases ("In our experience...", "The hard truth is...") |
+| Natural fragments | Short fragment sentences at paragraph ends ("Makes sense?", "Exactly.") |
+| Concrete details | Replaces generic assertions with specific data points ("enrichment failure rates near 15%") |
+
+**Key properties:**
+- Deterministic per keyword (same keyword = same output, via CRC32 seed)
+- Zero impact on meta tags, schema, canonical, robots, or any SEO infrastructure
+- Quality gate runs AFTER ghost transforms (so quality score reflects final text)
+- Safe to toggle on/off per run without affecting existing content
+
+**To enable:** Set `"ghost_mode": true` in `config.yaml` under `growth_engine`.  
+**To configure individual transforms:** Use a dict instead of bool, e.g. `"ghost_mode": {"enabled": true, "contraction_rate": 0.8, "sentence_vary": true, "opinion_language": false}`
+
 **Relevant Files:**
 - `core/content_coverage.py` — ContentCoverage class, text extraction, n-gram mining, gap detection.
 - `core/keyword_engine.py` — KeywordEngine.discover() accepts coverage param.
+- `core/humanize.py` — Ghost mode transformation functions.
 - `agents/seo_os_agent.py` — Step 4d, git pull, latent keywords in briefing.
 - `temp_frontend_repo/src/data/blog-articles.ts` — 16 blog articles source.
 - `temp_frontend_repo/src/data/glossary-terms.ts` — 87 glossary terms.

@@ -22,6 +22,7 @@ import zlib as _zlib
 from datetime import date as _date
 from typing import Any
 
+from core.humanize import transform as ghost_transform
 from utils.models import ContentAsset, KeywordCluster
 from utils.text import slugify, title_case_keyword
 
@@ -76,6 +77,8 @@ class BlogContentEngine:
         self.cta_cfg = self.site.get("cta", {})
         self.funnel_cta_rules = config.get("funnel_config", {}).get("cta_rules", {})
         self.default_author = config.get("growth_engine", {}).get("default_author", "Pipeleap Team")
+        ghost_mode = config.get("growth_engine", {}).get("ghost_mode", False)
+        self._ghost_config = {"enabled": ghost_mode} if isinstance(ghost_mode, bool) else ghost_mode
 
     # ── Public interface ──────────────────────────────────────────────────────
 
@@ -100,6 +103,7 @@ class BlogContentEngine:
             )
 
         body = _strip_formatting(self._render_blog_body(keyword, kw_title, cluster, strategy))
+        body = ghost_transform(body, keyword, self._ghost_config)
         quality_score, quality_flags = self._quality_score(body, keyword, intent)
 
         if quality_score < _MIN_QUALITY_SCORE:
@@ -143,6 +147,7 @@ class BlogContentEngine:
         slug = slugify(keyword)
         strategy = self._build_strategy(cluster, gsc_row)
         body = _strip_formatting(self._render_comparison_body(keyword, kw_title, cluster, strategy))
+        body = ghost_transform(body, keyword, self._ghost_config)
         quality_score, _ = self._quality_score(body, keyword, "commercial")
 
         if quality_score < _MIN_QUALITY_SCORE:
@@ -187,6 +192,7 @@ class BlogContentEngine:
         slug = slugify(keyword)
         strategy = self._build_strategy(cluster, gsc_row)
         body = _strip_formatting(self._render_use_case_body(keyword, kw_title, cluster, strategy))
+        body = ghost_transform(body, keyword, self._ghost_config)
         quality_score, _ = self._quality_score(body, keyword, "informational")
 
         if quality_score < _MIN_QUALITY_SCORE:
@@ -231,6 +237,7 @@ class BlogContentEngine:
         slug = slugify(f"case-study-{keyword}")
         strategy = self._build_strategy(cluster, gsc_row)
         body = _strip_formatting(self._render_case_study_body(keyword, kw_title, cluster, strategy))
+        body = ghost_transform(body, keyword, self._ghost_config)
         quality_score, _ = self._quality_score(body, keyword, "informational")
 
         if quality_score < _MIN_QUALITY_SCORE:

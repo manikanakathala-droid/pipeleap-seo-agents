@@ -669,6 +669,7 @@
     "moz_api_secret_key": "fF5ukc0XVtgFy1lO9E1RJQAbFL0OZyUd",
     "bing_api_key": "f2ce40b491c44f1282976da068df483c",
     "default_author": "pipeleap_team",
+    "ghost_mode": false,
     "decay_thresholds": {
       "position_drop_min_impressions": 50,
       "position_regression_delta": 5.0,
