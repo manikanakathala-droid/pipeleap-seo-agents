@@ -20,8 +20,9 @@ dist/
 build/
 
 # Generated outputs
-outputs/
+outputs/*
 !outputs/warroom/
+!outputs/warroom/**
 !outputs/*/post_publish_signals.json
 *.sqlite
 *.db

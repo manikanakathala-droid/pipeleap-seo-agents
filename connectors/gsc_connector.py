@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 import os
 import time
 from pathlib import Path
@@ -84,7 +85,7 @@ class GoogleSearchConsoleConnector:
     """
 
     def __init__(self, config: dict[str, Any], logger) -> None:
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.config = config.get("integrations", {}).get("gsc", {})
         self.site_url = (
             self.config.get("site_url")
