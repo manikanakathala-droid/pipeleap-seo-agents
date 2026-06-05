@@ -56,6 +56,24 @@ core_pages = [
     ("https://www.pipeleap.com/terms", "monthly", "0.3"),
 ]
 
+pages_entries = [url(loc, TODAY, changefreq, priority) for loc, changefreq, priority in core_pages]
+pages_xml = urlset(pages_entries)
+
+# ── Fetch tool slugs ──────────────────────────────────────────────
+print("Fetching tool categories and slugs ...")
+r2 = requests.get(f"{API}/repos/{REPO}/contents/src/data/tools/categories.ts", headers=HEADERS, params={"ref": BRANCH})
+r2.raise_for_status()
+cat_content = base64.b64decode(r2.json()["content"]).decode("utf-8")
+# Extract category slug + tool list from each block
+tool_blocks = re.findall(r"slug:\s*[\"']([\w-]+)[\"']\s*,\s*name:\s*[\"']([^\"']+)[\"'][\s\S]*?tools:\s*\[([^\]]+)\]", cat_content)
+tool_categories = []
+tools_by_category: dict[str, list[str]] = {}
+for cat_slug, cat_name, tools_list in tool_blocks:
+    tool_categories.append(cat_slug)
+    tool_slugs = re.findall(r"[\"']([\w-]+)[\"']", tools_list)
+    tools_by_category[cat_slug] = tool_slugs
+print(f"  Found {len(tool_categories)} tool categories, {sum(len(v) for v in tools_by_category.values())} tools")
+
 blog_slugs = [
     "ai-outbound-sales-agents",
     "automated-outbound",
@@ -113,7 +131,7 @@ def commit_file(path, content, sha, message):
 
 files = [
     ("public/sitemap-pages.xml", pages_xml, f"seo: rebuild sitemap-pages.xml — {len(core_pages)} core URL(s)"),
-    ("public/sitemap-blog.xml", blog_xml, f"seo: rebuild sitemap-blog.xml — {len(blog_posts)} blog URL(s)"),
+    ("public/sitemap-blog.xml", blog_xml, f"seo: rebuild sitemap-blog.xml — {len(blog_slugs)} blog URL(s)"),
     ("public/sitemap-glossary.xml", glossary_xml, f"seo: rebuild sitemap-glossary.xml — {len(glossary_slugs)} glossary URL(s)"),
     ("public/sitemap-tools.xml", tools_xml, f"seo: rebuild sitemap-tools.xml — {len(tool_entries)} tool URL(s)"),
     ("public/sitemap.xml", index_xml, "seo: rebuild sitemap index -> 4 sub-sitemaps"),
@@ -127,7 +145,7 @@ for path, content, msg in files:
     except Exception as e:
         print(f"  [SKIP] {path}: {e}")
 
-total = len(core_pages) + len(blog_posts) + len(glossary_slugs) + len(tool_entries)
+total = len(core_pages) + len(blog_slugs) + len(glossary_slugs) + len(tool_entries)
 print(f"\nTotal: {total} URLs across 4 sub-sitemaps")
 
 # ── Re-submit to GSC ──────────────────────────────────────────────────
@@ -150,15 +168,41 @@ try:
 except Exception as e:
     print(f"  GSC error: {e}")
 
-# ── Re-submit to Yandex IndexNow ──────────────────────────────────────
-print("\nRe-submitting all URLs to Yandex IndexNow ...")
+# ── Gather all URLs for IndexNow ────────────────────────────────
 all_locs = []
 for xml in [pages_xml, blog_xml, glossary_xml, tools_xml]:
     all_locs.extend(re.findall(r"<loc>(https://[^<]+)</loc>", xml))
-r = requests.post("https://yandex.com/indexnow",
-    json={"host": "www.pipeleap.com", "key": "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55",
-          "keyLocation": "https://www.pipeleap.com/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt",
-          "urlList": all_locs}, timeout=20)
-print(f"  Yandex: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
+INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
+INDEXNOW_PAYLOAD = {
+    "host": "www.pipeleap.com",
+    "key": INDEXNOW_KEY,
+    "keyLocation": f"https://www.pipeleap.com/{INDEXNOW_KEY}.txt",
+    "urlList": all_locs,
+}
+
+# Submit to generic IndexNow hub (notifies Bing + other engines)
+print("\nSubmitting to api.indexnow.org (generic hub) ...")
+try:
+    r = requests.post("https://api.indexnow.org/indexnow", json=INDEXNOW_PAYLOAD, timeout=20)
+    print(f"  api.indexnow.org: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
+except Exception as e:
+    print(f"  api.indexnow.org error: {e}")
+
+# Submit to Yandex IndexNow
+print("\nSubmitting to Yandex IndexNow ...")
+try:
+    r = requests.post("https://yandex.com/indexnow", json=INDEXNOW_PAYLOAD, timeout=20)
+    print(f"  Yandex: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
+except Exception as e:
+    print(f"  Yandex error: {e}")
+
+# Submit sitemap to Bing Webmaster Tools (legacy endpoint, may fail)
+print("\nSubmitting sitemap index to Bing Webmaster ...")
+try:
+    bing_url = f"https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?siteUrl=https://www.pipeleap.com&feedUrl=https://www.pipeleap.com/sitemap.xml"
+    r = requests.get(bing_url, headers={"api-key": os.getenv("BING_API_KEY", "")}, timeout=15)
+    print(f"  Bing: HTTP {r.status_code} — {'OK' if r.status_code in (200,201) else 'FAILED'}")
+except Exception as e:
+    print(f"  Bing error (non-fatal): {e}")
 
 print(f"\nDone. {total} URLs across 4 sub-sitemaps + index.")
