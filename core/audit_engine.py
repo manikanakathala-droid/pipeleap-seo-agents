@@ -652,6 +652,67 @@ class AuditEngine:
                 )
             )
 
+        if page.canonical and page.url and page.canonical not in (page.url, page.url + "/"):
+            page_parsed = urlparse(page.url)
+            canon_parsed = urlparse(page.canonical)
+            if page_parsed.path and canon_parsed.path and page_parsed.path != canon_parsed.path:
+                issues.append(
+                    AuditIssue(
+                        severity="Medium",
+                        category="canonical",
+                        url=page.url,
+                        title="Canonical URL points to a different page path",
+                        description=(
+                            f"Canonical tag '{page.canonical}' points to a path different from "
+                            f"this page's URL '{page.url}'. This signals to Google that this page "
+                            "is a duplicate of another, risking deindexation."
+                        ),
+                        fix_instructions=(
+                            f"Change the canonical tag to self-reference: "
+                            f"<link rel=\"canonical\" href=\"{page.url}\">"
+                        ),
+                        impact_score=72.0,
+                    )
+                )
+
+        h1_count = sum(1 for h in page.headings if h == page.h1) or (1 if page.h1 else 0)
+        if h1_count > 1:
+            issues.append(
+                AuditIssue(
+                    severity="Medium",
+                    category="heading",
+                    url=page.url,
+                    title="Multiple H1 tags detected",
+                    description=(
+                        f"The page contains {h1_count} H1 tags. Only one H1 is recommended "
+                        "for a clear content hierarchy and improved accessibility."
+                    ),
+                    fix_instructions="Consolidate all H1 tags into a single H1 that represents the primary page topic.",
+                    impact_score=55.0,
+                )
+            )
+
+        if page.title and page.h1:
+            title_words = set(w.lower() for w in page.title.replace("|", "").split() if len(w) > 2)
+            h1_words = set(w.lower() for w in page.h1.split() if len(w) > 2)
+            overlap = title_words & h1_words
+            if len(overlap) == 0:
+                issues.append(
+                    AuditIssue(
+                        severity="Low",
+                        category="metadata",
+                        url=page.url,
+                        title="Title tag and H1 have no keyword overlap",
+                        description=(
+                            f"The title '{page.title}' shares no significant words with "
+                            f"the H1 '{page.h1}'. Mismatched title and H1 confuse search "
+                            "engines about the page's primary topic."
+                        ),
+                        fix_instructions="Align the title and H1 so they share core keywords describing the page topic.",
+                        impact_score=42.0,
+                    )
+                )
+
         if not page.has_viewport_meta:
             issues.append(
                 AuditIssue(
