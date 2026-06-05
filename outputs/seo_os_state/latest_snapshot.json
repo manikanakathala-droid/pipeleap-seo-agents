@@ -1,7 +1,7 @@
 {
-  "run_id": "20260604T142845Z",
+  "run_id": "20260605T141930Z",
   "site_url": "https://www.pipeleap.com",
-  "captured_at": "2026-06-04T14:28:45.031001+00:00",
+  "captured_at": "2026-06-05T14:19:30.391963+00:00",
   "total_pages": 1,
   "sitemap_urls": [
     "https://www.pipeleap.com/",
@@ -24,6 +24,7 @@
     "https://www.pipeleap.com/blog/sales-ops-automation-guide",
     "https://www.pipeleap.com/blog/scale-sdr-efficiency-without-hiring",
     "https://www.pipeleap.com/blog/what-is-sales-automation",
+    "https://www.pipeleap.com/case-studies",
     "https://www.pipeleap.com/contact",
     "https://www.pipeleap.com/faq",
     "https://www.pipeleap.com/glossary",
@@ -118,8 +119,8 @@
     "https://www.pipeleap.com/how-it-works",
     "https://www.pipeleap.com/pricing",
     "https://www.pipeleap.com/privacy",
-    "https://www.pipeleap.com/results",
     "https://www.pipeleap.com/services",
+    "https://www.pipeleap.com/terms",
     "https://www.pipeleap.com/tools",
     "https://www.pipeleap.com/tools/ai-outbound-agents/11x-ai-agent",
     "https://www.pipeleap.com/tools/ai-outbound-agents/artisan-ai-agent",
@@ -255,20 +256,20 @@
       "url": "https://www.pipeleap.com/",
       "title": "Pipeleap | Sales Automation Platform for B2B Sales Teams",
       "meta_description": "Pipeleap designs and automates multi-channel outbound sales workflows that handle prospecting, research, personalization, and outreach - helping revenue teams build a predictable revenue engine that scales without increasing manual effort.",
-      "h1": "",
+      "h1": "Transform Your Outbound Sales Motion Into a Predictable Revenue Engine",
       "h2s": [],
       "word_count": 0,
       "internal_links": [],
       "external_links": [],
-      "canonical": "https://www.pipeleap.com/",
+      "canonical": "",
       "meta_robots": "index, follow",
       "has_schema": false,
       "schema_types": [],
       "in_sitemap": true,
       "status_code": 200,
-      "response_time_ms": 166,
+      "response_time_ms": 44,
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "captured_at": "2026-06-04T14:28:45.031001+00:00"
+      "captured_at": "2026-06-05T14:19:30.391963+00:00"
     }
   ],
   "errors": []
