@@ -38,26 +38,29 @@ gt_content = base64.b64decode(r.json()["content"]).decode("utf-8")
 glossary_slugs = re.findall(r"slug:\s*[\"']([\w-]+)[\"']\s*,\s*term:", gt_content)
 print(f"  Found {len(glossary_slugs)} glossary terms")
 
-# ── Page data ─────────────────────────────────────────────────────────
-core_pages = [
-    ("https://www.pipeleap.com/", "weekly", "1.0"),
-    ("https://www.pipeleap.com/services", "monthly", "0.9"),
-    ("https://www.pipeleap.com/how-it-works", "monthly", "0.8"),
-    ("https://www.pipeleap.com/gtm-audit", "monthly", "0.9"),
-    ("https://www.pipeleap.com/pricing", "monthly", "0.8"),
-    ("https://www.pipeleap.com/about", "monthly", "0.7"),
-    ("https://www.pipeleap.com/contact", "monthly", "0.8"),
-    ("https://www.pipeleap.com/faq", "monthly", "0.7"),
-    ("https://www.pipeleap.com/blog", "weekly", "0.9"),
-    ("https://www.pipeleap.com/glossary", "monthly", "0.8"),
-    ("https://www.pipeleap.com/tools", "weekly", "0.9"),
-    ("https://www.pipeleap.com/case-studies", "weekly", "0.9"),
-    ("https://www.pipeleap.com/privacy", "monthly", "0.3"),
-    ("https://www.pipeleap.com/terms", "monthly", "0.3"),
-]
+# ── Fetch blog slugs ──────────────────────────────────────────────
+print("Fetching blog slugs ...")
+r_b = requests.get(f"{API}/repos/{REPO}/contents/src/data/blog-articles.ts", headers=HEADERS, params={"ref": BRANCH})
+r_b.raise_for_status()
+blog_content = base64.b64decode(r_b.json()["content"]).decode("utf-8")
+blog_slugs = re.findall(r'"slug":\s*"([^"]+)"', blog_content) + re.findall(r'slug:\s*`([^`]+)`', blog_content)
+print(f"  Found {len(blog_slugs)} blog slugs")
 
-pages_entries = [url(loc, TODAY, changefreq, priority) for loc, changefreq, priority in core_pages]
-pages_xml = urlset(pages_entries)
+# ── Fetch case study slugs ────────────────────────────────────────────
+print("Fetching case study slugs ...")
+r_cs = requests.get(f"{API}/repos/{REPO}/contents/src/data/case-studies.ts", headers=HEADERS, params={"ref": BRANCH})
+r_cs.raise_for_status()
+cs_content = base64.b64decode(r_cs.json()["content"]).decode("utf-8")
+case_study_slugs = re.findall(r"slug:\s*[\"']([\w-]+)[\"']", cs_content)
+print(f"  Found {len(case_study_slugs)} case study slugs")
+
+# ── Fetch App.tsx for static routes ───────────────────────────────────
+print("Fetching static routes from App.tsx ...")
+r_a = requests.get(f"{API}/repos/{REPO}/contents/src/App.tsx", headers=HEADERS, params={"ref": BRANCH})
+r_a.raise_for_status()
+app_content = base64.b64decode(r_a.json()["content"]).decode("utf-8")
+static_routes = re.findall(r'path="/([a-z][\w/()-]*)"', app_content)
+static_routes_no_param = [r for r in static_routes if ':' not in r and r != '*']
 
 # ── Fetch tool slugs ──────────────────────────────────────────────
 print("Fetching tool categories and slugs ...")
@@ -74,24 +77,30 @@ for cat_slug, cat_name, tools_list in tool_blocks:
     tools_by_category[cat_slug] = tool_slugs
 print(f"  Found {len(tool_categories)} tool categories, {sum(len(v) for v in tools_by_category.values())} tools")
 
-blog_slugs = [
-    "ai-outbound-sales-agents",
-    "automated-outbound",
-    "b2b-outbound-automation-stack",
-    "best-workflow-orchestration-tools-for-saas-sales-teams",
-    "clay-sales-navigator",
-    "enterprise-saas-sales-workflow-governance",
-    "how-to-automate-outbound-emails",
-    "how-to-automate-sales-workflows",
-    "lead-enrichment-workflows",
-    "pipeleap",
-    "pipeleap-vs-clay-which-is-better-for-outbound",
-    "revenue-automation-platform",
-    "saas-sales-team-workflow-automation",
-    "sales-ops-automation-guide",
-    "scale-sdr-efficiency-without-hiring",
-    "what-is-sales-automation",
+# ── Page data ─────────────────────────────────────────────────────────
+core_pages = [
+    ("https://www.pipeleap.com/", "weekly", "1.0"),
 ]
+# Add routes from App.tsx, filtering out param routes
+route_priorities = {
+    'services': ('monthly', '0.9'), 'how-it-works': ('monthly', '0.8'),
+    'gtm-audit': ('monthly', '0.9'), 'pricing': ('monthly', '0.8'),
+    'about': ('monthly', '0.7'), 'contact': ('monthly', '0.8'),
+    'faq': ('monthly', '0.7'), 'blog': ('weekly', '0.9'),
+    'glossary': ('monthly', '0.8'), 'tools': ('weekly', '0.9'),
+    'case-studies': ('weekly', '0.9'), 'outbound-automation': ('weekly', '0.8'),
+    'privacy': ('monthly', '0.3'), 'terms': ('monthly', '0.3'),
+}
+for route in static_routes_no_param:
+    freq, pri = route_priorities.get(route, ('monthly', '0.7'))
+    core_pages.append((f"https://www.pipeleap.com/{route}", freq, pri))
+
+# Add case study detail pages
+for slug in case_study_slugs:
+    core_pages.append((f"https://www.pipeleap.com/case-studies/{slug}", "monthly", "0.7"))
+
+pages_entries = [url(loc, TODAY, changefreq, priority) for loc, changefreq, priority in core_pages]
+pages_xml = urlset(pages_entries)
 
 blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", TODAY, "weekly") for slug in blog_slugs]
 blog_xml = urlset(blog_entries)
