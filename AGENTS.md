@@ -249,3 +249,32 @@ When enabled, template-built content passes through `core/humanize.py` transform
 - `temp_frontend_repo/src/data/tools/*.ts` — 126 tools + 13 categories.
 - `content/blogs/apollo-clay-pipeleap-comparison.md` — draft content brief (outline, not full article).
 - `content/glossary/outbound-sales-automation.md`, `sales-orchestration.md`, `gtm-audit.md` — glossary briefs with full definitions (publishable but deprioritized).
+
+### 18. Googlebot audit — 13 issues fixed (June 5)
+**Trigger:** Site-wide HTTP header/sitemap/robots/crawl simulator scan revealed Googlebot sees near-empty page shells (SPA with broken prerender) and critical missing schemas (BreadcrumbList, WebSite, sameAs).
+
+**All 13 fixes applied (commit `a1a0f9b` to launchpad):**
+
+| Priority | Issue | Fix |
+|---|---|---|
+| P0 | #1 Prerender broken (empty Googlebot pages) | Rewrote `prerender.mjs` — `@sparticuz/chromium` primary, Playwright fallback. Added `@sparticuz/chromium ^131.0.0` + `playwright-core` to deps |
+| P0 | #2 Hardcoded wrong canonical in index.html | Removed `<link rel="canonical" href="https://www.pipeleap.com/">` — per-page Helmet canonical now authoritative |
+| P0 | #3 `/pricing` orphaned (0 internal links) | Added Pricing to Navbar + Footer navLink arrays |
+| P1 | #4 Non-www→www redirect is 307, not 301 | `vercel.json` already has `"permanent": true` — verify in Vercel dashboard |
+| P1 | #5 Hreflang not in static HTML | Blocked by #1 — fix renders after prerender works |
+| P1 | #6 Link equity leaks to /gtm-audit | Replaced 3 `/gtm-audit` CTAs → `/pricing` on Services, HowItWorks, BlogArticle |
+| P1 | #7 Missing contextual editorial links | Added `/services` link on HowItWorks, `/faq` on Pricing, `/privacy`+`/terms` on Contact |
+| P1 | #8 Sitemap `<lastmod>` missing for many entries | Already fixed in `push_sitemap.py` (`TODAY` for all) — verify live sitemap after deploy |
+| P2 | #9 Missing X/Twitter in Organization sameAs | Added `"https://twitter.com/pipeleap"` to `Index.tsx` Organization schema |
+| P2 | #10 No cross-links between content sections | Glossary→/tools, ToolDetail→/glossary, ToolCategory→/glossary |
+| P2 | #11 WebSite+SearchAction schema missing on most pages | Auto-injected in `SEO.tsx` for every page (deduped) |
+| P2 | #12 BreadcrumbList missing on 11 pages | Added to About, Pricing, Contact, Services, HowItWorks, FAQ, Privacy, Terms, GTMAudit, Glossary, Tools |
+| P2 | #13 No apple-touch-icon | Added `<link rel="apple-touch-icon" href="/og-image.png" sizes="180x180">` to index.html |
+
+**Key decisions:**
+- Prerender: `@sparticuz/chromium` as primary browser engine (serverless Vercel), Playwright Chromium as fallback. `playwright-core` used instead of full `playwright` to avoid redundant browser downloads.
+- Canonical: No hardcoded canonical in `index.html`. Each page's Helmet sets own canonical via `SEO.tsx`. Depends on prerender for Googlebot to see it.
+- BreadcrumbList: First entry in each page's `jsonLd` array. Pattern: `[{ BreadcrumbList }, { main content schema }]`.
+- WebSite schema: Default-injected in `SEO.tsx` for every page. Pages with existing WebSite schema skip injection (dedup by `@type`).
+- Link equity: Replaced `/gtm-audit` CTAs → `/pricing` on Services, HowItWorks, BlogArticle. Kept `/gtm-audit` in Footer and on tool pages where contextually relevant.
+- Apple touch icon: Uses `og-image.png` (1200x1200) as icon source — Google recommends 180x180 minimum.
