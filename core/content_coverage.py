@@ -13,13 +13,16 @@ _STATIC_PAGES: dict[str, str] = {
     "index": "Pipeleap | Sales Automation Platform for B2B Sales Teams",
     "services": "Services",
     "how-it-works": "How It Works",
-    "results": "Results",
     "gtm-audit": "GTM Audit",
     "pricing": "Pricing",
     "about": "About",
     "contact": "Contact",
     "faq": "FAQ",
+    "tools": "Tools",
+    "glossary": "Glossary",
+    "case-studies": "Case Studies",
     "privacy": "Privacy",
+    "terms": "Terms of Service",
 }
 
 

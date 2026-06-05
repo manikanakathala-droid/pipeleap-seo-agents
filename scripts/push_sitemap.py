@@ -43,7 +43,6 @@ core_pages = [
     ("https://www.pipeleap.com/", "weekly", "1.0"),
     ("https://www.pipeleap.com/services", "monthly", "0.9"),
     ("https://www.pipeleap.com/how-it-works", "monthly", "0.8"),
-    ("https://www.pipeleap.com/results", "monthly", "0.8"),
     ("https://www.pipeleap.com/gtm-audit", "monthly", "0.9"),
     ("https://www.pipeleap.com/pricing", "monthly", "0.8"),
     ("https://www.pipeleap.com/about", "monthly", "0.7"),
@@ -51,7 +50,10 @@ core_pages = [
     ("https://www.pipeleap.com/faq", "monthly", "0.7"),
     ("https://www.pipeleap.com/blog", "weekly", "0.9"),
     ("https://www.pipeleap.com/glossary", "monthly", "0.8"),
+    ("https://www.pipeleap.com/tools", "weekly", "0.9"),
+    ("https://www.pipeleap.com/case-studies", "weekly", "0.9"),
     ("https://www.pipeleap.com/privacy", "monthly", "0.3"),
+    ("https://www.pipeleap.com/terms", "monthly", "0.3"),
 ]
 
 blog_slugs = [

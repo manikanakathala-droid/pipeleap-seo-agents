@@ -80,7 +80,6 @@ class CMSConnector:
         ("/",               "1.0", "daily"),
         ("/services",       "0.9", "weekly"),
         ("/how-it-works",   "0.9", "weekly"),
-        ("/results",        "0.9", "weekly"),
         ("/gtm-audit",      "0.9", "weekly"),
         ("/pricing",        "0.9", "weekly"),
         ("/about",          "0.8", "monthly"),
@@ -88,6 +87,9 @@ class CMSConnector:
         ("/faq",            "0.8", "monthly"),
         ("/blog",           "0.8", "daily"),
         ("/glossary",       "0.9", "monthly"),
+        ("/tools",          "0.9", "weekly"),
+        ("/case-studies",   "0.9", "weekly"),
+        ("/terms",          "0.3", "monthly"),
         # Blog articles that exist in src/data/blog-articles.ts
         ("/blog/why-your-pipeline-looks-full-but-rarely-converts", "0.8", "monthly"),
         ("/blog/the-hidden-reason-deals-dont-move",                "0.8", "monthly"),
