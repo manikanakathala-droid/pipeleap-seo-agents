@@ -177,22 +177,6 @@ try:
 except Exception as e:
     print(f"  GSC error: {e}")
 
-# Submit sitemap to Bing Webmaster Tools
-print("\nSubmitting sitemap index to Bing Webmaster ...")
-bing_ok = False
-bing_api_key = os.getenv("BING_API_KEY", "")
-for bing_domain in ["www.bing.com", "ssl.bing.com"]:
-    try:
-        bing_url = f"https://{bing_domain}/webmaster/api.svc/json/SubmitSitemap?siteUrl=https://www.pipeleap.com&feedUrl=https://www.pipeleap.com/sitemap.xml"
-        r = requests.get(bing_url, headers={"api-key": bing_api_key}, timeout=15)
-        ok = r.status_code in (200, 201)
-        print(f"  Bing ({bing_domain}): HTTP {r.status_code} — {'OK' if ok else 'FAILED'}")
-        if ok:
-            bing_ok = True
-            break
-    except Exception as e:
-        print(f"  Bing ({bing_domain}) error: {e}")
-if not bing_ok:
-    print("  Bing sitemap submission failed on all endpoints — IndexNow already handles URL notification")
+# Bing sitemap submission handled by PostPublishHook — not duplicated here.
 
 print(f"\nDone. {total} URLs across 4 sub-sitemaps + index.")

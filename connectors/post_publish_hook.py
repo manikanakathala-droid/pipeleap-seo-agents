@@ -99,7 +99,27 @@ class PostPublishHook:
         else:
             report["signals"]["indexnow"] = {"ok": False, "error": "IndexNow not available"}
 
-        # ── 1b. WebSub only (IndexNow covers Bing/Yandex/Seznam already above) ──
+        # ── 1b. Bing Webmaster sitemap submission ──────────────────────────────
+        bing_api_key = os.environ.get("BING_API_KEY", "")
+        if bing_api_key:
+            for bing_domain in ["www.bing.com", "ssl.bing.com"]:
+                try:
+                    import requests as _req
+                    bing_url = f"https://{bing_domain}/webmaster/api.svc/json/SubmitSitemap?siteUrl={self.site_url}&feedUrl={self.sitemap_url}"
+                    r = _req.get(bing_url, headers={"api-key": bing_api_key}, timeout=15)
+                    if r.status_code in (200, 201):
+                        report["signals"]["bing_sitemap"] = {"ok": True, "domain": bing_domain, "status": r.status_code}
+                        self.logger.info("Bing sitemap submitted via %s: HTTP %d", bing_domain, r.status_code)
+                        break
+                    self.logger.info("Bing (%s): HTTP %d", bing_domain, r.status_code)
+                except Exception as exc:
+                    self.logger.info("Bing (%s) error: %s", bing_domain, exc)
+            else:
+                report["signals"]["bing_sitemap"] = {"ok": False, "note": "all Bing endpoints failed — IndexNow handles URL notification"}
+        else:
+            report["signals"]["bing_sitemap"] = {"ok": False, "note": "BING_API_KEY not set — skipping Webmaster API submission"}
+
+        # ── 1c. WebSub only (IndexNow covers Bing/Yandex/Seznam already above) ──
         try:
             import requests as _req
             r = _req.post("https://pubsubhubbub.appspot.com/",
@@ -146,7 +166,7 @@ class PostPublishHook:
         ok_count = sum(1 for s in report["signals"].values() if isinstance(s, dict) and s.get("ok"))
         report["summary"] = {
             "signals_ok":     ok_count,
-            "signals_total":  3,
+            "signals_total":  4,
             "urls_submitted": len(submit_urls),
         }
 
