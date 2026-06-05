@@ -206,7 +206,7 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - `GTMEngineDiagram.tsx`: Branding fix `PipeLeap`→`Pipeleap`
 - `types/blog.ts`: New `BlogAuthor` interface (`name`, `url?`), optional `author` field on `BlogArticle`
 
-**All 50 issues now fixed** — Batch 2 (commit `TBD` to launchpad): ErrorBoundary component, GA4 SPA route tracking via `GATracker`, `<main id="main-content">` on all 20 pages, skip-to-content link, Terms of Service page with route, Knowledge Graph `foundingDate`+`foundingLocation` on Organization schema, social sharing buttons (LinkedIn/Twitter/Copy) on BlogArticle, web-vitals (CLS/FCP/INP/LCP/TTFB) in main.tsx, BingSiteAuth.xml placeholder in public/, CI/CD validate workflow + broken link checker workflow, accessibility verified (all 4 images have alt+loading=lazy).
+**All 50 issues now fixed** — Batch 2 (commit `1fe62b7` to launchpad): ErrorBoundary component, GA4 SPA route tracking via `GATracker`, `<main id="main-content">` on all 20 pages, skip-to-content link, Terms of Service page with route, Knowledge Graph `foundingDate`+`foundingLocation` on Organization schema, social sharing buttons (LinkedIn/Twitter/Copy) on BlogArticle, web-vitals (CLS/FCP/INP/LCP/TTFB) in main.tsx, BingSiteAuth.xml placeholder in public/, accessibility verified (all 4 images have alt+loading=lazy). CI/CD workflow files (`validate_frontend.yml`, `broken_link_checker.yml`) exist locally but couldn't push — PAT needs `workflow` scope; update on GitHub (Settings → Developer settings → Personal access tokens → add `workflow` scope) then push.
 
 **Key Decisions:**
 - Content coverage from local data files (fast, ~1s) over live HTTP crawl.
