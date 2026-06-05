@@ -1,6 +1,6 @@
 """
-One-shot script — adds JSON-LD schema to 5 Lovable pages that were missing it.
-Pages: Results, GTMAudit, Pricing, About, Contact.
+One-shot script — adds JSON-LD schema to Lovable pages that were missing it.
+Pages: GTMAudit, Pricing, About, Contact (Results page was deleted).
 Commits each file directly to the Lovable GitHub repo via the Contents API.
 """
 import base64, json, os, sys
@@ -43,38 +43,6 @@ def commit_file(path, content, sha, message):
 # ── Patches ──────────────────────────────────────────────────────────────────
 
 PATCHES = [
-    # ── Results.tsx ──────────────────────────────────────────────────────────
-    {
-        "path": "src/pages/Results.tsx",
-        "message": "seo: add WebPage + BreadcrumbList schema to /results",
-        "find": '''      <SEO
-        title="B2B Outbound Sales Results & Case Studies"
-        description="Real B2B outbound sales results: 3× more meetings, 2–4× pipeline growth, and 30% higher reply rates. See how Pipeleap's automation drives revenue."
-        path="/results"
-      />''',
-        "replace": '''      <SEO
-        title="B2B Outbound Sales Results & Case Studies"
-        description="Real B2B outbound sales results: 3x more meetings, 2-4x pipeline growth, and 30% higher reply rates. See how Pipeleap automation drives revenue."
-        path="/results"
-        jsonLd={[
-          {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "url": "https://www.pipeleap.com/results",
-            "name": "B2B Outbound Sales Results & Case Studies | Pipeleap",
-            "description": "Real outbound automation results: 3x meetings booked, 2.5x pipeline growth, 45% improvement in reply rates within 90 days.",
-            "breadcrumb": {
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.pipeleap.com" },
-                { "@type": "ListItem", "position": 2, "name": "Results", "item": "https://www.pipeleap.com/results" }
-              ]
-            }
-          }
-        ]}
-      />''',
-    },
-
     # ── GTMAudit.tsx ─────────────────────────────────────────────────────────
     {
         "path": "src/pages/GTMAudit.tsx",
