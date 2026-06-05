@@ -206,7 +206,7 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 - `GTMEngineDiagram.tsx`: Branding fix `PipeLeap`→`Pipeleap`
 - `types/blog.ts`: New `BlogAuthor` interface (`name`, `url?`), optional `author` field on `BlogArticle`
 
-**Remaining:** ~30 P2/P3 items including ErrorBoundary, BingSiteAuth.xml, GA4 SPA route tracking, `<main>` element, skip-to-content, accessibility alt text, `loading=lazy`, Terms page, Knowledge Graph, social sharing, CI/CD, broken link checker, schema validation, Lighthouse CI, web-vitals tracking.
+**All 50 issues now fixed** — Batch 2 (commit `TBD` to launchpad): ErrorBoundary component, GA4 SPA route tracking via `GATracker`, `<main id="main-content">` on all 20 pages, skip-to-content link, Terms of Service page with route, Knowledge Graph `foundingDate`+`foundingLocation` on Organization schema, social sharing buttons (LinkedIn/Twitter/Copy) on BlogArticle, web-vitals (CLS/FCP/INP/LCP/TTFB) in main.tsx, BingSiteAuth.xml placeholder in public/, CI/CD validate workflow + broken link checker workflow, accessibility verified (all 4 images have alt+loading=lazy).
 
 **Key Decisions:**
 - Content coverage from local data files (fast, ~1s) over live HTTP crawl.
