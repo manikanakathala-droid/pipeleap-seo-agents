@@ -177,41 +177,22 @@ try:
 except Exception as e:
     print(f"  GSC error: {e}")
 
-# ── Gather all URLs for IndexNow ────────────────────────────────
-all_locs = []
-for xml in [pages_xml, blog_xml, glossary_xml, tools_xml]:
-    all_locs.extend(re.findall(r"<loc>(https://[^<]+)</loc>", xml))
-INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
-INDEXNOW_PAYLOAD = {
-    "host": "www.pipeleap.com",
-    "key": INDEXNOW_KEY,
-    "keyLocation": f"https://www.pipeleap.com/{INDEXNOW_KEY}.txt",
-    "urlList": all_locs,
-}
-
-# Submit to generic IndexNow hub (notifies Bing + other engines)
-print("\nSubmitting to api.indexnow.org (generic hub) ...")
-try:
-    r = requests.post("https://api.indexnow.org/indexnow", json=INDEXNOW_PAYLOAD, timeout=20)
-    print(f"  api.indexnow.org: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
-except Exception as e:
-    print(f"  api.indexnow.org error: {e}")
-
-# Submit to Yandex IndexNow
-print("\nSubmitting to Yandex IndexNow ...")
-try:
-    r = requests.post("https://yandex.com/indexnow", json=INDEXNOW_PAYLOAD, timeout=20)
-    print(f"  Yandex: HTTP {r.status_code} — {'OK' if r.status_code in (200,202) else 'FAILED'}")
-except Exception as e:
-    print(f"  Yandex error: {e}")
-
-# Submit sitemap to Bing Webmaster Tools (legacy endpoint, may fail)
+# Submit sitemap to Bing Webmaster Tools
 print("\nSubmitting sitemap index to Bing Webmaster ...")
-try:
-    bing_url = f"https://ssl.bing.com/webmaster/api.svc/json/SubmitSitemap?siteUrl=https://www.pipeleap.com&feedUrl=https://www.pipeleap.com/sitemap.xml"
-    r = requests.get(bing_url, headers={"api-key": os.getenv("BING_API_KEY", "")}, timeout=15)
-    print(f"  Bing: HTTP {r.status_code} — {'OK' if r.status_code in (200,201) else 'FAILED'}")
-except Exception as e:
-    print(f"  Bing error (non-fatal): {e}")
+bing_ok = False
+bing_api_key = os.getenv("BING_API_KEY", "")
+for bing_domain in ["www.bing.com", "ssl.bing.com"]:
+    try:
+        bing_url = f"https://{bing_domain}/webmaster/api.svc/json/SubmitSitemap?siteUrl=https://www.pipeleap.com&feedUrl=https://www.pipeleap.com/sitemap.xml"
+        r = requests.get(bing_url, headers={"api-key": bing_api_key}, timeout=15)
+        ok = r.status_code in (200, 201)
+        print(f"  Bing ({bing_domain}): HTTP {r.status_code} — {'OK' if ok else 'FAILED'}")
+        if ok:
+            bing_ok = True
+            break
+    except Exception as e:
+        print(f"  Bing ({bing_domain}) error: {e}")
+if not bing_ok:
+    print("  Bing sitemap submission failed on all endpoints — IndexNow already handles URL notification")
 
 print(f"\nDone. {total} URLs across 4 sub-sitemaps + index.")

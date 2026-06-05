@@ -18,7 +18,7 @@ from typing import Any
 
 log = logging.getLogger(__name__)
 
-SUBMITTED_TODAY_FILE = "outputs/submitted_today.json"
+SUBMITTED_URLS_FILE = "outputs/submitted_urls.json"
 
 
 class IndexingVerifier:
@@ -34,9 +34,7 @@ class IndexingVerifier:
         self.site_url = config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
         self._gsc = gsc
         self._indexnow = indexnow
-        today_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        self.submitted_today: set[str] = self._load_submitted_today(today_key)
-        self._today_key = today_key
+        self.submitted_urls: set[str] = self._load_submitted_urls()
 
     def verify_post_publish(
         self,
@@ -106,7 +104,7 @@ class IndexingVerifier:
         report["channels"][channel] = indexing_fixed
 
         # ── 5. Post-submit GSC Inspection (only for newly submitted URLs) ──
-        urls_to_inspect = [u for u in new_urls if u not in self.submitted_today]
+        urls_to_inspect = [u for u in new_urls if u not in self.submitted_urls]
         if urls_to_inspect and self._gsc:
             self.logger.info("Verifier: inspecting %d new URLs via GSC API", len(urls_to_inspect))
             inspected = []
@@ -116,7 +114,7 @@ class IndexingVerifier:
                     if isinstance(insp, dict):
                         insp["url"] = url
                         inspected.append(insp)
-                    self.submitted_today.add(url)
+                    self.submitted_urls.add(url)
                 except Exception as exc:
                     inspected.append({"url": url, "ok": False, "error": str(exc)[:100]})
                 time.sleep(0.3)
@@ -136,7 +134,7 @@ class IndexingVerifier:
                 all_ok = None
         report["overall_ok"] = all_ok if all_ok is not None else (not any_failed if any_failed else None)
 
-        self._save_submitted_today()
+        self._save_submitted_urls()
 
         if output_dir:
             out = Path(output_dir)
@@ -147,29 +145,26 @@ class IndexingVerifier:
 
         return report
 
-    # ── Submitted-today persistence (shared with PostPublishHook) ────────
+    # ── Submitted-urls persistence (shared with PostPublishHook) ─────────
 
-    def _load_submitted_today(self, date_key: str) -> set[str]:
+    def _load_submitted_urls(self) -> set[str]:
         try:
-            p = Path(SUBMITTED_TODAY_FILE)
+            p = Path(SUBMITTED_URLS_FILE)
             if p.exists():
                 data = json.loads(p.read_text(encoding="utf-8"))
-                return set(data.get(date_key, []))
+                if isinstance(data, list):
+                    return set(data)
         except Exception:
             pass
         return set()
 
-    def _save_submitted_today(self) -> None:
+    def _save_submitted_urls(self) -> None:
         try:
-            p = Path(SUBMITTED_TODAY_FILE)
+            p = Path(SUBMITTED_URLS_FILE)
             p.parent.mkdir(parents=True, exist_ok=True)
-            data: dict[str, list[str]] = {}
-            if p.exists():
-                data = json.loads(p.read_text(encoding="utf-8"))
-            data[self._today_key] = sorted(self.submitted_today)
-            p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            p.write_text(json.dumps(sorted(self.submitted_urls), indent=2), encoding="utf-8")
         except Exception as exc:
-            self.logger.warning("IndexingVerifier: failed to persist submitted_today: %s", exc)
+            self.logger.warning("IndexingVerifier: failed to persist submitted_urls: %s", exc)
 
     # ── Per-channel retry ─────────────────────────────────────────────────
 
@@ -201,10 +196,10 @@ class IndexingVerifier:
             result = self._indexnow.submit_sitemap_urls(sitemap_path)
             return result if isinstance(result, dict) else {"ok": False}
         if self._indexnow and new_urls:
-            fresh = [u for u in new_urls if u not in self.submitted_today]
+            fresh = [u for u in new_urls if u not in self.submitted_urls]
             if fresh:
                 result = self._indexnow.submit_all_endpoints(fresh[:500])
-                self.submitted_today.update(fresh)
+                self.submitted_urls.update(fresh)
                 return result if isinstance(result, dict) else {"ok": False}
         return {"ok": False, "error": "IndexNow not available"}
 
@@ -228,14 +223,14 @@ class IndexingVerifier:
         return {"ok": False, "error": "GSC not configured"}
 
     def _retry_indexing_api(self, new_urls: list[str]) -> dict:
-        fresh = [u for u in new_urls if u not in self.submitted_today]
+        fresh = [u for u in new_urls if u not in self.submitted_urls]
         if not fresh:
             return {"ok": True, "submitted": 0, "note": "all URLs already submitted"}
         if self._gsc:
             batch = fresh[:200]
             results = self._gsc.request_indexing(batch)
             ok = sum(1 for r in results if r.get("ok"))
-            self.submitted_today.update(batch)
+            self.submitted_urls.update(batch)
             return {
                 "ok": ok > 0,
                 "submitted": len(batch),

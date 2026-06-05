@@ -333,7 +333,7 @@ class SEOOSAgent:
         try:
             from core.indexing_verifier import IndexingVerifier
             verifier = IndexingVerifier(self.config, self.logger)
-            verifier.submitted_today = hook.submitted_today if pp_report else set()
+            verifier.submitted_urls = hook.submitted_urls if pp_report else set()
             if pp_report:
                 new_urls = [f"{self.site_url}/blog/{s}" for s in new_slugs]
                 verification = verifier.verify_post_publish(

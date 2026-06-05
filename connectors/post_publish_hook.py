@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any
 
 
-SUBMITTED_TODAY_FILE = "outputs/submitted_today.json"
+SUBMITTED_URLS_FILE = "outputs/submitted_urls.json"
 INDEXNOW_KEY = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 
 def _site_url_from_config(config: dict) -> str:
@@ -42,19 +42,17 @@ class PostPublishHook:
                  new_slugs=["outbound-automation-for-uk-saas", ...])
     """
 
-    def __init__(self, config: dict, logger: Any, submitted_today: set[str] | None = None) -> None:
+    def __init__(self, config: dict, logger: Any, submitted_urls: set[str] | None = None) -> None:
         self.config = config
         self.logger = logger
         self.site_url = _site_url_from_config(config)
         self.sitemap_url = _sitemap_url_from_config(config)
         self._gsc      = self._build_gsc()
         self._indexnow = self._build_indexnow()
-        today_key = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        if submitted_today is not None:
-            self.submitted_today = submitted_today
+        if submitted_urls is not None:
+            self.submitted_urls = submitted_urls
         else:
-            self.submitted_today = self._load_submitted_today(today_key)
-        self._today_key = today_key
+            self.submitted_urls = self._load_submitted_urls()
 
     def run(
         self,
@@ -81,10 +79,10 @@ class PostPublishHook:
         new_urls = self._slug_urls(new_slugs) if new_slugs else []
         all_sitemap_urls = self._load_sitemap_urls(sitemap_path) if sitemap_path else []
         submit_urls = all_sitemap_urls or new_urls
-        # ── Dedup: filter out URLs already submitted today ─────────────────
-        fresh_new_urls = [u for u in new_urls if u not in self.submitted_today]
-        self.submitted_today.update(fresh_new_urls)
-        self.logger.info("PostPublish: %d new URLs after dedup (%d already submitted today)",
+        # ── Dedup: filter out URLs already submitted across all runs ───────
+        fresh_new_urls = [u for u in new_urls if u not in self.submitted_urls]
+        self.submitted_urls.update(fresh_new_urls)
+        self.logger.info("PostPublish: %d new URLs after dedup (%d already submitted previously)",
                          len(fresh_new_urls), len(new_urls) - len(fresh_new_urls))
 
         # ── 1. IndexNow ──────────────────────────────────────────────────────
@@ -152,8 +150,8 @@ class PostPublishHook:
             "urls_submitted": len(submit_urls),
         }
 
-        # ── 5. Persist submitted_today for cross-workflow dedup ────────────
-        self._save_submitted_today()
+        # ── 5. Persist submitted_urls for cross-run dedup ──────────────────
+        self._save_submitted_urls()
 
         # ── 6. Write report ───────────────────────────────────────────────────
         if output_dir:
@@ -225,27 +223,24 @@ class PostPublishHook:
         except Exception:
             return []
 
-    def _load_submitted_today(self, date_key: str) -> set[str]:
+    def _load_submitted_urls(self) -> set[str]:
         try:
-            p = Path(SUBMITTED_TODAY_FILE)
+            p = Path(SUBMITTED_URLS_FILE)
             if p.exists():
                 data = json.loads(p.read_text(encoding="utf-8"))
-                return set(data.get(date_key, []))
+                if isinstance(data, list):
+                    return set(data)
         except Exception:
             pass
         return set()
 
-    def _save_submitted_today(self) -> None:
+    def _save_submitted_urls(self) -> None:
         try:
-            p = Path(SUBMITTED_TODAY_FILE)
+            p = Path(SUBMITTED_URLS_FILE)
             p.parent.mkdir(parents=True, exist_ok=True)
-            data: dict[str, list[str]] = {}
-            if p.exists():
-                data = json.loads(p.read_text(encoding="utf-8"))
-            data[self._today_key] = sorted(self.submitted_today)
-            p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            p.write_text(json.dumps(sorted(self.submitted_urls), indent=2), encoding="utf-8")
         except Exception as exc:
-            self.logger.warning("PostPublish: failed to persist submitted_today: %s", exc)
+            self.logger.warning("PostPublish: failed to persist submitted_urls: %s", exc)
 
     def _build_gsc(self) -> Any:
         try:

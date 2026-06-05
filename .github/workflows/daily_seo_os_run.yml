@@ -65,6 +65,13 @@ jobs:
           key: seo-os-cache-${{ github.run_id }}
           restore-keys: seo-os-cache-
 
+      - name: Restore submitted URLs cache (cross-run dedup)
+        uses: actions/cache@v5
+        with:
+          path: outputs/submitted_urls.json
+          key: submitted-urls-${{ github.run_id }}
+          restore-keys: submitted-urls-
+
       - name: Run SEO OS Agent
         env:
           MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
