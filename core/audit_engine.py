@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections import defaultdict
 from urllib.parse import urlparse
 from typing import Any
@@ -13,7 +14,7 @@ class AuditEngine:
 
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.config = config
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.pagespeed_config = config.get("integrations", {}).get("pagespeed", {})
 
     def run(self, crawl_report: CrawlerReport) -> list[AuditIssue]:

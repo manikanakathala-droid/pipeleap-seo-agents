@@ -21,6 +21,8 @@ build/
 
 # Generated outputs
 outputs/
+!outputs/warroom/
+!outputs/*/post_publish_signals.json
 *.sqlite
 *.db
 

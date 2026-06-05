@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from collections import deque
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -237,7 +238,7 @@ class SiteCrawler:
 
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.config = config
-        self.logger = logger
+        self.logger = logger or logging.getLogger(__name__)
         self.session = requests.Session()
         self.session.headers.update(
             {
