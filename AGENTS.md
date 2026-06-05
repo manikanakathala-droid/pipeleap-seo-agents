@@ -190,6 +190,24 @@ Email notifications are sent via GitHub Actions after each scheduled run:
 
 **Rule:** Never include "produced with AI assistance" or any AI-transparency disclaimer in any blog, glossary, landing page, tool page, or other content. Zero AI disclaimers across the entire site.
 
+### 16. 50-item SEO/GEO audit batch 1 fixes (June 5)
+**Problem:** Comprehensive gap analysis produced 50 issues across P0–P3 priority buckets covering technical SEO, content, GEO/EEAT, and infra.
+
+**Batch 1 fixes applied (commit `0a28ead` to launchpad):**
+- `vercel.json`: HSTS (`max-age=63072000; includeSubDomains; preload`) + Permissions-Policy (`camera=(), microphone=(), geolocation=(), interest-cohort=()`) + COOP (`same-origin`) + COEP (`require-corp`) headers
+- `SEO.tsx`: hreflang reduced from 8 variants → 2 (`x-default` + `en` only). Removed 6 useless regional variants (en-us, en-gb, en-au, en-ca, en-in, en-sg) that all pointed to the same URL
+- `index.html`: `fonts.googleapis.com` preconnect now has `crossorigin` attribute; redundant `dns-prefetch` lines removed (preconnect already resolves DNS); preload changed from `favicon.png` → `og-image.png`
+- `NotFound.tsx`: `<a href="/">` replaced with `<Link to="/">` for SPA routing (no full page reload)
+- `Index.tsx`: Dual `<h1>` merged into single `aria-label` approach — removes `aria-hidden="true"` from visible H1 and `sr-only` duplicate H1
+- `CookieConsent.tsx`: `window.location.reload()` removed from `handleAccept` — no page reload on consent grant (cookies already set client-side)
+- `Footer.tsx` + `Navbar.tsx`: "Case Studies" link added to both navigation components
+- `BlogArticle.tsx`: Author schema now supports `Person` type (EEAT signal) — falls back to `Organization` when `article.author` is undefined. Added "Explore more" section below article content linking to `/tools`, `/glossary`, `/case-studies`
+- `Contact.tsx`: `address` field (`PostalAddress`, `addressCountry: US`) added to Organization schema
+- `GTMEngineDiagram.tsx`: Branding fix `PipeLeap`→`Pipeleap`
+- `types/blog.ts`: New `BlogAuthor` interface (`name`, `url?`), optional `author` field on `BlogArticle`
+
+**Remaining:** ~30 P2/P3 items including ErrorBoundary, BingSiteAuth.xml, GA4 SPA route tracking, `<main>` element, skip-to-content, accessibility alt text, `loading=lazy`, Terms page, Knowledge Graph, social sharing, CI/CD, broken link checker, schema validation, Lighthouse CI, web-vitals tracking.
+
 **Key Decisions:**
 - Content coverage from local data files (fast, ~1s) over live HTTP crawl.
 - Title/slug/heading match for coverage checking; body text mining is separate extraction for latent keywords.
