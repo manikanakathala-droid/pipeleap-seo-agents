@@ -101,22 +101,27 @@ class PostPublishHook:
             report["signals"]["indexnow"] = {"ok": False, "error": "IndexNow not available"}
 
         # ── 1b. Bing Webmaster sitemap submission ──────────────────────────────
+        # API spec: POST /webmaster/api.svc/json/SubmitFeed?apikey=KEY
+        # with JSON body: {"siteUrl": "https://www...", "feedUrl": "https://www.../sitemap.xml"}
+        # See: https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed
         bing_api_key = os.environ.get("BING_API_KEY", "")
         if bing_api_key:
-            for bing_domain in ["www.bing.com", "ssl.bing.com"]:
-                try:
-                    import requests as _req
-                    bing_url = f"https://{bing_domain}/webmaster/api.svc/json/SubmitSitemap?siteUrl={self.site_url}&feedUrl={self.sitemap_url}"
-                    r = _req.get(bing_url, headers={"api-key": bing_api_key}, timeout=15)
-                    if r.status_code in (200, 201):
-                        report["signals"]["bing_sitemap"] = {"ok": True, "domain": bing_domain, "status": r.status_code}
-                        self.logger.info("Bing sitemap submitted via %s: HTTP %d", bing_domain, r.status_code)
-                        break
-                    self.logger.info("Bing (%s): HTTP %d", bing_domain, r.status_code)
-                except Exception as exc:
-                    self.logger.info("Bing (%s) error: %s", bing_domain, exc)
-            else:
-                report["signals"]["bing_sitemap"] = {"ok": False, "note": "all Bing endpoints failed — IndexNow handles URL notification"}
+            try:
+                import requests as _req
+                import urllib.parse as _up
+                params = _up.urlencode({"apikey": bing_api_key})
+                bing_url = f"https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed?{params}"
+                body = {"siteUrl": self.site_url, "feedUrl": self.sitemap_url}
+                r = _req.post(bing_url, json=body, timeout=15)
+                if r.status_code in (200, 201):
+                    report["signals"]["bing_sitemap"] = {"ok": True, "status": r.status_code}
+                    self.logger.info("Bing sitemap submitted: HTTP %d", r.status_code)
+                else:
+                    report["signals"]["bing_sitemap"] = {"ok": False, "status": r.status_code, "body": r.text[:200]}
+                    self.logger.info("Bing sitemap: HTTP %d — %s", r.status_code, r.text[:120])
+            except Exception as exc:
+                report["signals"]["bing_sitemap"] = {"ok": False, "error": str(exc)[:120]}
+                self.logger.info("Bing sitemap error: %s", exc)
         else:
             report["signals"]["bing_sitemap"] = {"ok": False, "note": "BING_API_KEY not set — skipping Webmaster API submission"}
 
