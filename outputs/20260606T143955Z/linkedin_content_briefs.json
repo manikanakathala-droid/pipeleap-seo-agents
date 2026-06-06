@@ -1,0 +1,22 @@
+[
+  {
+    "week_number": 23,
+    "day": "Monday",
+    "format": "insight",
+    "topic": "why is my sales pipeline not working",
+    "hook": "Most B2B sales teams have a stack problem disguised as a pipeline problem.",
+    "body_guidance": "They buy Why tools. They hire SDRs. They add Clay. They add Apollo. They wait for pipeline.\n\nWhat they get is reps spending 65% of their day on admin.\n\nThe insight nobody says out loud: the more tools you add, the worse the handoff tax gets.\n\nThe fix is not another tool. It is one system that owns the entire chain.",
+    "cta": "We run this entire system for B2B sales teams at Pipeleap. Link in bio.",
+    "target_keyword": "why is my sales pipeline not working"
+  },
+  {
+    "week_number": 23,
+    "day": "Thursday",
+    "format": "system_or_howto",
+    "topic": "revenue operations platform",
+    "hook": "Here is the exact sequence we use to go from cold list to CRM opportunity in 72 hours.",
+    "body_guidance": "Step 1: Trigger from intent signal or list upload\nStep 2: Enrich with firmographic + technographic data\nStep 3: Score against ICP model (threshold: 70+)\nStep 4: Route to personalised outreach sequence\nStep 5: Handle reply, book meeting, write back to CRM\n\nThe whole thing runs without a rep touching it until the meeting is booked.\n\nWe built this for revenue operations platform \u2014 and we operate it for clients end-to-end.",
+    "cta": "We deploy this for clients in 2 to 4 weeks. DM me if you want to see it.",
+    "target_keyword": "revenue operations platform"
+  }
+]
