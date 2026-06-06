@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-06-06T03:30:23.008411+00:00",
+  "channels": {
+    "indexnow": {
+      "ok": true,
+      "source": "retry_1",
+      "urls_submitted": 261,
+      "endpoints_ok": 3,
+      "endpoints_total": 3,
+      "results": [
+        {
+          "ok": true,
+          "submitted": 261,
+          "status": 200,
+          "endpoint": "https://api.indexnow.org/indexnow"
+        },
+        {
+          "ok": true,
+          "submitted": 261,
+          "status": 200,
+          "endpoint": "https://www.bing.com/indexnow"
+        },
+        {
+          "ok": true,
+          "submitted": 261,
+          "status": 202,
+          "endpoint": "https://yandex.com/indexnow"
+        }
+      ]
+    },
+    "websub": {
+      "ok": true,
+      "source": "initial",
+      "status": 204
+    },
+    "gsc_sitemap": {
+      "ok": true,
+      "source": "retry_1",
+      "sitemap_url": "https://www.pipeleap.com/sitemap.xml"
+    },
+    "google_indexing_api": {
+      "ok": true,
+      "source": "retry_1",
+      "submitted": 0,
+      "note": "all URLs already submitted"
+    }
+  },
+  "new_urls_inspected": [],
+  "overall_ok": true
+}
