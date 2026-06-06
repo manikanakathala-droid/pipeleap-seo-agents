@@ -193,3 +193,36 @@ status: draft
 
 ---
 *SEO OS draft — run 20260606T131912Z — 2026-06-06T13:19:50.266559+00:00*
+
+<!-- NEW DRAFT 20260606T132427Z -->
+
+---
+run_id: 20260606T132427Z
+generated_at: 2026-06-06T13:25:07.831305+00:00
+slug: b2b-sales-software-directory
+title: "B2b Sales Software Directory"
+seo_title: "B2b Sales Software Directory"
+meta_description: "Understand b2b sales software directory end to end: signal capture, enrichment, CRM sync, and operations governed by one workflow layer."
+target_keyword: ""
+cluster: ""
+persona: ""
+status: draft
+---
+
+# B2b Sales Software Directory
+
+**Target keyword:**   
+**Persona:**   
+**Pillar page:** [/](/)
+
+## Content Structure
+
+
+## Internal Links
+
+
+## E-E-A-T Requirements
+
+
+---
+*SEO OS draft — run 20260606T132427Z — 2026-06-06T13:25:07.831305+00:00*
