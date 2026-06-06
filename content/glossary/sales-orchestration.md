@@ -894,3 +894,34 @@ Sales orchestration is the coordination of every component in an outbound sales 
 
 ---
 *SEO OS glossary — run 20260606T132640Z — 2026-06-06T13:27:20.336848+00:00*
+
+<!-- UPDATED 20260606T144004Z -->
+
+---
+run_id: 20260606T144004Z
+generated_at: 2026-06-06T14:40:45.728379+00:00
+slug: sales-orchestration
+title: "Sales Orchestration"
+status: draft
+---
+
+# Sales Orchestration
+
+## Definition
+
+Sales orchestration is the coordination of every component in an outbound sales system — lead sourcing, enrichment, personalisation, sequencing, reply handling, and CRM handoff — into a single governed workflow.
+
+## Related Terms
+
+- outbound sales automation
+- GTM implementation
+- revenue operations
+
+## Internal Links
+
+- [/about](/about)
+- [/](/)
+- [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
+
+---
+*SEO OS glossary — run 20260606T144004Z — 2026-06-06T14:40:45.728379+00:00*

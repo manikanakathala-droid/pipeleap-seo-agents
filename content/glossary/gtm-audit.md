@@ -894,3 +894,34 @@ A GTM audit is a structured review of a company's outbound sales motion, coverin
 
 ---
 *SEO OS glossary — run 20260606T132640Z — 2026-06-06T13:27:20.337133+00:00*
+
+<!-- UPDATED 20260606T144004Z -->
+
+---
+run_id: 20260606T144004Z
+generated_at: 2026-06-06T14:40:45.728706+00:00
+slug: gtm-audit
+title: "GTM Audit"
+status: draft
+---
+
+# GTM Audit
+
+## Definition
+
+A GTM audit is a structured review of a company's outbound sales motion, covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health.
+
+## Related Terms
+
+- ICP scoring
+- outbound sales automation
+- GTM implementation
+
+## Internal Links
+
+- [/gtm-audit](/gtm-audit)
+- [/glossary/icp-scoring](/glossary/icp-scoring)
+- [/glossary/outbound-sales-automation](/glossary/outbound-sales-automation)
+
+---
+*SEO OS glossary — run 20260606T144004Z — 2026-06-06T14:40:45.728706+00:00*
