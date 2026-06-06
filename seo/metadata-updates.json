@@ -1190,5 +1190,50 @@
     ],
     "safe_to_apply": true,
     "requires_dev_review": false
+  },
+  {
+    "run_id": "20260606T131912Z",
+    "generated_at": "2026-06-06T13:19:50.268223+00:00",
+    "url": "https://www.pipeleap.com/gtm-audit",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
+    "meta_description": "Get a full audit of your revenue engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+    "recommended_changes": [
+      "Title: update to 'Free GTM Audit for B2B Sales Teams | Pipeleap'",
+      "Meta: update to 'Get a full audit of your revenue engine - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260606T131912Z",
+    "generated_at": "2026-06-06T13:19:50.268223+00:00",
+    "url": "https://www.pipeleap.com/",
+    "current_title": "Pipeleap | Sales Automation Platform for B2B Sales Teams",
+    "current_meta": "Pipeleap designs and automates multi-channel outbound sales workflows that handle prospecting, research, personalization, and outreach - helping revenue teams build a predictable revenue engine that scales without increasing manual effort.",
+    "title": "Revenue Operations & Pipeline Automation | Pipeleap",
+    "meta_description": "Pipeleap builds and runs your entire revenue engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+    "recommended_changes": [
+      "Title: update to 'Revenue Operations & Pipeline Automation | Pipeleap'",
+      "Meta: update to 'Pipeleap builds and runs your entire revenue engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260606T131912Z",
+    "generated_at": "2026-06-06T13:19:50.268223+00:00",
+    "url": "https://www.pipeleap.com/pricing",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Revenue Operations Pricing | Pipeleap",
+    "meta_description": "Pipeleap pricing for managed revenue operations and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.",
+    "recommended_changes": [
+      "Title: update to 'Revenue Operations Pricing | Pipeleap'",
+      "Meta: update to 'Pipeleap pricing for managed revenue operations and GTM implementation. Built and operated for B2B teams - no seat licences, no duct tape.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
   }
 ]
