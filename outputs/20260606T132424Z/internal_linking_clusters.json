@@ -1,0 +1,39 @@
+[
+  {
+    "cluster": "Revenue Operations",
+    "pillar_page": "/",
+    "spoke_articles": [
+      "/blog/ai-personalization-cold-email",
+      "/blog/cost-of-manual-prospecting",
+      "/blog/outbound-stack-too-many-tools",
+      "/blog/predictable-pipeline-without-sdrs"
+    ],
+    "glossary_links": [
+      "/glossary/sales-automation"
+    ]
+  },
+  {
+    "cluster": "GTM Implementation",
+    "pillar_page": "/gtm-audit",
+    "spoke_articles": [
+      "/blog/how-to-run-gtm-audit",
+      "/blog/sdr-agency-vs-revenue-automation",
+      "/blog/apollo-clay-pipeleap-comparison"
+    ],
+    "glossary_links": [
+      "/glossary/gtm-audit",
+      "/glossary/icp-scoring"
+    ]
+  },
+  {
+    "cluster": "Sales Orchestration",
+    "pillar_page": "/about",
+    "spoke_articles": [
+      "/blog/what-is-sales-orchestration",
+      "/blog/11-modules-outbound-engine"
+    ],
+    "glossary_links": [
+      "/glossary/sales-orchestration"
+    ]
+  }
+]
