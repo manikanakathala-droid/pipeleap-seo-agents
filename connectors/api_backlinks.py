@@ -106,7 +106,7 @@ This is what we built at [Pipeleap]({SITE_URL}) — a workflow orchestration sys
         "slug":    "signal-based-outbound-guide",
         "title":   "Signal-Based Outbound: How SaaS Teams Replace Static Lists with Real-Time Intent",
         "tags":    ["sales", "outbound", "b2b", "saas", "automation"],
-        "canonical": f"{SITE_URL}/blog/what-is-signal-based-outbound",
+        "canonical": f"{SITE_URL}/blog",
         "body": f"""Static lead lists are the biggest source of outbound inefficiency in B2B SaaS. You build a list, work it for 30 days, and move on — regardless of whether those accounts are actually in a buying moment.
 
 Signal-based outbound flips this. Instead of asking "who should we reach out to this month?", you ask "who is showing buying intent right now?"
@@ -143,7 +143,7 @@ A workflow orchestration system like [Pipeleap]({SITE_URL}) governs the full sig
 
 ---
 
-*Learn how Pipeleap handles signal-based outbound: [{SITE_URL}/blog/what-is-signal-based-outbound]({SITE_URL}/blog/what-is-signal-based-outbound)*
+*Learn more about Pipeleap: [{SITE_URL}]({SITE_URL})*
 """,
     },
     {
@@ -255,7 +255,7 @@ predictable outbound pipeline through structured, signal-based outbound sales au
 
 ## Resources
 
-- [What is Signal-Based Outbound?]({SITE_URL}/blog/what-is-signal-based-outbound)
+- [Sales Automation Blog]({SITE_URL}/blog)
 - [How to Scale Outbound Without Hiring SDRs]({SITE_URL}/blog/how-to-automate-outbound-without-hiring-sdrs)
 - [Outbound Automation Glossary]({SITE_URL}/glossary)
 - [Free GTM Audit]({SITE_URL}/gtm-audit)
