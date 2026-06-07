@@ -38,14 +38,14 @@
     "use_renderer": true,
     "landing_pages_per_run": 10,
     "blog_posts_per_run": 10,
-    "comparison_pages_per_run": 5,
+    # comparison_pages_per_run removed
     "use_case_pages_per_run": 5,
     "case_studies_per_run": 3,
     "output_dir": "outputs",
     "memory_db": "outputs/pipeleap_seo_memory.sqlite",
     "log_level": "INFO",
     "role_pages_per_run": 3,
-    "competitor_pages_per_run": 4
+    # competitor_pages_per_run removed
   },
   "schedule": {
     "continuous": false,
@@ -170,31 +170,7 @@
         "sales team time management",
         "sales process optimization"
       ],
-      "competitor": [
-        "zapier alternatives for outbound",
-        "clay alternative",
-        "make.com automation for sales",
-        "pipeleap vs clay",
-        "hubspot workflows alternative",
-        "smartlead alternative for outbound automation",
-        "outreach.io vs pipeleap",
-        "instantly vs smartlead vs pipeleap",
-        "salesloft alternatives for revops",
-        "alternatives to salesloft",
-        "alternatives to outreach",
-        "alternatives to apollo",
-        "alternatives to zoominfo",
-        "salesloft vs pipeleap",
-        "outreach vs pipeleap",
-        "apollo vs pipeleap",
-        "alternatives to hubspot sales hub",
-        "alternatives to clay",
-        "alternatives to groove",
-        "alternatives to revenue.io",
-        "best outbound sales tools directory",
-        "best sales tools 2026",
-        "b2b sales software directory"
-      ],
+      # competitor seed keywords removed
       "pain_point": [
         "sales administrative burden",
         "sales operational drag",
@@ -498,35 +474,7 @@
         "url": "https://pipeleap.com/how-it-works"
       }
     ],
-    "competitors": [
-      "Zapier",
-      "Make",
-      "Clay",
-      "HubSpot",
-      "Apollo",
-      "Outreach",
-      "SalesLoft",
-      "Instantly",
-      "Smartlead",
-      "Phantombuster",
-      "Findymail",
-      "Uplead",
-      "Sales Navigator",
-      "Instant Data Scraper",
-      "Leadfeeder",
-      "BuiltWith",
-      "Ocean.io",
-      "LaGrowthMachine",
-      "SolidInbox",
-      "Orum",
-      "HippoVideo",
-      "Potion",
-      "Sendoso",
-      "Handwrytten",
-      "Mailreach",
-      "Warmbox",
-      "ZeroBounce",
-      "Warmer",
+    # competitors list removed
       "GetCargo",
       "Lavender",
       "Regie",
@@ -758,9 +706,7 @@
     "use_case_pages_per_run": 5,
     "case_studies_per_run": 3,
     "problem_pages_per_run": 2,
-    "competitor_vs_pages_per_run": 5,
-    "competitor_alt_pages_per_run": 5,
-    "multi_competitor_pages_per_run": 4,
+    # competitor_vs/alt/multi pages removed
     "integration_pages_per_run": 10,
     "workflow_pages_per_run": 5,
     "generate_tools_pages": true,
@@ -776,10 +722,6 @@
     "run_backlink_gap": true,
     "run_decay_detection": true,
     "decay_period_days": 28,
-    "priority_competitors": [
-      "Clay", "Zapier", "Make", "HubSpot", "Outreach",
-      "SalesLoft", "Instantly", "Smartlead", "Apollo", "Lemlist"
-    ],
     "dataforseo_login": "${DATAFORSEO_LOGIN}",
     "dataforseo_password": "${DATAFORSEO_PASSWORD}",
     "dataforseo_location_code": 2840,
@@ -813,7 +755,7 @@
   "funnel_config": {
     "tofu_page_types": ["blog_post", "glossary_page", "problem_page"],
     "mofu_page_types": ["use_case_page", "role_page", "integration_page", "workflow_page"],
-    "bofu_page_types": ["comparison_page", "alternative_page", "multi_competitor_page", "bofu_page", "objection_page", "landing_page"],
+    "bofu_page_types": ["bofu_page", "objection_page", "landing_page"],
     "sql_page_types": ["demo_page", "roi_page"],
     "cta_rules": {
       "TOFU": {

@@ -163,21 +163,7 @@ class CannibalizationDetector:
                     })
                 else:
                     role_seen[role] = page.get("slug", "")
-            if page.get("page_type") in ("comparison_page", "alternative_page"):
-                comp = page.get("competitor", "").lower()
-                pt   = page.get("page_type", "")
-                key  = f"{pt}:{comp}"
-                if key in comp_seen:
-                    issues.append({
-                        "type":    "competitor_page_duplicate",
-                        "keyword": key,
-                        "page_1":  comp_seen[key],
-                        "page_2":  page.get("slug", ""),
-                        "recommendation": f"Only one {pt} per competitor. Keep the higher-quality page.",
-                        "severity": "HIGH",
-                    })
-                else:
-                    comp_seen[key] = page.get("slug", "")
+            # competitor page dedup removed
 
         return issues
 

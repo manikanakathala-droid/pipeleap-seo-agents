@@ -82,7 +82,7 @@ class ContentEngine:
         schema_types = {
             "blog_post": ["Article", "FAQPage"],
             "landing_page": ["WebPage", "SoftwareApplication", "FAQPage"],
-            "comparison_page": ["WebPage", "FAQPage"],
+            # comparison_page schema removed
             "use_case_page": ["WebPage", "FAQPage"],
             "case_study": ["Article", "FAQPage"],
         }.get(page_type, ["WebPage"])
@@ -115,12 +115,6 @@ class ContentEngine:
         return label
 
     def generate_blog_post(self, cluster: KeywordCluster) -> ContentAsset:
-        # Redirect comparison-intent keywords to the dedicated engine path
-        from utils.intent_classifier import COMPARISON_TERMS
-        if any(term in cluster.primary_keyword.lower() for term in COMPARISON_TERMS):
-            self.logger.warning("Routing comparison keyword to comparison engine: %s", cluster.primary_keyword)
-            return self.generate_comparison_page(cluster)
-
         # ── Delegate to advanced GSC-aware engine ──────────────────────────
         asset = self._blog_engine.generate_blog(cluster)
 
@@ -131,17 +125,6 @@ class ContentEngine:
             return asset
 
         # One CTA per blog , cta_variants must be empty so the CMS renders no extra buttons
-        asset.cta_variants = []
-        asset.hreflang_hints = self._hreflang_hints(asset.slug)
-        asset.body_markdown = _strip_formatting(asset.body_markdown)
-        return asset
-
-    def generate_comparison_page(self, cluster: KeywordCluster) -> ContentAsset:
-        asset = self._blog_engine.generate_comparison(cluster)
-        if self._is_near_duplicate(asset.body_markdown):
-            self.logger.warning("Near-duplicate detected , suppressing comparison: %s", cluster.primary_keyword)
-            asset.uniqueness_score = 0.0
-            return asset
         asset.cta_variants = []
         asset.hreflang_hints = self._hreflang_hints(asset.slug)
         asset.body_markdown = _strip_formatting(asset.body_markdown)
@@ -170,8 +153,8 @@ class ContentEngine:
         return asset
 
     # ── Legacy template renderers , BLOCKED ───────────────────────────────────
-    # The methods below (_render_blog_body, _render_comparison_body,
-    # _render_use_case_body) are no longer called by any production path.
+    # The methods below (_render_blog_body, _render_use_case_body)
+    # are no longer called by any production path.
     # All generation now routes through BlogContentEngine.
     # They are retained here only as an audit trail and will be removed once
     # the new engine has completed a full production cycle.
@@ -328,53 +311,6 @@ class ContentEngine:
         ]
         return "\n".join(sections)
 
-    def _render_comparison_body(self, brief: ContentBrief) -> str:
-        competitor_term = title_case_keyword(brief.primary_keyword)
-        intro_variations = [
-            f"Teams evaluating **{brief.primary_keyword}** are usually comparing flexibility, speed to launch, governance, and whether the system can eliminate non-selling work at scale instead of just automating individual tasks.",
-            f"When you're looking at **{brief.primary_keyword}**, you aren't just looking for features; you're looking for a sustainable way to scale your revenue operations without the technical debt of a 'Franken-stack'.",
-            f"The search for **{brief.primary_keyword}** often leads to two choices: stitch together 5+ different apps, or use a unified revenue operating system built for production-grade scale."
-        ]
-        intro = intro_variations[len(brief.primary_keyword) % len(intro_variations)]
-
-        return "\n".join(
-            [
-                f"# {competitor_term}",
-                "",
-                intro,
-                "",
-                "## What buyers should compare",
-                "- Workflow flexibility for enrichment and routing logic.",
-                "- CRM depth and data integrity controls.",
-                "- Ability to support high-volume revenue operations.",
-                "- Speed of building, iterating, and monitoring workflows.",
-                "",
-                f"## Where Pipeleap wins for {brief.target_persona}",
-                "- **Eliminates the 'Franken-stack'**: Replaces 4-5 different fragmented tools with one unified revenue operating system.",
-                "- Revenue-first workflow architecture instead of general automation alone.",
-                "- Native alignment with enrichment, CRM, and pipeline workflows.",
-                "- Faster iteration for RevOps teams building repeatable systems.",
-                "",
-                "## Where another tool may still fit",
-                "- Simpler one-step automation use cases.",
-                "- Teams that do not need workflow governance or CRM-heavy logic.",
-                "",
-                "## How to evaluate the stack for your use case",
-                "1. Map the workflow from signal to meeting booked.",
-                "2. Count the number of handoffs where data quality can break.",
-                "3. Score how much operational work is still manual after launch.",
-                "4. Choose the system that reduces ongoing RevOps overhead, not just launch time.",
-                "",
-                "## Suggested proof points to add before publishing",
-                "- Screenshots of workflow builders.",
-                "- Before and after CRM hygiene improvements.",
-                "- Time-to-launch and maintenance benchmarks.",
-                "",
-                "## Next step",
-                self._cta_block(brief.stage),
-            ]
-        )
-
     def _render_use_case_body(self, brief: ContentBrief) -> str:
 
         intro_variations = [
@@ -498,8 +434,6 @@ class ContentEngine:
                     f"The outcome: {stage_outcome[0]}."
                 )
 
-        if page_type == "comparison_page":
-            return f"{base} The comparison must attack the hidden costs of managing multiple disconnected sales tools, proving that an all-in-one revenue operating system drives faster pipeline."
         if page_type == "use_case_page":
             return f"{base} The use case should show how signal capture, enrichment, routing, and sequencing work flawlessly together when they share the same architecture."
         return base
@@ -552,38 +486,7 @@ class ContentEngine:
     @staticmethod
     def _direct_answer_block(keyword: str, page_type: str) -> str:
         """40-60 word TL;DR block optimised for Google's AI Overviews and featured snippets."""
-        if page_type == "comparison_page":
-            return (
-                f"> **TL;DR , {keyword.title()}:** Evaluate options on workflow flexibility, "
-                f"CRM depth, enrichment control, and workflow governance speed. "
-                f"Pipeleap unifies these into a single governed revenue layer rather than requiring "
-                f"separate tools for each step.\n"
-            )
-        if page_type == "use_case_page":
-            return (
-                f"> **TL;DR , {keyword.title()}:** Connect raw signals to demo-ready opportunities "
-                f"through governed automation. The workflow covers intake, enrichment, CRM sync, "
-                f"sequence assignment, and reply routing , without manual handoffs.\n"
-            )
-        # blog_post default
-        return (
-            f"> **TL;DR , {keyword.title()}:** A production-ready {keyword} system captures intent signals, "
-            f"enriches and qualifies contacts, writes clean data to the CRM, and triggers outreach "
-            f"sequences automatically , replacing fragmented point tools with one governed revenue workflow.\n"
-        )
-
-    # ------------------------------------------------------------------ #
-    # Hreflang hints (P2)                                                 #
-    # ------------------------------------------------------------------ #
-
-    _LOCATION_TO_HREFLANG: dict[int, str] = {
-        2840: "en-us",
-        2826: "en-gb",
-        2036: "en-au",
-        2124: "en-ca",
-        2356: "en-in",
-        2702: "en-sg",
-    }
+        # comparison_page config removed
 
     def _hreflang_hints(self, slug: str) -> list[dict[str, str]]:
         """Returns hreflang link annotations for the global markets in config."""
@@ -610,7 +513,7 @@ class ContentEngine:
         """Returns 3 CTA variants for A/B testing. Caller picks one; all are tracked."""
         primary_url = self.cta.get("primary_url", self.site.get("site_url", "https://pipeleap.com"))
         secondary_url = self.cta.get("secondary_url", primary_url)
-        funnel_stage = "TOFU" if page_type == "blog_post" else "BOFU" if page_type in {"comparison_page", "landing_page"} else "MOFU"
+        funnel_stage = "TOFU" if page_type == "blog_post" else "BOFU" if page_type == "landing_page" else "MOFU"
         variants_by_funnel: dict[str, list[dict[str, Any]]] = {
             "TOFU": [
                 {"label": "See how SaaS teams build predictable pipeline", "url": secondary_url, "variant": "A"},
@@ -644,7 +547,7 @@ class ContentEngine:
             {"item": "Outcome proof point", "status": "missing", "instructions": "Add a quantified result: e.g. '40% reply rate lift', 'CRM hygiene improved in 2 weeks', or a named customer quote."},
             {"item": "Last-reviewed date", "status": "missing", "instructions": "Update dateModified each time the page is refreshed. Set a 90-day review reminder."},
         ]
-        if page_type in {"comparison_page", "landing_page"}:
+        if page_type == "landing_page":
             base.append({
                 "item": "Third-party validation",
                 "status": "missing",

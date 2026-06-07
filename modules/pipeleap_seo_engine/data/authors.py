@@ -66,8 +66,6 @@ def get_author_for_page_type(page_type: str) -> dict[str, Any]:
     mapping = {
         "role_page": "revops_expert",
         "use_case_page": "revops_expert",
-        "comparison_page": "pipeleap_team",
-        "alternative_page": "pipeleap_team",
         "problem_page": "revops_expert",
         "glossary_page": "pipeleap_team",
         "integration_page": "revops_expert",

@@ -6,10 +6,8 @@ Self-contained — does not import from or modify the existing keyword engine.
 Sources:
   - Role keywords (from ROLES data)
   - Use case keywords
-  - Competitor vs / alternative keywords
   - Problem page keywords
   - Role × Use Case cross-product
-  - Role × Competitor cross-product
   - Long-tail expansion from head terms
   - Question-format keywords (what is, how to, why does, when should)
   - Industry vertical keywords (fintech, healthtech, proptech, etc.)
@@ -21,14 +19,14 @@ from __future__ import annotations
 from typing import Any
 
 from modules.pipeleap_seo_engine.data.roles import ROLES
-from modules.pipeleap_seo_engine.data.competitors import COMPETITORS, COMPETITOR_CATEGORIES
+# competitor imports removed
 from modules.pipeleap_seo_engine.data.use_cases import USE_CASES, PROBLEM_PAGES
 
 
 class GrowthKeywordEngine:
     """
     Generates the full keyword matrix for the Pipeleap SaaS Growth Engine.
-    Produces Role × Use Case × Competitor × Industry × Long-tail combinations prioritized by:
+    Produces Role × Use Case × Industry × Long-tail combinations prioritized by:
     - intent (transactional > commercial > informational)
     - competition (long-tail preferred)
     - SaaS specificity
@@ -112,10 +110,9 @@ class GrowthKeywordEngine:
     # Medium-tail patterns that expand core terms into natural 3-4 word phrases
     MEDIUM_TAIL_PATTERNS = [
         ("{term} platform",               "commercial",     "landing_page",    "solution-aware"),
-        ("{term} software",               "commercial",     "comparison_page", "solution-aware"),
-        ("{term} tools",                  "commercial",     "comparison_page", "solution-aware"),
-        ("{term} system",                 "commercial",     "use_case_page",   "solution-aware"),
-        ("best {term}",                   "commercial",     "comparison_page", "solution-aware"),
+        ("{term} software",               "commercial",     "landing_page",    "solution-aware"),
+        ("{term} tools",                  "commercial",     "landing_page",    "solution-aware"),
+        ("best {term}",                   "commercial",     "landing_page",    "solution-aware"),
         ("{term} for b2b",               "commercial",     "use_case_page",   "solution-aware"),
         ("{term} for saas companies",     "commercial",     "use_case_page",   "solution-aware"),
         ("{term} for startups",           "commercial",     "use_case_page",   "solution-aware"),
@@ -172,10 +169,10 @@ class GrowthKeywordEngine:
 
         entries.extend(self._role_keywords())
         entries.extend(self._use_case_keywords())
-        entries.extend(self._competitor_keywords())
+        # competitor keywords removed
         entries.extend(self._problem_keywords())
         entries.extend(self._role_x_use_case_keywords())
-        entries.extend(self._role_x_competitor_keywords())
+        # role x competitor keywords removed
         entries.extend(self._short_tail_keywords())
         entries.extend(self._medium_tail_keywords())
         entries.extend(self._navigational_keywords())
@@ -242,58 +239,6 @@ class GrowthKeywordEngine:
                 })
         return entries
 
-    # ─── Competitor keywords ──────────────────────────────────────────────────
-
-    def _competitor_keywords(self) -> list[dict[str, Any]]:
-        entries = []
-        for name, data in COMPETITORS.items():
-            slug_name = name.lower().replace(".", "-").replace(" ", "-")
-            # vs pages
-            for kw in [
-                f"pipeleap vs {name.lower()}",
-                f"{name.lower()} vs pipeleap",
-                f"pipeleap vs {name.lower()} for saas",
-                f"pipeleap vs {name.lower()} comparison",
-            ]:
-                entries.append({
-                    "keyword": kw,
-                    "intent": "commercial",
-                    "source": f"competitor:{name}:vs",
-                    "competitor": name,
-                    "page_type": "comparison_page",
-                    "slug": data["slug_vs"],
-                    "funnel_stage": "decision",
-                })
-            # alternative pages
-            for kw in [
-                f"{name.lower()} alternative",
-                f"{name.lower()} alternative for saas",
-                f"best {name.lower()} alternative",
-                f"{name.lower()} alternative outbound automation",
-                f"replace {name.lower()} with pipeleap",
-                f"switch from {name.lower()} to pipeleap",
-            ]:
-                entries.append({
-                    "keyword": kw,
-                    "intent": "commercial",
-                    "source": f"competitor:{name}:alt",
-                    "competitor": name,
-                    "page_type": "alternative_page",
-                    "slug": data["slug_alt"],
-                    "funnel_stage": "decision",
-                })
-        # Category-level keywords
-        for category, tools in COMPETITOR_CATEGORIES.items():
-            entries.append({
-                "keyword": f"best {category} tools for saas outbound",
-                "intent": "commercial",
-                "source": f"category:{category}",
-                "page_type": "comparison_page",
-                "funnel_stage": "solution-aware",
-                "slug": f"best-{category}-tools-saas",
-            })
-        return entries
-
     # ─── Problem page keywords ────────────────────────────────────────────────
 
     def _problem_keywords(self) -> list[dict[str, Any]]:
@@ -325,27 +270,6 @@ class GrowthKeywordEngine:
                     "use_case": uc["slug"],
                     "page_type": "use_case_page",
                     "slug": uc["slug"],
-                    "funnel_stage": "decision",
-                })
-        return entries
-
-    # ─── Role × Competitor cross-product ─────────────────────────────────────
-
-    def _role_x_competitor_keywords(self) -> list[dict[str, Any]]:
-        entries = []
-        top_competitors = list(COMPETITORS.keys())[:5]
-        for role_key, role in ROLES.items():
-            for name in top_competitors:
-                slug_name = name.lower().replace(".", "-")
-                kw = f"{name.lower()} alternative for {role['abbreviation'].lower()}"
-                entries.append({
-                    "keyword": kw,
-                    "intent": "commercial",
-                    "source": f"matrix:role×comp:{role_key}:{name}",
-                    "role": role_key,
-                    "competitor": name,
-                    "page_type": "alternative_page",
-                    "slug": f"{slug_name}-alternative-for-{ROLES[role_key]['slug'].split('for-')[1]}",
                     "funnel_stage": "decision",
                 })
         return entries
@@ -402,12 +326,12 @@ class GrowthKeywordEngine:
             ("what tools do revops teams use",                  "blog_post"),
             ("how to scale pipeline without hiring more reps",  "blog_post"),
             ("how to automate lead enrichment for b2b sales",   "use_case_page"),
-            ("what is the difference between zapier and n8n for sales", "comparison_page"),
+            ("what is the difference between zapier and n8n for sales", "blog_post"),
             ("what are the benefits of workflow governance",    "blog_post"),
             ("how to reduce time spent on crm data entry",      "blog_post"),
         ]
         for kw, page_type in specific_questions:
-            intent = "commercial" if page_type in ("comparison_page", "use_case_page") else "informational"
+            intent = "commercial" if page_type in ("use_case_page",) else "informational"
             entries.append({
                 "keyword": kw,
                 "intent": intent,

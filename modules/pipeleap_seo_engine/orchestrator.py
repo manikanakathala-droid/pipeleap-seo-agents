@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from modules.pipeleap_seo_engine.data.authors import get_author_for_page_type
-from modules.pipeleap_seo_engine.data.competitors import COMPETITORS
+# competitor import removed
 from modules.pipeleap_seo_engine.engines.content_engine import GrowthContentEngine
 from modules.pipeleap_seo_engine.engines.entity_linker import SemanticEntityLinker
 from modules.pipeleap_seo_engine.engines.keyword_engine import GrowthKeywordEngine
@@ -327,7 +327,7 @@ class GrowthEngineOrchestrator:
         # ── 15. Backlink gap analysis ─────────────────────────────────────────
         backlink_gaps = []
         if mc.get("run_backlink_gap", True):
-            comp_domains = [f"{c.lower()}.com" for c in priority_competitors[:5]]
+            comp_domains = []
             backlink_gaps = self.backlink_gap.gap_analysis(comp_domains)
             self._log(f"  Backlink gaps:    {len(backlink_gaps)} targets identified")
 
@@ -436,7 +436,7 @@ class GrowthEngineOrchestrator:
             f'word_count: {page.word_count}',
             f'uniqueness_score: {page.uniqueness_score}',
             *(([f'role: "{page.role}"'] if page.role else [])),
-            *(([f'competitor: "{page.competitor}"'] if page.competitor else [])),
+            # competitor frontmatter removed
             *(([f'use_case: "{page.use_case}"'] if page.use_case else [])),
             *(([og] if og else [])),
             *(([tw] if tw else [])),
@@ -567,7 +567,6 @@ class GrowthEngineOrchestrator:
         from utils.models import KeywordCluster
         intent_map = {
             "blog_post": "informational",
-            "comparison_page": "commercial",
             "use_case_page": "informational",
             "landing_page": "commercial",
         }

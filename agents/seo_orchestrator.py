@@ -331,7 +331,6 @@ class SEOOrchestrator:
             "tool": "/tools/",
             "tool_category": "/tools/",
             "landing_page": "/",
-            "comparison_page": "/blog/",
             "use_case_page": "/",
             "case_study": "/case-studies/",
         }

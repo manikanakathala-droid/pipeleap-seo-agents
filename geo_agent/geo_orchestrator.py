@@ -30,7 +30,6 @@ from geo_agent.engines.citation_gap_engine import CitationGapEngine
 from geo_agent.engines.entity_authority_engine import EntityAuthorityEngine
 from geo_agent.engines.ai_visibility_engine import AIVisibilityEngine
 from geo_agent.engines.semantic_coverage_engine import SemanticCoverageEngine
-from geo_agent.engines.comparison_optimizer import ComparisonOptimizer
 from geo_agent.generators.listing_generator import ListingGenerator
 from geo_agent.generators.quora_generator import QuoraGenerator
 from geo_agent.generators.outreach_generator import OutreachGenerator
@@ -82,7 +81,6 @@ class GEOOrchestrator:
             registry_path=str(self.output_dir / "visibility_registry.json")
         )
         self.coverage_engine  = SemanticCoverageEngine()
-        self.comparison_engine= ComparisonOptimizer()
         self.listing_generator = ListingGenerator()
         self.quora_generator   = QuoraGenerator()
         self.outreach_generator= OutreachGenerator()
@@ -143,10 +141,6 @@ class GEOOrchestrator:
         gm_generator = GlobalMarketGenerator(site_url=self.site_url)
         geo_pages = gm_generator.generate_all(GLOBAL_MARKETS)
         self._log(f"  GEO pages:     {len(geo_pages)} global market pages generated")
-
-        # ── 7. Comparison optimization ────────────────────────────────────────
-        comp_schemas = self.comparison_engine.all_comparison_schemas()
-        self._log(f"  Comparison:    {len(comp_schemas)} comparison schema sets generated")
 
         # ── 8. AI visibility update ───────────────────────────────────────────
         if serp_results:

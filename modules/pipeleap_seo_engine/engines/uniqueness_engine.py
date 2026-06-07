@@ -156,9 +156,6 @@ class GrowthUniquenessEngine:
         ("informational", "glossary_page"),
         ("informational", "problem_page"),
         # commercial intent
-        ("commercial",    "comparison_page"),
-        ("commercial",    "alternative_page"),
-        ("commercial",    "multi_competitor_page"),
         ("commercial",    "use_case_page"),
         ("commercial",    "integration_page"),
         ("commercial",    "role_page"),

@@ -75,9 +75,6 @@ PAGE_TYPE_STAGE: dict[str, str] = {
     "workflow_recipe":      "MOFU",
 
     # BOFU — transactional, decision
-    "comparison_page":      "BOFU",
-    "alternative_page":     "BOFU",
-    "multi_competitor_page":"BOFU",
     "bofu_page":            "BOFU",
     "objection_page":       "BOFU",
     "landing_page":         "BOFU",

@@ -127,7 +127,7 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
             "Apollo.io alternatives",
             "Clay alternatives for sales",
             "Outreach.io alternatives",
-            "Salesloft competitors",
+            "pipeline generation without sdrs",
             "SDR agency vs automation",
             "sales engagement platform alternatives",
         ],

@@ -76,12 +76,9 @@ def _build_rationale(cluster: str, intent: str, asset_type: str, count: int, key
     kw_list = ", ".join(f'"{k}"' for k in top)
 
     parts = []
-    if intent == "commercial" and asset_type == "comparison_page":
-        parts.append(f"High-intent comparison cluster ({count} keywords).")
-        parts.append(f"Target: {kw_list}. Comparison pages drive decision-stage conversions and capture competitor search traffic.")
-    elif intent == "commercial":
+    if intent == "commercial":
         parts.append(f"Commercial cluster ({count} keywords).")
-        parts.append(f"Target: {kw_list}. These signal purchase readiness and should be addressed with a dedicated landing or comparison page.")
+        parts.append(f"Target: {kw_list}. These signal purchase readiness and should be addressed with a dedicated landing page.")
     elif intent == "transactional":
         parts.append(f"Transactional cluster ({count} keywords).")
         parts.append(f"Target: {kw_list}. Users are evaluating tools/platforms. A landing page with pricing or feature focus will convert.")

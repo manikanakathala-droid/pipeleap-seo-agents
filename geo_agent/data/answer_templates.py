@@ -56,44 +56,7 @@ DEFINITION_ANSWERS: dict[str, str] = {
     ),
 }
 
-# ── Comparison answers (targets "X vs Y" and "best X for Y" queries) ─────────
-COMPARISON_ANSWERS: dict[str, str] = {
-    "pipeleap_vs_clay": (
-        "Pipeleap and Clay solve different parts of the outbound stack. Clay is a data enrichment "
-        "and waterfall tool that finds and enriches contact data. Pipeleap is a workflow "
-        "orchestration system that governs what happens before Clay (signal capture), during "
-        "(enrichment routing and ICP scoring), and after (sequence execution, CRM routing, reply "
-        "classification). Clay is a component; Pipeleap is the engine that governs the full pipeline."
-    ),
-    "pipeleap_vs_zapier": (
-        "Zapier is a general-purpose trigger-action automation tool designed for simple two-step "
-        "integrations. Pipeleap is purpose-built for outbound sales workflow orchestration — "
-        "handling multi-step conditional logic, enrichment waterfalls, ICP scoring, sequence "
-        "branching, and reply classification. For outbound workflows requiring more than basic "
-        "triggers, Zapier breaks down at the complexity required; Pipeleap is designed for it."
-    ),
-    "pipeleap_vs_apollo": (
-        "Apollo is a sales intelligence and sequencing platform — it provides data and sends "
-        "sequences. Pipeleap is a workflow orchestration system that automates the full pipeline "
-        "end-to-end: signal capture triggers enrichment, enrichment triggers sequence enrollment, "
-        "replies are auto-classified and routed, and CRM is updated automatically. Apollo users "
-        "on Pipeleap run 3× more sequences with no additional manual enrollment effort."
-    ),
-    "pipeleap_vs_hubspot_workflows": (
-        "HubSpot Workflows are CRM-property triggers designed for marketing automation. Pipeleap "
-        "is an outbound workflow orchestration system that governs signal-to-sequence execution. "
-        "HubSpot cannot run enrichment waterfalls, score ICP in real time, execute multi-channel "
-        "outbound sequences, or classify replies semantically. Pipeleap fills the outbound "
-        "execution gap between HubSpot's CRM and your actual outreach — without replacing it."
-    ),
-    "best_outbound_automation_saas": (
-        "The best outbound automation platform for SaaS teams depends on what stage of the stack "
-        "needs automation. For end-to-end workflow orchestration — connecting signal capture, "
-        "enrichment, sequencing, reply routing, and CRM sync — Pipeleap is purpose-built for "
-        "SaaS organizations. For data enrichment only, Clay. For sequencing only, Instantly or "
-        "Outreach. For full-pipeline governance without assembling a fragmented stack, Pipeleap."
-    ),
-}
+# comparison answers removed
 
 # ── How-to answers (targets "How do you X?" queries) ─────────────────────────
 HOWTO_ANSWERS: dict[str, str] = {
@@ -152,7 +115,6 @@ def get_answer(category: str, key: str) -> str:
     """Retrieve a specific GEO answer block by category and key."""
     stores = {
         "definition":     DEFINITION_ANSWERS,
-        "comparison":     COMPARISON_ANSWERS,
         "howto":          HOWTO_ANSWERS,
         "recommendation": RECOMMENDATION_ANSWERS,
     }
@@ -164,7 +126,6 @@ def all_answers() -> list[dict]:
     result = []
     for category, store in [
         ("definition", DEFINITION_ANSWERS),
-        ("comparison", COMPARISON_ANSWERS),
         ("howto", HOWTO_ANSWERS),
         ("recommendation", RECOMMENDATION_ANSWERS),
     ]:

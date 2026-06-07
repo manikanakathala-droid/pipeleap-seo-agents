@@ -50,13 +50,7 @@ TITLE_TEMPLATES: dict[str, list[str]] = {
         "Pipeleap {keyword} — Start Building Predictable Pipeline",
         "Get Your {keyword} — Free 48-Hour Assessment",
     ],
-    "comparison": [
-        "Pipeleap vs {competitor}: Which Is Right for SaaS Teams?",
-        "{competitor} Alternative for SaaS Outbound — Honest Comparison",
-        "Pipeleap vs {competitor} ({year}): Features, Pricing, Use Cases",
-        "Why SaaS Teams Switch from {competitor} to Pipeleap",
-        "{competitor} vs Pipeleap for Outbound Automation",
-    ],
+    # comparison titles removed
 }
 
 # Featured snippet structure targets by page type
@@ -66,9 +60,6 @@ SNIPPET_TARGETS: dict[str, str] = {
     "problem_page":         "list",        # numbered root causes
     "use_case_page":        "paragraph",   # "X allows you to..."
     "role_page":            "paragraph",   # "For VP Sales, X means..."
-    "comparison_page":      "table",       # side-by-side comparison table
-    "alternative_page":     "list",        # bullet list of differences
-    "multi_competitor_page":"table",       # multi-column comparison
     "integration_page":     "list",        # what the integration does
     "workflow_page":        "list",        # numbered workflow steps
     "workflow_recipe":      "list",
@@ -145,7 +136,7 @@ class CTREngine:
         templates = TITLE_TEMPLATES.get(intent, TITLE_TEMPLATES["informational"])
         variants = []
         persona = self._persona_from_page_type(page_type)
-        competitor = self._competitor_from_keyword(keyword)
+        competitor = ""
         action = self._action_from_keyword(keyword)
         kw_clean = self._clean_keyword(keyword)
         kw_title = kw_clean.title()
@@ -268,8 +259,6 @@ class CTREngine:
             "blog_post": 0.7,
             "problem_page": 0.75,
             "use_case_page": 0.6,
-            "comparison_page": 0.65,
-            "alternative_page": 0.65,
             "workflow_page": 0.7,
             "bofu_page": 0.5,
             "objection_page": 0.45,
@@ -296,16 +285,7 @@ class CTREngine:
     @staticmethod
     def _persona_from_page_type(page_type: str) -> str:
         return {"role_page": "Sales Leaders", "use_case_page": "SaaS Teams",
-                "bofu_page": "SaaS Teams", "comparison_page": "Buyers"}.get(page_type, "SaaS Teams")
-
-    @staticmethod
-    def _competitor_from_keyword(keyword: str) -> str:
-        competitors = ["Clay", "Zapier", "HubSpot", "Apollo", "Outreach", "Instantly", "SalesLoft"]
-        kw_lower = keyword.lower()
-        for c in competitors:
-            if c.lower() in kw_lower:
-                return c
-        return "Competitor"
+                "bofu_page": "SaaS Teams"}.get(page_type, "SaaS Teams")
 
     @staticmethod
     def _action_from_keyword(keyword: str) -> str:
@@ -331,8 +311,6 @@ class CTREngine:
         kw = keyword.lower()
         if any(w in kw for w in ["revops", "revenue ops", "revenue operations"]):
             return "revops"
-        if any(w in kw for w in ["competitor", "vs ", "alternative", "compare"]):
-            return "competitor"
         if any(w in kw for w in ["workflow", "orchestrat"]):
             return "workflow_orchestration"
         if any(w in kw for w in ["pipeline"]):

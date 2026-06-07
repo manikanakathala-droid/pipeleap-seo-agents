@@ -37,17 +37,7 @@ PILLARS: dict[str, dict[str, Any]] = {
             "workflow orchestration vs {tool}",
         ],
     },
-    "competitor-comparison": {
-        "label": "Competitor Comparisons",
-        "pillar_slug": "why-saas-outbound-fails",
-        "target_spoke_count": 20,
-        "spoke_templates": [
-            "pipeleap vs {tool}",
-            "{tool} alternative for saas",
-            "best {tool} alternative outbound",
-            "{tool1} vs {tool2} vs pipeleap",
-        ],
-    },
+    # competitor-comparison pillar removed
     "glossary": {
         "label": "Glossary / Entity SEO",
         "pillar_slug": "glossary",
@@ -127,8 +117,6 @@ class TopicalAuthorityMapper:
             return "glossary"
         if page_type == "integration_page" or slug.startswith("integrations"):
             return "integrations"
-        if page_type in ("comparison_page", "alternative_page", "multi_comparison_page"):
-            return "competitor-comparison"
         if page_type == "workflow_recipe" or slug.startswith("workflows"):
             return "workflow-orchestration"
         if "pipeline" in slug:

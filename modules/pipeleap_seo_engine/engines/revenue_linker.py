@@ -227,8 +227,6 @@ class RevenueLinkingEngine:
         title_short = page.title.split("|")[0].strip()
 
         if target_stage == "BOFU":
-            if page.page_type in ("comparison_page", "alternative_page"):
-                return f"see how Pipeleap compares to {page.competitor or 'alternatives'}"
             if page.page_type == "bofu_page":
                 return f"see a live demo for {page.use_case or 'your use case'}"
             if page.page_type == "objection_page":

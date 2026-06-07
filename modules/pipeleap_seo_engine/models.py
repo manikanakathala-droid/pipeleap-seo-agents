@@ -36,7 +36,6 @@ class GrowthPage:
     industry: str = "SaaS"
     role: str = ""
     use_case: str = ""
-    competitor: str = ""
     glossary_term: str = ""
     integration_partner: str = ""
     pain_points: list[str] = field(default_factory=list)
@@ -79,7 +78,6 @@ class GrowthPage:
             "industry": self.industry,
             "role": self.role,
             "use_case": self.use_case,
-            "competitor": self.competitor,
             "glossary_term": self.glossary_term,
             "integration_partner": self.integration_partner,
             "pain_points": self.pain_points,

@@ -37,15 +37,13 @@ class GrowthLinkingEngine:
 
     PILLAR_SLUG = "saas-workflow-orchestration"
     PILLAR_ANCHOR = "SaaS workflow orchestration"
-    BOFU_TYPES = {"comparison_page", "alternative_page", "multi_competitor_page",
-                  "bofu_page", "objection_page", "landing_page"}
+    BOFU_TYPES = {"bofu_page", "objection_page", "landing_page"}
 
     def build(self, pages: list["GrowthPage"]) -> dict[str, list[dict[str, str]]]:
         link_map: dict[str, list[dict[str, str]]] = {p.slug: [] for p in pages}
 
         role_pages       = [p for p in pages if p.page_type == "role_page"]
         use_case_pages   = [p for p in pages if p.page_type == "use_case_page"]
-        competitor_pages = [p for p in pages if p.page_type in ("comparison_page", "alternative_page")]
         problem_pages    = [p for p in pages if p.page_type == "problem_page"]
         glossary_pages   = [p for p in pages if p.page_type == "glossary_page"]
         integration_pages= [p for p in pages if p.page_type == "integration_page"]
@@ -66,14 +64,6 @@ class GrowthLinkingEngine:
                         "anchor": role_page.title.split("|")[0].strip(),
                         "url": f"/blog/{role_page.slug}",
                     })
-
-        # Competitor → Role (funnels competitor traffic into conversion pages)
-        for comp_page in competitor_pages:
-            for role_page in role_pages[:2]:
-                link_map[comp_page.slug].append({
-                    "anchor": role_page.title.split("|")[0].strip(),
-                    "url": f"/blog/{role_page.slug}",
-                })
 
         # Problem pages → Use cases + top role pages
         for prob_page in problem_pages:
@@ -122,16 +112,16 @@ class GrowthLinkingEngine:
                     "url": f"/blog/{uc_page.slug}",
                 })
 
-        # Integration pages → comparison page for the same tool (if it exists)
+        # Integration pages → use case page for same tool context
         for int_page in integration_pages:
             partner = (int_page.integration_partner or "").lower()
-            matching_comp = next(
-                (p for p in competitor_pages if partner and partner in p.competitor.lower()),
+            matching_uc = next(
+                (p for p in use_case_pages if partner and partner in (p.use_case or "").lower()),
                 None
             )
-            if matching_comp:
+            if matching_uc:
                 link_map[int_page.slug].append({
-                    "anchor": f"Pipeleap vs {int_page.integration_partner}",
+                    "anchor": f"Pipeleap for {int_page.integration_partner}",
                     "url": f"/blog/{matching_comp.slug}",
                 })
 

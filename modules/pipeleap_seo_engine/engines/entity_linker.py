@@ -7,7 +7,6 @@ import re
 from typing import Any
 
 from modules.pipeleap_seo_engine.data.entities import ENTITIES
-from modules.pipeleap_seo_engine.data.competitors import COMPETITORS
 from modules.pipeleap_seo_engine.data.roles import ROLES
 
 

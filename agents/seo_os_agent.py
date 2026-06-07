@@ -13,7 +13,7 @@ Runs in SAFE MODE: never modifies core website code.
   Step 3:  Adaptive action engine
   Step 4:  Technical SEO (safe mode)
   Step 5:  Keyword engine (20 keywords: 10 high-intent, 5 competitor gaps, 5 long-tail)
-   Step 6:  Content engine (respects config per-run limits: blog_posts, comparison_pages, use_case_pages + 3 glossary stubs)
+   Step 6:  Content engine (respects config per-run limits: blog_posts, use_case_pages + 3 glossary stubs)
   Step 7:  On-page optimisation (3 pages: titles, meta, headers)
   Step 8:  Internal linking strategy
   Step 9:  Competitor analysis (2 competitors, keyword gaps)
@@ -297,14 +297,7 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("Linking engine skipped: %s", exc)
 
-        # ── Step 9: Competitor Analysis ───────────────────────────────────────
-        self.logger.info("Step 9: Competitor analysis")
-        try:
-            competitors = self._run_competitor_analysis()
-            result.competitor_insights = competitors
-            self._write_json(output_dir / "competitor_insights.json", competitors)
-        except Exception as exc:
-            self.logger.warning("Competitor analysis skipped: %s", exc)
+        # ── Step 9: (removed - competitor analysis) ──────────────────────────
 
         # ── Step 10: Indexing ─────────────────────────────────────────────────
         self.logger.info("Step 10: Indexing recommendations")
@@ -617,8 +610,6 @@ class SEOOSAgent:
             kw_lower = kw.get("keyword", "").lower()
             if intent in ("commercial", "transactional"):
                 recommended = "blog_post"
-            elif "comparison" in kw_lower:
-                recommended = "comparison_page"
             elif ("use case" in kw_lower
                   or "for" in kw_lower.split()[:1]):
                 recommended = "use_case_page"
@@ -653,11 +644,10 @@ class SEOOSAgent:
         agent = ContentAgent(self.config, engine, self.logger)
         assets: list[ContentAsset] = agent.generate(clusters)
         limit_b = self.config.get("execution", {}).get("blog_posts_per_run", 4)
-        limit_c = self.config.get("execution", {}).get("comparison_pages_per_run", 2)
         limit_u = self.config.get("execution", {}).get("use_case_pages_per_run", 2)
         self.logger.info(
-            "ContentAgent produce config limits: blog=%d comparison=%d use_case=%d | actual=%d assets",
-            limit_b, limit_c, limit_u, len(assets),
+            "ContentAgent produce config limits: blog=%d use_case=%d | actual=%d assets",
+            limit_b, limit_u, len(assets),
         )
 
         for asset in assets:
@@ -833,31 +823,6 @@ class SEOOSAgent:
             "gtm-audit", "pricing", "about", "contact", "faq", "privacy",
         ])
         return slugs
-
-    def _run_competitor_analysis(self) -> list[dict]:
-        from modules.pipeleap_seo_engine.data.competitors import COMPETITORS
-
-        insights: list[dict] = []
-        top_2 = list(COMPETITORS.items())[:2]
-
-        for name, profile in top_2:
-            insights.append({
-                "competitor": name,
-                "category": profile.get("category", ""),
-                "their_strength": profile.get("description", ""),
-                "pipeleap_wins": profile.get("pipeleap_wins", []),
-                "limitations": profile.get("limitations", []),
-                "keyword_gaps_to_target": [
-                    f"{name} alternatives",
-                    f"{name} vs Pipeleap",
-                    f"better than {name}",
-                    f"{name} competitors 2025",
-                ],
-                "content_to_outrank": f"Publish '{name} vs Pipeleap' comparison page targeting transactional intent. Lead with concrete outcome differentials.",
-                "best_for": profile.get("best_for", ""),
-            })
-
-        return insights
 
     def _run_ga4_audit(self) -> list[dict]:
         from connectors.ga4_connector import GA4Connector
