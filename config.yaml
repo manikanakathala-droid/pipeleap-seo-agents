@@ -91,7 +91,7 @@
       "webhook_url": ""
     },
     "github": {
-      "token": "$GITHUB_TOKEN",
+      "token": "",
       "repo": "manikanakathala-droid/pipeleap-launchpad-040053e5",
       "branch": "main",
       "blog_data_path": "src/data/blog-articles.ts",
