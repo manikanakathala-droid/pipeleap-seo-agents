@@ -1111,3 +1111,34 @@ Outbound sales automation is the use of software and AI to execute prospecting, 
 
 ---
 *SEO OS glossary — run 20260607T074812Z — 2026-06-07T07:49:01.851836+00:00*
+
+<!-- UPDATED 20260607T075247Z -->
+
+---
+run_id: 20260607T075247Z
+generated_at: 2026-06-07T07:53:32.916148+00:00
+slug: outbound-sales-automation
+title: "Outbound Sales Automation"
+status: draft
+---
+
+# Outbound Sales Automation
+
+## Definition
+
+Outbound sales automation is the use of software and AI to execute prospecting, lead enrichment, personalised outreach, and follow-up sequences without manual rep effort.
+
+## Related Terms
+
+- ICP scoring
+- sales orchestration
+- GTM audit
+
+## Internal Links
+
+- [/](/)
+- [/gtm-audit](/gtm-audit)
+- [/glossary/icp-scoring](/glossary/icp-scoring)
+
+---
+*SEO OS glossary — run 20260607T075247Z — 2026-06-07T07:53:32.916148+00:00*
