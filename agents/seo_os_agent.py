@@ -371,7 +371,7 @@ class SEOOSAgent:
             if publisher.is_configured():
                 for item in result.content_generated:
                     item_type = item.get("type", "")
-                    if item_type in ("blog_post", "comparison_page") and item.get("slug"):
+                    if item_type == "blog_post" and item.get("slug"):
                         publisher.publish_blog_post(item)
         except Exception as exc:
             self.logger.warning("GitHub publish skipped: %s", exc)
@@ -392,8 +392,7 @@ class SEOOSAgent:
                         backlink_urls.append(f"{self.site_url}/tools/{slug}")
                     elif ptype in ("landing_page", "use_case_page"):
                         backlink_urls.append(f"{self.site_url}/{slug}")
-                    elif ptype == "comparison_page":
-                        backlink_urls.append(f"{self.site_url}/blog/{slug}")
+                    # comparison pages not published to blog — skip backlinks
                     elif ptype == "case_study":
                         backlink_urls.append(f"{self.site_url}/case-studies/{slug}")
                     else:

@@ -278,3 +278,16 @@ When enabled, template-built content passes through `core/humanize.py` transform
 - WebSite schema: Default-injected in `SEO.tsx` for every page. Pages with existing WebSite schema skip injection (dedup by `@type`).
 - Link equity: Replaced `/gtm-audit` CTAs → `/pricing` on Services, HowItWorks, BlogArticle. Kept `/gtm-audit` in Footer and on tool pages where contextually relevant.
 - Apple touch icon: Uses `og-image.png` (1200x1200) as icon source — Google recommends 180x180 minimum.
+
+### 19. Comparison pages must never be written to blog section (June 7)
+**Problem:** Comparison pages (`comparison_page` type) were being published to `blog-articles.ts` alongside regular blog posts. This puts comparison content (e.g. "Apollo.io alternatives", "Salesloft vs Pipeleap") on `/blog/` URLs where it dilutes the blog's topical authority.
+
+**Fix:**
+- `agents/seo_os_agent.py:374` — Only publish `blog_post` type to `blog-articles.ts`, not `comparison_page`
+- `agents/seo_os_agent.py:395-396` — Removed backlink URL mapping for comparison pages (no `/blog/` URLs for them)
+
+**Rule:** Never write comparison pages to the blog section (`blog-articles.ts`). Comparison content should either not be generated or be generated as standalone landing pages at a non-blog URL path. Check `seo_os_agent.py` publish step before making any changes to blog publishing logic.
+
+**Relevant Files:**
+- `agents/seo_os_agent.py` — Blog publish step (line ~374) and backlink URL mapping (line ~395)
+- `connectors/github_publisher.py` — `publish_blog_post()` writes to blog-articles.ts
