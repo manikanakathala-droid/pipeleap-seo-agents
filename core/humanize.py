@@ -98,7 +98,7 @@ _SHORT_CONNECTORS = [
 
 def _vary_sentence_structure(text: str, seed: int) -> str:
     """Occasionally break long sentences, add conversational connectors."""
-    rng = _zlib.crc32(str(seed).encode())
+    rng = zlib.crc32(str(seed).encode())
     sentences = _SENTENCE_SPLIT_RE.split(text)
     result: list[str] = []
     for i, s in enumerate(sentences):
@@ -138,7 +138,7 @@ _OPINION_INSERTS = [
 def _add_opinionated_language(text: str, seed: int) -> str:
     """Insert expert-opinion phrases at natural break points."""
     paragraphs = text.split("\n\n")
-    rng = _zlib.crc32(str(seed + 1).encode())
+    rng = zlib.crc32(str(seed + 1).encode())
     result: list[str] = []
     for i, para in enumerate(paragraphs):
         if len(para) > 60 and (rng + i) % 4 == 0:
@@ -166,7 +166,7 @@ _FRAGMENTS = [
 def _add_natural_fragments(text: str, seed: int) -> str:
     """Add short fragment sentences at paragraph ends."""
     paragraphs = text.split("\n\n")
-    rng = _zlib.crc32(str(seed + 2).encode())
+    rng = zlib.crc32(str(seed + 2).encode())
     result: list[str] = []
     for i, para in enumerate(paragraphs):
         result.append(para)
@@ -193,7 +193,7 @@ _DETAIL_MAP: dict[str, list[str]] = {
 
 def _inject_concrete_details(text: str, seed: int) -> str:
     """Replace generic statements with specific, credible-sounding details."""
-    rng = _zlib.crc32(str(seed + 3).encode())
+    rng = zlib.crc32(str(seed + 3).encode())
     lowered = text.lower()
     matches = []
     for trigger, options in _DETAIL_MAP.items():
