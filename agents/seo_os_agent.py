@@ -537,6 +537,8 @@ class SEOOSAgent:
         keywords: list[dict] = []
         seen: set[str] = set()
         for category, kws in seed.items():
+            if category == "pain_point":
+                continue  # pain_points are woven into existing pages, not generated as articles
             for kw in kws:
                 if kw not in seen:
                     seen.add(kw)

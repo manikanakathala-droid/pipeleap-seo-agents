@@ -783,6 +783,95 @@ class BlogContentEngine:
         ]
         return "\n".join(s for s in sections if s is not None)
 
+    # ── Helpers for competitor-specific content ─────────────────────────────
+
+    KNOWN_COMPETITORS = [
+        "Salesloft", "Outreach", "Apollo", "Apollo.io", "HubSpot", "ZoomInfo",
+        "Clay", "Zapier", "Make", "Instantly", "Smartlead", "Lemlist",
+        "Groove", "Revenue.io", "n8n", "Pipedrive", "Close"
+    ]
+
+    COMPETITOR_WEAKNESSES: dict[str, list[str]] = {
+        "Salesloft": [
+            "built for enterprise sequencing, not for eliminating the non-selling work across the full pipeline",
+            "requires dedicated admin to configure and maintain workflows",
+            "weak enrichment and data governance compared to a unified operational layer"
+        ],
+        "Outreach": [
+            "focuses on email sequencing and call logging, not the operational layer behind them",
+            "relies on manual prospect research and list building outside the platform",
+            "enrichment and CRM sync require third-party tools and manual mapping"
+        ],
+        "Apollo": [
+            "primarily a data provider with basic sequencing tacked on",
+            "enrichment lacks fallback chaining and error handling needed for high-volume pipelines",
+            "workflow automation is limited to simple if-then rules with no orchestration layer"
+        ],
+        "HubSpot": [
+            "a CRM with built-in automation, not a dedicated outbound operational layer",
+            "workflows are linear and break at scale when enrichment, routing, and reply handling are needed",
+            "requires significant manual configuration and ongoing maintenance by a dedicated ops person"
+        ],
+        "ZoomInfo": [
+            "a large B2B database but limited to contact discovery and basic enrichment",
+            "no workflow engine, no reply routing, no pipeline governance",
+            "requires separate tools for sequencing, routing, and CRM automation"
+        ],
+        "Clay": [
+            "excellent at multi-source enrichment but stops at data preparation",
+            "no built-in sequencing, reply handling, or pipeline management",
+            "teams need 2-3 additional tools to turn enriched data into pipeline"
+        ],
+        "Zapier": [
+            "general-purpose automation with no sales-specific workflow patterns",
+            "breaks unpredictably when APIs change, with no observability for revenue teams",
+            "each automation is a standalone step, not governed orchestration across tools"
+        ],
+        "Make": [
+            "visual workflow builder but no pre-built sales automation patterns",
+            "enrichment, routing, and CRM sync require custom construction from scratch",
+            "no dedup, collision prevention, or governance built into the platform"
+        ],
+        "Instantly": [
+            "email deliverability and warmup specialist, not a full operational layer",
+            "no enrichment, no CRM write-back, no reply routing beyond basic auto-reply",
+            "designed for cold email volume, not pipeline generation and management"
+        ],
+        "Smartlead": [
+            "multi-channel sequencing focused on deliverability and inbox rotation",
+            "no lead enrichment, no signal detection, no governed CRM handoff",
+            "teams must manually research, enrich, and route leads before they enter the sequence"
+        ],
+        "Lemlist": [
+            "email personalization and landing page builder for cold outreach",
+            "no enrichment orchestration, no CRM sync, no reply classification",
+            "sits at the execution layer only - does not solve the data or operations problem"
+        ],
+    }
+
+    COMPETITOR_PRICING_POSTURE: dict[str, str] = {
+        "Salesloft": "enterprise pricing starting at $75/seat/month with annual contracts",
+        "Outreach": "enterprise pricing starting around $100/seat/month with minimum seat requirements",
+        "Apollo": "freemium with paid plans from $49/seat/month",
+        "HubSpot": "Sales Hub from $50/seat/month for basic features, Enterprise at $150/seat/month",
+        "ZoomInfo": "enterprise plans starting at $15,000/year for basic access",
+        "Clay": "usage-based pricing from $149/month for 5,000 credits",
+        "Zapier": "from $19.99/month for 750 tasks; enterprise from custom pricing",
+        "Make": "from $9/month for 1,000 operations; enterprise from custom pricing",
+        "Instantly": "from $30/month for warmup + campaign features",
+        "Smartlead": "from $39/month for basic multi-channel campaigns",
+        "Lemlist": "from $32/month for cold email + LinkedIn automation",
+    }
+
+    def _extract_competitors(self, keyword: str) -> list[str]:
+        kw_lower = keyword.lower()
+        found: list[str] = []
+        for comp in self.KNOWN_COMPETITORS:
+            comp_lower = comp.lower()
+            if comp_lower in kw_lower:
+                found.append(comp)
+        return found
+
     # ── Comparison body ───────────────────────────────────────────────────────
 
     def _render_comparison_body(
@@ -793,6 +882,26 @@ class BlogContentEngine:
         strategy: dict[str, Any],
     ) -> str:
         brand = self.brand
+        competitors = self._extract_competitors(keyword)
+        competitor_name = competitors[0] if competitors else None
+
+        if competitor_name:
+            weaknesses = self.COMPETITOR_WEAKNESSES.get(competitor_name, [])
+            can_do_1 = weaknesses[0] if len(weaknesses) > 0 else "covers one slice of the pipeline but not the full operational layer"
+            can_do_2 = weaknesses[1] if len(weaknesses) > 1 else "requires additional tools for enrichment, routing, and pipeline management"
+            can_do_3 = weaknesses[2] if len(weaknesses) > 2 else "lacks the governed architecture needed for teams scaling outbound"
+            pricing_note = self.COMPETITOR_PRICING_POSTURE.get(competitor_name, "varies by plan and usage tier")
+
+            pipeleap_advantage_1 = (
+                f"automate the enrichment, routing, and CRM sync {competitor_name} leaves for your team to figure out"
+            )
+        else:
+            can_do_1 = "covers one slice of the pipeline but not the full operational layer"
+            can_do_2 = "requires additional tools for enrichment, routing, and pipeline management"
+            can_do_3 = "lacks the governed architecture needed for teams scaling outbound"
+            pricing_note = "varies by plan and usage tier"
+            competitor_name = "other tools"
+            pipeleap_advantage_1 = "govern enrichment, routing, and CRM sync in one architecture"
 
         sections = [
             f"# {kw_title}: A Revenue Team's Evaluation Guide",
@@ -830,6 +939,39 @@ class BlogContentEngine:
                 f"The point-solution purchase always reveals the orchestration need 6-12 months later."
             ),
             "",
+            f"## Where {competitor_name} falls short",
+            "",
+            f"**{competitor_name}** {can_do_1}. It {can_do_2}. And it {can_do_3}.",
+            "",
+            f"The result is that your team spends more time managing {competitor_name} than selling. "
+            f"Data lives in {competitor_name} but enrichment lives somewhere else. Reply handling "
+            f"is a separate system. CRM updates are manual. Every new hire needs training on four tools "
+            f"instead of one operational layer.",
+            "",
+            f"## How {brand} fills the gap",
+            "",
+            f"Instead of adding {competitor_name} to a fragmented stack, {brand} becomes the operational "
+            f"layer that {pipeleap_advantage_1}. Your enrichment, routing, CRM sync, and reply handling "
+            f"operate as one governed system, not four disconnected tools.",
+            "",
+            f"**{brand} is the right choice when:**",
+            f"- You need {competitor_name}'s core capability plus enrichment, CRM, and governance in one layer",
+            f"- Your team needs to iterate on workflows without engineering dependency",
+            f"- Data quality between tools is a recurring operational problem",
+            f"- You are consolidating a fragmented point-solution stack",
+            "",
+            f"**{brand} is not the best fit when:**",
+            f"- You only need one-step automations with no CRM or enrichment requirement",
+            f"- Your team runs purely inbound with no outreach component",
+            f"- You need a consumer no-code tool with zero workflow configuration",
+            "",
+            f"## Pricing comparison",
+            "",
+            f"| Tool | Starting price | What you get |",
+            f"| --- | --- | --- |",
+            f"| {competitor_name} | {pricing_note} | Point-solution capability, limited scope |",
+            f"| {brand} | $2,500/month | Full operational layer: enrichment, CRM sync, sequencing, routing, governance |",
+            "",
             f"## What to actually test during evaluation",
             "",
             "| Capability | What to test |",
@@ -841,24 +983,12 @@ class BlogContentEngine:
             "| Observability | Can revenue teams see exactly which step failed and why? |",
             "| Iteration speed | How long does it take to change one workflow step without re-deploying? |",
             "",
-            f"## Where {brand} fits on {keyword}",
-            "",
-            f"**{brand} is the right choice when:**",
-            f"- You need enrichment, CRM, and workflow routing in one governed architecture",
-                f"- Your team needs to iterate on workflows without engineering dependency",
-            f"- Data quality between tools is a recurring operational problem",
-            f"- You are consolidating a fragmented point-solution stack",
-            "",
-            f"**{brand} is not the best fit when:**",
-            f"- You only need one-step automations with no CRM or enrichment requirement",
-            f"- Your team runs purely inbound with no outreach component",
-            f"- You need a consumer no-code tool with zero workflow configuration",
-            "",
             f"## Implementation and migration notes",
             "",
             (
-                f"Start with one workflow. Prove the data quality improvement. Then migrate additional "
-                f"use cases. Avoid big-bang migrations, they create downtime risk and make debugging "
+                f"If you are migrating from {competitor_name}, start with one workflow. "
+                f"Prove the data quality improvement. Then migrate additional use cases. "
+                f"Avoid big-bang migrations, they create downtime risk and make debugging "
                 f"harder when problems arise."
             ),
             "",
