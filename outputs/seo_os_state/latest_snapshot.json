@@ -1,7 +1,7 @@
 {
-  "run_id": "20260607T075247Z",
+  "run_id": "20260607T075525Z",
   "site_url": "https://www.pipeleap.com",
-  "captured_at": "2026-06-07T07:52:47.362766+00:00",
+  "captured_at": "2026-06-07T07:55:25.463588+00:00",
   "total_pages": 1,
   "sitemap_urls": [
     "https://www.pipeleap.com/",
@@ -297,9 +297,9 @@
       ],
       "in_sitemap": true,
       "status_code": 200,
-      "response_time_ms": 131,
+      "response_time_ms": 139,
       "content_hash": "37506bd7f703dab12597afbe5c86c2cc4a4b853071039248fe5e62f6e5a7f004",
-      "captured_at": "2026-06-07T07:52:47.362766+00:00"
+      "captured_at": "2026-06-07T07:55:25.463588+00:00"
     }
   ],
   "errors": []
