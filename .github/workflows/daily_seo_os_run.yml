@@ -74,6 +74,7 @@ jobs:
 
       - name: Run SEO OS Agent
         env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
           MOZ_API_SECRET_KEY: ${{ secrets.MOZ_API_SECRET_KEY }}
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
