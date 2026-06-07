@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: manikanakathala-droid/pipeleap-launchpad-040053e5
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GH_PAT }}
           path: pipeleap-launchpad
 
       - name: Set up Python 3.12
@@ -74,7 +74,8 @@ jobs:
 
       - name: Run SEO OS Agent
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GH_PAT }}
+          LAUNCHPAD_DEPLOY_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}
           MOZ_API_ACCESS_ID: ${{ secrets.MOZ_API_ACCESS_ID }}
           MOZ_API_SECRET_KEY: ${{ secrets.MOZ_API_SECRET_KEY }}
           BING_API_KEY: ${{ secrets.BING_API_KEY }}
@@ -131,7 +132,7 @@ jobs:
 
       - name: Rebuild all sitemaps with today's lastmod dates
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GH_PAT }}
         run: python scripts/push_sitemap.py
 
       - name: Trigger Vercel deploy
