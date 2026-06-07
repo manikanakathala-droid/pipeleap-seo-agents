@@ -66,6 +66,9 @@ def infer_topic_cluster(keyword: str, topic_map: dict[str, list[str]]) -> str:
 
 def infer_page_type(keyword: str, intent: str) -> str:
     keyword_lower = keyword.lower()
+    # Skip comparison terms — they don't match our content strategy (blog=nurture, no vs/alternative pages)
+    if any(term in keyword_lower for term in COMPARISON_TERMS):
+        return ""
     if "for " in keyword_lower or "use case" in keyword_lower:
         return "use_case_page"
     if intent in {"transactional", "commercial"}:
