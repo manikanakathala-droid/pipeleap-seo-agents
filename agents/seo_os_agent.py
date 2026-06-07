@@ -370,7 +370,8 @@ class SEOOSAgent:
             )
             if publisher.is_configured():
                 for item in result.content_generated:
-                    if item.get("type") == "blog_post" and item.get("slug"):
+                    item_type = item.get("type", "")
+                    if item_type in ("blog_post", "comparison_page") and item.get("slug"):
                         publisher.publish_blog_post(item)
         except Exception as exc:
             self.logger.warning("GitHub publish skipped: %s", exc)
