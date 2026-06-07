@@ -52,7 +52,7 @@ class GitHubPublisher:
             content, sha = self._get_file(self.blog_data_path)
             entry = self._blog_entry(asset)
             updated = self._append_ts_entry(content, entry)
-            slug = getattr(asset, "slug", "unknown")
+            slug = self._get_attr(asset, "slug", "unknown")
             success = self._update_file(
                 self.blog_data_path,
                 updated,
@@ -328,19 +328,26 @@ class GitHubPublisher:
 
     # ── Entry builders ────────────────────────────────────────────────────────
 
+    @staticmethod
+    def _get_attr(obj: Any, name: str, default: Any = "") -> Any:
+        if isinstance(obj, dict):
+            return obj.get(name, default)
+        return getattr(obj, name, default)
+
     def _blog_entry(self, asset: Any) -> dict[str, Any]:
-        slug = getattr(asset, "slug", "")
+        slug = self._get_attr(asset, "slug", "")
         clean_slug = re.sub(r"^blog/", "", slug)
-        body = getattr(asset, "body_markdown", "")
-        keywords = getattr(asset, "source_keywords", [])
+        body = self._get_attr(asset, "body_markdown", "")
+        keywords = self._get_attr(asset, "source_keywords", [])
         word_count = len(body.split())
 
         read_minutes = max(1, round(word_count / 200))
         read_time = f"{read_minutes} min read"
 
-        category = self._derive_category(keywords, getattr(asset, "seo_title", "") or getattr(asset, "title", ""))
+        title = self._get_attr(asset, "seo_title", "") or self._get_attr(asset, "title", "")
+        category = self._derive_category(keywords, title)
 
-        pub_date = getattr(asset, "date_published", "")
+        pub_date = self._get_attr(asset, "date_published", "")
         if not pub_date:
             pub_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -348,8 +355,8 @@ class GitHubPublisher:
 
         return {
             "slug": clean_slug,
-            "title": getattr(asset, "seo_title", "") or getattr(asset, "title", ""),
-            "description": getattr(asset, "meta_description", ""),
+            "title": title,
+            "description": self._get_attr(asset, "meta_description", ""),
             "category": category,
             "publishedAt": pub_date,
             "readTime": read_time,
@@ -458,32 +465,33 @@ class GitHubPublisher:
         return sections
 
     def _tool_entry(self, page: Any) -> dict[str, Any]:
-        slug = getattr(page, "slug", "")
+        ga = self._get_attr
+        slug = ga(page, "slug", "")
         clean_slug = re.sub(r"^tools/", "", slug)
-        pub_date = getattr(page, "date_published", "")
+        pub_date = ga(page, "date_published", "")
         if not pub_date:
             pub_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-        cat_slug = getattr(page, "category_slug", "") or getattr(page, "categorySlug", "")
+        cat_slug = ga(page, "category_slug", "") or ga(page, "categorySlug", "")
         if not cat_slug:
             cat_slug = "ai-outbound-agents"
 
         return {
             "slug": clean_slug,
-            "name": getattr(page, "name", "") or getattr(page, "seo_title", "") or getattr(page, "title", ""),
+            "name": ga(page, "name", "") or ga(page, "seo_title", "") or ga(page, "title", ""),
             "categorySlug": cat_slug,
-            "tagline": getattr(page, "meta_description", ""),
-            "description": getattr(page, "meta_description", ""),
-            "longDescription": getattr(page, "body_markdown", ""),
-            "website": getattr(page, "website_url", "") or getattr(page, "website", "") or "",
-            "pricing": getattr(page, "pricing", {"model": "Contact", "hasFree": False}),
-            "bestFor": getattr(page, "best_for", []) or getattr(page, "bestFor", []),
-            "features": getattr(page, "features", []),
-            "pros": getattr(page, "pros", []),
-            "cons": getattr(page, "cons", []),
-            "alternatives": getattr(page, "alternatives", []),
-            "useCases": getattr(page, "use_cases", []) or getattr(page, "useCases", []),
-            "pipeLeapContext": getattr(page, "pipeleap_context", "") or getattr(page, "pipeLeapContext", ""),
-            "faqs": getattr(page, "faqs", []),
+            "tagline": ga(page, "meta_description", ""),
+            "description": ga(page, "meta_description", ""),
+            "longDescription": ga(page, "body_markdown", ""),
+            "website": ga(page, "website_url", "") or ga(page, "website", "") or "",
+            "pricing": ga(page, "pricing", {"model": "Contact", "hasFree": False}),
+            "bestFor": ga(page, "best_for", []) or ga(page, "bestFor", []),
+            "features": ga(page, "features", []),
+            "pros": ga(page, "pros", []),
+            "cons": ga(page, "cons", []),
+            "alternatives": ga(page, "alternatives", []),
+            "useCases": ga(page, "use_cases", []) or ga(page, "useCases", []),
+            "pipeLeapContext": ga(page, "pipeleap_context", "") or ga(page, "pipeLeapContext", ""),
+            "faqs": ga(page, "faqs", []),
             "publishedAt": pub_date,
         }
