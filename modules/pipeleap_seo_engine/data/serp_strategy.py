@@ -474,7 +474,7 @@ LINKING_CLUSTERS: list[dict] = [
 
 # 9. LinkedIn content cadence
 LINKEDIN_CADENCE: dict = {
-    "author": "Rajeev Manik",
+    "author": "Rajiv Maanik",
     "frequency": "2x per week",
     "slots": [
         {

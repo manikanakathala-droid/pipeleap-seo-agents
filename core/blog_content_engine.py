@@ -284,9 +284,9 @@ class BlogContentEngine:
     def _commercial_h2(self, keyword: str) -> str:
         v = self._variant_index(keyword, 3)
         variants = [
-            f"## What CROs and VP Sales Operations actually compare when evaluating {keyword}",
-            f"## What RevOps leaders actually compare when evaluating {keyword}",
-            f"## What GTM leaders actually compare when evaluating {keyword}",
+            f"## What CROs and VP Sales Operations actually look for when evaluating {keyword}",
+            f"## What sales ops leaders actually look for when evaluating {keyword}",
+            f"## What sales leaders actually look for when evaluating {keyword}",
         ]
         return variants[v]
 
@@ -1208,9 +1208,9 @@ class BlogContentEngine:
         if "outbound" in cl or "sdr" in cl:
             return "VP of Sales Operations and revenue teams"
         if "crm" in cl or "revenue" in cl:
-            return "RevOps leaders and CROs"
+            return "Sales ops leaders and CROs"
         if "n8n" in cl:
-            return "GTM leaders and operations teams"
+            return "Sales leaders and operations teams"
         return "revenue leadership teams"
 
     def _cta(self, funnel_stage: str) -> str:

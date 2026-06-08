@@ -127,7 +127,7 @@ const Pricing = () => {
           {
             "@context": "https://schema.org",
             "@type": "Person",
-            "name": "Rajeev Manik",
+            "name": "Rajiv Maanik",
             "jobTitle": "GTM Partner",
             "worksFor": { "@type": "Organization", "name": "Pipeleap", "url": "https://www.pipeleap.com" },
             "url": "https://www.pipeleap.com/about",

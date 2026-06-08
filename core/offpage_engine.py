@@ -182,7 +182,7 @@ class OffPageEngine:
                 "Happy to send a full outline within 48 hours.",
                 "",
                 "Best,",
-                f"Rajeev Manik, Pipeleap ({self.site_url})",
+                f"Rajiv Maanik, Pipeleap ({self.site_url})",
             ])
 
             pitches.append(GuestPostPitch(

@@ -42,7 +42,7 @@ _EXTRA_FAQS: list[tuple[str, str]] = [
     ),
     (
         "Do I need technical skills to build workflows?",
-        "No. Pipeleap uses a visual workflow builder that non-technical RevOps and growth teams can configure without engineering support. For advanced custom logic, the underlying n8n engine is fully accessible.",
+        "No. Pipeleap uses a visual workflow builder that non-technical sales ops and growth teams can configure without engineering support. For advanced custom logic, the underlying n8n engine is fully accessible.",
     ),
     (
         "Can Pipeleap replace my existing CRM?",
@@ -67,7 +67,7 @@ class ContentEngine:
         self.logger = logger
         self.site = config.get("site", {})
         self.cta = self.site.get("cta", {})
-        self.personas = self.site.get("target_personas", ["RevOps teams"])
+        self.personas = self.site.get("target_personas", ["Sales ops teams"])
         self.features = self.site.get("core_features", [])
         self.conversion_pages = config.get("seo", {}).get("conversion_pages", [])
         # Tracks 600-char intro samples to detect near-duplicate bodies at runtime
@@ -174,7 +174,7 @@ class ContentEngine:
         # RevOps Pain Variations
         pain_variations = [
             f"Most teams hit a ceiling when sales operations live across spreadsheets, enrichment tools, point integrations, and manual CRM cleanup. {self.site.get('brand', 'Pipeleap')} positions this motion as one orchestrated revenue workflow.",
-            f"Scaling revenue operations is impossible when your data and execution layers are disconnected. {self.site.get('brand', 'Pipeleap')} solves the {brief.primary_keyword} bottleneck by unifying targeting, enrichment, and CRM sync into a single governed system.",
+            f"Scaling sales operations is impossible when your data and execution layers are disconnected. {self.site.get('brand', 'Pipeleap')} solves the {brief.primary_keyword} bottleneck by unifying targeting, enrichment, and CRM sync into a single governed system.",
             f"Fragmented sales stacks create 'tool fatigue' and high operational drag. For teams looking at {brief.primary_keyword}, the goal isn't more software, it's a unified operating model that drives predictable pipeline."
         ]
         pain_point = pain_variations[len(brief.primary_keyword) % len(pain_variations)]
@@ -406,7 +406,7 @@ class ContentEngine:
         if "outbound" in cluster_lower or "sdr" in cluster_lower:
             return "Growth marketers and SDR leaders"
         if "crm" in cluster_lower or "revenue" in cluster_lower:
-            return "RevOps teams"
+            return "Sales ops teams"
         if "n8n" in cluster_lower:
             return "Technical founders and automation operators"
         return self.personas[0]
@@ -516,18 +516,18 @@ class ContentEngine:
         funnel_stage = "TOFU" if page_type == "blog_post" else "BOFU" if page_type == "landing_page" else "MOFU"
         variants_by_funnel: dict[str, list[dict[str, Any]]] = {
             "TOFU": [
-                {"label": "See how SaaS teams build predictable pipeline", "url": secondary_url, "variant": "A"},
+                {"label": "See how teams build predictable pipeline", "url": secondary_url, "variant": "A"},
                 {"label": "Explore the workflow framework", "url": secondary_url, "variant": "B"},
                 {"label": "Watch a 3-minute workflow walkthrough", "url": secondary_url, "variant": "C"},
             ],
             "MOFU": [
                 {"label": "See how Pipeleap works for your team", "url": primary_url, "variant": "A"},
-                {"label": "Compare Pipeleap to your current stack", "url": primary_url, "variant": "B"},
+                {"label": "See Pipeleap in your stack", "url": primary_url, "variant": "B"},
                 {"label": "Get a free workflow audit", "url": primary_url, "variant": "C"},
             ],
             "BOFU": [
                 {"label": "Book a demo", "url": primary_url, "variant": "A"},
-                {"label": "Get a free GTM audit", "url": primary_url, "variant": "B"},
+                {"label": "Get a free sales ops audit", "url": primary_url, "variant": "B"},
                 {"label": "Book a 30-minute strategy call", "url": primary_url, "variant": "C"},
             ],
         }

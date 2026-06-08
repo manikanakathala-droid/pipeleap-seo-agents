@@ -131,9 +131,9 @@ class SnapshotEngine:
     def _synthetic_snapshot(self, run_id: str, now: str) -> SiteSnapshot:
         """Fallback: build snapshot from known Pipeleap page structure."""
         known_pages = [
-            ("/",                  "Pipeleap - Outbound Sales Automation & GTM Implementation",    "outbound sales automation"),
+            ("/",                  "Pipeleap - Outbound Sales Automation & Sales Ops",             "outbound sales automation"),
             ("/about",             "About Pipeleap - Sales Orchestration That Learns",             "about pipeleap"),
-            ("/gtm-audit",         "Free GTM Audit for B2B Sales Teams | Pipeleap",                "gtm audit"),
+            ("/sales-ops-audit",   "Free Sales Ops Audit | Pipeleap",                             "sales ops audit"),
             ("/faq",               "Outbound Sales Automation FAQ - Pipeleap",                     "faq"),
             ("/pricing",           "Outbound Sales Automation Pricing | Pipeleap",                 "pricing"),
             ("/blog",              "Blog | Pipeleap",                                               "blog"),

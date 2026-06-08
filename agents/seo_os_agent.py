@@ -679,8 +679,8 @@ class SEOOSAgent:
                     "Outbound sales automation is the use of software and AI to execute prospecting, "
                     "lead enrichment, personalised outreach, and follow-up sequences without manual rep effort."
                 ),
-                "related_terms": ["ICP scoring", "sales orchestration", "GTM audit"],
-                "internal_links": ["/", "/gtm-audit", "/glossary/icp-scoring"],
+                "related_terms": ["ICP scoring", "sales orchestration", "sales ops audit"],
+                "internal_links": ["/", "/sales-ops-audit", "/glossary/icp-scoring"],
             },
             {
                 "type": "glossary_page",
@@ -691,19 +691,19 @@ class SEOOSAgent:
                     "lead sourcing, enrichment, personalisation, sequencing, reply handling, and CRM handoff — "
                     "into a single governed workflow."
                 ),
-                "related_terms": ["outbound sales automation", "GTM implementation", "revenue operations"],
+                "related_terms": ["outbound sales automation", "sales ops", "sales operations"],
                 "internal_links": ["/about", "/", "/glossary/outbound-sales-automation"],
             },
             {
                 "type": "glossary_page",
-                "slug": "gtm-audit",
-                "title": "GTM Audit",
+                "slug": "sales-ops-audit",
+                "title": "Sales Ops Audit",
                 "definition": (
-                    "A GTM audit is a structured review of a company's outbound sales motion, "
+                    "A sales ops audit is a structured review of a company's outbound sales motion, "
                     "covering ICP definition, lead targeting, messaging quality, outreach workflow, and pipeline health."
                 ),
-                "related_terms": ["ICP scoring", "outbound sales automation", "GTM implementation"],
-                "internal_links": ["/gtm-audit", "/glossary/icp-scoring", "/glossary/outbound-sales-automation"],
+                "related_terms": ["ICP scoring", "outbound sales automation", "sales ops"],
+                "internal_links": ["/sales-ops-audit", "/glossary/icp-scoring", "/glossary/outbound-sales-automation"],
             },
         ]
         generated.extend(glossary_terms)

@@ -165,7 +165,7 @@ class ContentBrief(SerializableMixin):
     schema_types: list[str]
     stage: str = ""          # "early" | "growth" | "scale" — empty = stage-agnostic
     role: str = ""           # "cro" | "cso" | "vp_sales" | "sales_manager" | "founder"
-    industry: str = "SaaS"
+    industry: str = "Sales Operations"
     use_case: str = ""
     competitor: str = ""
 
@@ -187,7 +187,7 @@ class ContentAsset(SerializableMixin):
     eeat_notes: list[str] = field(default_factory=list)
     stage: str = ""          # "early" | "growth" | "scale"
     role: str = ""
-    industry: str = "SaaS"
+    industry: str = "Sales Operations"
     use_case: str = ""
     competitor: str = ""
     uniqueness_score: float = 1.0

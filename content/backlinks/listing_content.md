@@ -73,7 +73,7 @@
 | Founded | 2024 |
 | Location | United States |
 | Business Model | SwaS (Software With A Service) |
-| Founders | Rajeev Manik |
+| Founders | Rajiv Maanik |
 
 ---
 
