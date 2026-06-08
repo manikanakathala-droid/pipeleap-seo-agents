@@ -145,7 +145,6 @@ LISTINGS: list[dict[str, Any]] = [
                 "layer in the typical SaaS outbound stack."
             ),
             "category": "Sales and Marketing / Lead Generation",
-            "alternatives": ["Zapier", "Clay", "Apollo", "Outreach"],
             "integrations": ["HubSpot", "Salesforce", "Clay", "Apollo", "Instantly", "Smartlead"],
         },
     },
@@ -153,7 +152,7 @@ LISTINGS: list[dict[str, Any]] = [
         "platform": "AlternativeTo",
         "url": "https://alternativeto.net/submit/",
         "priority": "P2",
-        "why": "Referenced in 'alternatives to X' queries — high Perplexity citation rate",
+        "why": "Listed as workflow orchestration software — high Perplexity citation rate for sales automation tools",
         "listing": {
             "software_name": "Pipeleap",
             "url": SITE_URL,
@@ -161,7 +160,6 @@ LISTINGS: list[dict[str, Any]] = [
                 "Workflow orchestration system for SaaS outbound sales. "
                 "Automates signal capture, enrichment, sequencing, and CRM routing end-to-end."
             ),
-            "alternative_to": ["Clay", "Zapier", "Apollo", "Outreach", "SalesLoft", "Instantly"],
             "tags": ["sales automation", "outbound", "workflow", "crm", "lead generation"],
             "license": "Commercial",
             "platform": "Web",

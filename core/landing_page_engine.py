@@ -81,21 +81,7 @@ class LandingPageEngine:
                 "- Poor visibility into which workflows drive pipeline."
             )
 
-        # Stage-specific before/after table
-        before_after_rows = STAGE_BEFORE_AFTER.get(stage, [])
-        if before_after_rows:
-            ba_lines = [
-                "",
-                "## Before Pipeleap vs. With Pipeleap",
-                "",
-                "| Dimension | Before Pipeleap | With Pipeleap |",
-                "| --- | --- | --- |",
-            ]
-            for dimension, before, after in before_after_rows:
-                ba_lines.append(f"| {dimension} | {before} | {after} |")
-            before_after_block = "\n".join(ba_lines)
-        else:
-            before_after_block = ""
+        before_after_block = ""
 
         direct_answer = (
             f"> **TL;DR — {keyword_title}:** A production-ready {keyword} system captures intent signals, "

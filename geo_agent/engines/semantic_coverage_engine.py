@@ -52,7 +52,7 @@ PILLAR_SUBTOPICS: dict[str, list[str]] = {
     "integrations": [
         "hubspot integration", "salesforce integration", "clay integration",
         "apollo integration", "outreach integration", "instantly integration",
-        "n8n integration", "zapier vs pipeleap",
+        "n8n integration", "zapier pipeleap integration",
     ],
 }
 

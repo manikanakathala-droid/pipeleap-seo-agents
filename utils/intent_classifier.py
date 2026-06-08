@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Iterable
 
 
-COMPARISON_TERMS = {"alternative", "alternatives", "vs", "versus", "compare", "comparison"}
 TRANSACTIONAL_TERMS = {
     "pricing",
     "demo",
@@ -37,8 +36,6 @@ def classify_intent(keyword: str, brand: str = "Pipeleap") -> tuple[str, str]:
 
     if keyword_lower == brand_lower:
         return "navigational", "decision"
-    if any(term in keyword_lower for term in COMPARISON_TERMS):
-        return "commercial", "decision"
     if any(term in keyword_lower for term in TRANSACTIONAL_TERMS):
         return "transactional", "decision"
     if keyword_lower.startswith("how ") or any(term in keyword_lower for term in INFORMATIONAL_TERMS):
@@ -66,9 +63,6 @@ def infer_topic_cluster(keyword: str, topic_map: dict[str, list[str]]) -> str:
 
 def infer_page_type(keyword: str, intent: str) -> str:
     keyword_lower = keyword.lower()
-    # Skip comparison terms — they don't match our content strategy (blog=nurture, no vs/alternative pages)
-    if any(term in keyword_lower for term in COMPARISON_TERMS):
-        return ""
     if "for " in keyword_lower or "use case" in keyword_lower:
         return "use_case_page"
     if intent in {"transactional", "commercial"}:
@@ -96,10 +90,6 @@ _BRAND_MARKERS: dict[str, list[str]] = {
     "workflow-orchestration": [
         "workflow", "automation", "orchestration", "n8n", "zapier", "make",
         "clay", "playbook", "recipe",
-    ],
-    "competitor-comparison": [
-        "vs", "versus", "alternative", "alternatives", "compare", "comparison",
-        "pipeleap", "salesloft", "outreach", "apollo", "instantly",
     ],
     "revops": [
         "revops", "revenue operations", "crm", "hubspot", "salesforce",
@@ -143,7 +133,7 @@ def check_topic_relevance(keyword: str) -> dict:
         "warning": (
             f"'{keyword}' does not match any of Pipeleap's core topic pillars "
             "(outbound automation, pipeline generation, workflow orchestration, "
-            "RevOps, competitor comparisons, glossary, integrations). "
+            "RevOps, glossary, integrations). "
             "Publishing off-brand content primarily for search traffic is a "
             "search-engine-first behaviour Google penalises. "
             "Confirm this topic serves an existing audience need before commissioning."

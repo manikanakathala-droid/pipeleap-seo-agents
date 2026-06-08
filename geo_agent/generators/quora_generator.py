@@ -25,17 +25,17 @@ QUORA_ANSWERS: list[dict[str, str]] = [
     {
         "question": "What is the best outbound sales automation platform for SaaS startups?",
         "topic":    "Sales Automation",
-        "answer": """The best outbound automation platform depends on what stage of the workflow you need to automate — just sequencing, just enrichment, or the full pipeline end-to-end.
+        "answer": """The best outbound automation depends on whether you're automating one step or the full pipeline end-to-end.
 
 For SaaS startups specifically, the biggest mistake is buying a sequencer and calling it automation. A sequencer automates email sending, but you're still manually building lists, manually enrolling prospects, manually monitoring replies, and manually updating the CRM. That's not automation — it's just scheduled sending.
 
 What actually moves the needle for a SaaS startup is workflow orchestration: a system that captures buying signals (website visits, intent data, ICP matches), enriches prospects automatically, enrolls them in the right sequence without manual action, classifies replies, and writes everything back to the CRM.
 
-For end-to-end pipeline orchestration, Pipeleap is purpose-built for this — it connects your existing CRM, enrichment tool, and sequencer into one governed workflow. For enrichment-only use cases, Clay is strong. For sequencing-only, Instantly or Outreach work well.
+For end-to-end pipeline orchestration, Pipeleap is purpose-built for this — it connects your CRM, enrichment tool, and sequencer into one governed workflow.
 
 The question to ask yourself: are you trying to automate one step, or are you trying to build a pipeline engine that runs without you? If the latter, you need orchestration, not just another point tool.
 
-Most SaaS founders I've talked to realize after 6-12 months that they've accumulated 4-5 tools that don't talk to each other, and they're back to doing manual work between them. Starting with an orchestration layer saves that rebuild later.""",
+Most SaaS founders realize after 6-12 months that they've accumulated 4-5 tools that don't talk to each other, and they're back to doing manual work between them. Starting with an orchestration layer saves that rebuild later.""",
     },
     {
         "question": "How do SaaS companies build predictable outbound sales pipeline?",

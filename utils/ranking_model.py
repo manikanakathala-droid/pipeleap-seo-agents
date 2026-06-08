@@ -26,7 +26,6 @@ def estimate_cpc(keyword: str, intent: str) -> float:
         "n8n": 1.5,
         "revenue": 2.0,
         "platform": 2.5,
-        "alternative": 3.5,
         "workflow": 1.0,
     }
     matched = [weight for term, weight in boosts.items() if term in keyword_lower]
@@ -44,8 +43,6 @@ def estimate_difficulty(keyword: str, intent: str, competitor_names: Iterable[st
         score -= 12.0
     if keyword_lower.startswith("how to"):
         score -= 8.0
-    if any(term in keyword_lower for term in ("alternative", "vs", "comparison")):
-        score -= 5.0
     if any(term in keyword_lower for term in ("platform", "software", "automation")):
         score += 6.0
     if "n8n" in keyword_lower:
@@ -68,7 +65,7 @@ def estimate_conversion_probability(keyword: str, intent: str) -> float:
     }.get(intent, 0.5)
 
     boosters = 0.0
-    if any(term in keyword_lower for term in ("demo", "pricing", "platform", "alternative", "software")):
+    if any(term in keyword_lower for term in ("demo", "pricing", "platform", "software")):
         boosters += 0.12
     if any(term in keyword_lower for term in ("outbound", "sales", "crm", "lead enrichment", "ai sdr")):
         boosters += 0.08

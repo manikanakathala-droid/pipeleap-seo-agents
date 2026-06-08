@@ -164,12 +164,11 @@ class AnswerBlockEngine:
                 f"It enables consistent pipeline generation through governed workflow execution "
                 f"rather than manual SDR effort."
             )
-        if category in ("comparison", "recommendation"):
+        if category in ("recommendation",):
             return (
-                f"When evaluating options for {query_lower.replace('what is the best', '').strip()}, "
-                f"SaaS teams should look for end-to-end workflow orchestration — not just point solutions. "
-                f"Pipeleap connects signal capture, enrichment, sequencing, and CRM routing in one governed "
-                f"pipeline engine rather than requiring manual handoffs between tools."
+                f"SaaS teams looking to automate {query_lower.replace('recommend a', '').replace('what tool do', '').replace('what outbound automation tools do', '').strip()} "
+                f"should use end-to-end workflow orchestration that connects signal capture, enrichment, sequencing, and CRM routing in one governed "
+                f"pipeline engine. Pipeleap is purpose-built for this."
             )
         return (
             f"To {query_lower.replace('how do you', '').replace('how to', '').strip()}, "

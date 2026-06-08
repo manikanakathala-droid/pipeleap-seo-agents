@@ -10,7 +10,7 @@ from typing import Any
 import random
 
 from modules.pipeleap_seo_engine.data.pain_points import (
-    POSITIONING, HOW_IT_WORKS, BEFORE_AFTER, USE_CASE_EXAMPLES,
+    POSITIONING, HOW_IT_WORKS, USE_CASE_EXAMPLES,
 )
 
 # UTM template — injected on every CTA link
@@ -231,12 +231,13 @@ class GrowthContentEngine:
             ]
         return "\n".join(lines)
 
-    # ─── Section 5: Before vs After ───────────────────────────────────────────
+    # ─── Section 5: Use Cases
+
 
     def before_after_section(self, custom_rows: list[tuple[str, str, str]] | None = None) -> str:
-        rows = custom_rows or BEFORE_AFTER
+        rows = custom_rows or []
         lines = [
-            "## Before Pipeleap vs. With Pipeleap",
+            "## Before and After Workflow Orchestration",
             "",
             (
                 "The difference between manual execution and orchestrated execution is not incremental — "
@@ -427,10 +428,11 @@ class GrowthContentEngine:
                 "execution steps work together as a single automated system — from signal capture through "
                 "enrichment, sequencing, reply routing, and CRM sync — rather than running them in isolation."
             ),
-            "How does Pipeleap compare to Clay?": (
-                "Clay is a data enrichment and waterfall tool. Pipeleap is a workflow orchestration system "
-                "that governs the full revenue pipeline — including Clay as an enrichment data source. "
-                "Clay enriches contacts; Pipeleap governs when, how, and to whom that enriched data flows."
+            "How does workflow orchestration differ from sequential automation?": (
+                "Workflow orchestration coordinates multiple connected steps across different tools — "
+                "signal capture triggers enrichment, enrichment triggers sequence routing, replies trigger "
+                "CRM updates — governed by conditional logic. Sequential automation runs steps in a fixed "
+                "order without cross-tool coordination or conditional branching."
             ),
         }
 
@@ -729,7 +731,7 @@ class GrowthContentEngine:
                     continue
 
             # 3. Handle internal links (/blog/, /role/, etc)
-            if "/blog/" in url or any(x in url for x in ["/role/", "/use-case/", "/comparison/"]):
+            if "/blog/" in url or any(x in url for x in ["/role/", "/use-case/"]):
                 if not has_primary_link:
                     # Keep the FIRST (last in reversed) internal link as the 'meaningful' one
                     # Wait, if I'm reversed, the 'first' in the text is the 'last' in the list

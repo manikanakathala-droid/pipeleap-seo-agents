@@ -28,15 +28,6 @@ _GENERATED_TERM_TEMPLATES: dict[str, dict] = {
         ),
         "relatedTerms": ["workflow-orchestration", "outbound-automation", "pipeline-generation"],
     },
-    "comparison": {
-        "category": "Tools & Technology",
-        "definition_template": (
-            "{term} is an outbound sales or workflow automation tool used by B2B organizations. "
-            "SaaS teams evaluating {term} typically assess its fit within their existing "
-            "tech stack and workflow automation infrastructure."
-        ),
-        "relatedTerms": ["workflow-orchestration", "sales-engagement", "outbound-automation"],
-    },
     "role": {
         "category": "Revenue & Pipeline",
         "definition_template": (
@@ -467,8 +458,7 @@ class GlossaryUpdater:
                 continue
             page_type = getattr(page, "page_type", "")
             template_key = (
-                "comparison" if "comparison" in page_type or "alternative" in page_type
-                else "role" if "role" in page_type
+                "role" if "role" in page_type
                 else "default"
             )
             tmpl = _GENERATED_TERM_TEMPLATES[template_key]

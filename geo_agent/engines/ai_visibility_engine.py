@@ -69,7 +69,7 @@ class AIVisibilityEngine:
             # Estimate eligibility: queries where Pipeleap content matches the answer format
             if has_aio or has_paa:
                 category = self._get_query_category(query)
-                if category in ("definition", "comparison", "how_to"):
+                if category in ("definition", "how_to"):
                     results["pipeleap_eligible"].append(query)
 
         return results

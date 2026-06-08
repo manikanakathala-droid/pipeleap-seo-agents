@@ -48,7 +48,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "max_depth": 2,
         "landing_pages_per_run": 5,
         "blog_posts_per_run": 4,
-        "comparison_pages_per_run": 2,
+        "comparison_pages_per_run": 0,
         "use_case_pages_per_run": 2,
         "case_studies_per_run": 0,
         "output_dir": "outputs",

@@ -177,13 +177,6 @@ PAA_BANKS: dict[str, list[str]] = {
         "How do you orchestrate multi-channel outbound workflows?",
         "What is the difference between a sequencer and a workflow orchestration tool?",
     ],
-    "competitor": [
-        "How does Pipeleap compare to Clay?",
-        "What is the difference between Pipeleap and Zapier for sales?",
-        "Is Pipeleap better than Apollo for outbound automation?",
-        "What does Pipeleap do that HubSpot Workflows cannot?",
-        "What are the best alternatives to Clay for outbound?",
-    ],
     "revops": [
         "What does a RevOps team do?",
         "How do RevOps teams automate workflows?",

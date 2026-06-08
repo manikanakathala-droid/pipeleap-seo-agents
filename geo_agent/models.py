@@ -13,7 +13,7 @@ class GEOPage:
     title: str
     meta_description: str
     primary_query: str               # The exact AI-engine query this page targets
-    query_category: str              # "definition" | "comparison" | "howto" | "recommendation"
+    query_category: str              # "definition" | "howto" | "recommendation"
     answer_block: str                # The 40-70 word AI-citation-ready answer
     body_markdown: str
     schema_markup: list[dict[str, Any]] = field(default_factory=list)

@@ -75,7 +75,6 @@ class GrowthKeywordEngine:
     BOFU_QUERIES = [
         ("book outbound automation demo",               "SQL",   "bofu_page"),
         ("outbound automation roi calculator",          "SQL",   "roi_page"),
-        ("outbound automation pricing comparison",      "BOFU",  "bofu_page"),
         ("pipeleap demo",                               "SQL",   "bofu_page"),
         ("pipeleap pricing",                            "BOFU",  "bofu_page"),
         ("pipeleap vs hiring sdr",                      "BOFU",  "objection_page"),

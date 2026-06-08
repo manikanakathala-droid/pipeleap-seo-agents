@@ -26,7 +26,7 @@ class ExecutionConfig(BaseModel):
     max_depth: int = Field(2, ge=1, le=5)
     landing_pages_per_run: int = Field(5, ge=0, le=50)
     blog_posts_per_run: int = Field(4, ge=0, le=50)
-    comparison_pages_per_run: int = Field(2, ge=0, le=50)
+    comparison_pages_per_run: int = Field(0, ge=0, le=50)
     use_case_pages_per_run: int = Field(2, ge=0, le=50)
     case_studies_per_run: int = Field(0, ge=0, le=50)
     output_dir: str = "outputs"

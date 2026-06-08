@@ -37,13 +37,6 @@ TOOLS_DATA: list[dict] = [
             "applying ICP qualification gates, writing structured data to CRM, and triggering sequences "
             "with suppression checks. Clay handles the data layer; Pipeleap governs the execution layer."
         ),
-        "comparison_rows": [
-            ("Enrichment waterfall (50+ providers)", "Yes", "Not natively"),
-            ("CRM write-back with deduplication", "No", "Yes"),
-            ("Sequence trigger and suppression check", "No", "Yes"),
-            ("Reply routing and meeting booking", "No", "Yes"),
-            ("End-to-end workflow audit trail", "Partial", "Yes"),
-        ],
         "faqs": [
             ("Does Pipeleap replace Clay?", "No. Clay handles the data enrichment layer. Pipeleap governs what happens after enrichment — CRM write-back, qualification, sequencing, and reply routing."),
             ("Can Pipeleap ingest Clay output directly?", "Yes. Pipeleap connects to Clay via webhook or API, picks up enriched records, and routes them through the downstream execution workflow."),
@@ -78,13 +71,6 @@ TOOLS_DATA: list[dict] = [
             "as governed workflow steps, so Apollo handles execution while Pipeleap handles the intake "
             "and output governance."
         ),
-        "comparison_rows": [
-            ("Contact database (270M+ records)", "Yes", "No — uses connected providers"),
-            ("ICP qualification gate before sequence", "No", "Yes"),
-            ("Enrichment waterfall (multi-provider)", "Single source", "Multi-provider with fallback"),
-            ("CRM deduplication on write-back", "Partial", "Yes"),
-            ("Reply routing as workflow step", "Manual", "Automated"),
-        ],
         "faqs": [
             ("Does Pipeleap replace Apollo?", "No. Apollo handles the contact database and sequence execution. Pipeleap governs the intake qualification and CRM output layer that Apollo does not enforce."),
             ("Can Pipeleap trigger Apollo sequences automatically?", "Yes. Pipeleap qualifies a contact against ICP criteria and triggers the Apollo sequence via API once all gates pass."),
@@ -118,17 +104,10 @@ TOOLS_DATA: list[dict] = [
             "on top: enrichment waterfall logic, ICP qualification gates, CRM deduplication, sequence "
             "suppression, and reply routing — all pre-configured for SaaS revenue workflows."
         ),
-        "comparison_rows": [
-            ("Visual workflow editor", "Yes", "Yes (n8n-based)"),
-            ("Outbound-specific ICP qualification gates", "Build yourself", "Pre-configured"),
-            ("Enrichment waterfall with fallback", "Build yourself", "Native"),
-            ("CRM deduplication logic", "Build yourself", "Native"),
-            ("Reply routing as workflow step", "Build yourself", "Native"),
-        ],
         "faqs": [
             ("Is Pipeleap built on n8n?", "Yes. Pipeleap uses n8n as its workflow execution engine and adds the outbound governance layer — enrichment waterfalls, ICP gates, CRM dedup, and reply routing — on top."),
             ("Can I migrate existing n8n outbound workflows to Pipeleap?", "Yes. Existing n8n workflows can be imported and extended with Pipeleap's governance nodes without rebuilding from scratch."),
-            ("When should a revenue team use raw n8n vs Pipeleap?", "Raw n8n works for general automation. Pipeleap is the right choice when the workflow is specifically outbound sales — enrichment, qualification, CRM sync, sequencing, and reply handling — where domain-specific governance matters."),
+            ("When should a revenue team use raw n8n compared to Pipeleap?", "Raw n8n works for general automation. Pipeleap is the right choice when the workflow is specifically outbound sales — enrichment, qualification, CRM sync, sequencing, and reply handling — where domain-specific governance matters."),
         ],
         "topical_pillar": "workflow-orchestration",
     },
@@ -159,13 +138,6 @@ TOOLS_DATA: list[dict] = [
             "consistently. Every Salesforce record created via Pipeleap meets defined data quality "
             "thresholds before it enters the CRM."
         ),
-        "comparison_rows": [
-            ("System of record for pipeline and forecasting", "Yes", "No — writes to Salesforce"),
-            ("Enrichment at point of contact creation", "Requires native/plugin setup", "Native workflow step"),
-            ("Deduplication on write-back", "Requires custom rules", "Built-in"),
-            ("Lifecycle stage and ownership assignment", "Manual or workflow rules", "Automated"),
-            ("Block outreach until data quality passes", "Not native", "Yes"),
-        ],
         "faqs": [
             ("Does Pipeleap replace Salesforce?", "No. Salesforce remains the system of record. Pipeleap governs what data enters Salesforce — enrichment, deduplication, and field mapping — so the records are clean when they arrive."),
             ("How does Pipeleap handle Salesforce deduplication?", "Pipeleap checks for existing contacts and accounts by email, domain, and name before every write-back, merging or skipping as configured."),
@@ -198,13 +170,6 @@ TOOLS_DATA: list[dict] = [
             "and uses them as triggers for automated workflow actions: re-engagement sequences, rep alerts, "
             "CRM stage updates, or manager escalations. Gong identifies the signal; Pipeleap acts on it."
         ),
-        "comparison_rows": [
-            ("Call recording and transcription", "Yes", "No"),
-            ("Deal risk and engagement scoring", "Yes", "Ingests from Gong"),
-            ("Automated action on risk signals", "Manual review required", "Automated workflow trigger"),
-            ("CRM update from call outcomes", "Via manual notes or native sync", "Automated write-back"),
-            ("Re-engagement sequence on deal risk", "Not native", "Yes"),
-        ],
         "faqs": [
             ("Does Pipeleap replace Gong?", "No. Gong provides the call intelligence and deal risk signals. Pipeleap acts on those signals automatically — triggering sequences, updating CRM, or escalating to managers."),
             ("What Gong signals can Pipeleap act on?", "Any signal Gong exposes via API: deal risk score, next step missing, champion engagement drop, or specific keywords flagged in call transcripts."),
@@ -239,13 +204,6 @@ TOOLS_DATA: list[dict] = [
             "to CRM suppression lists automatically. Reply handling becomes a workflow step, not a "
             "manual inbox task."
         ),
-        "comparison_rows": [
-            ("Multi-touch sequence execution", "Yes", "No — wraps Outreach"),
-            ("Positive reply → meeting booking (automated)", "Manual", "Automated"),
-            ("Out-of-office → snooze and re-entry", "Manual", "Automated"),
-            ("Unsubscribe → CRM suppression", "Requires setup", "Automated"),
-            ("Reply intent classification", "Basic", "Signal-based routing"),
-        ],
         "faqs": [
             ("Does Pipeleap replace Outreach?", "No. Outreach runs the sequences. Pipeleap governs what happens when a reply arrives — routing it to the right action automatically."),
             ("How does Pipeleap classify reply intent?", "Pipeleap uses keyword and sentiment signals to classify replies as positive, out-of-office, unsubscribe, or objection, then routes each to the appropriate workflow branch."),
@@ -280,13 +238,6 @@ TOOLS_DATA: list[dict] = [
             "records at the point of creation. HubSpot remains the system of record; Pipeleap governs "
             "the data that enters it."
         ),
-        "comparison_rows": [
-            ("CRM and deal tracking", "Yes", "No — writes to HubSpot"),
-            ("Enrichment gate before sequence entry", "Not native", "Yes"),
-            ("Contact deduplication at scale", "Basic", "Enforced at write-back"),
-            ("ICP qualification workflow step", "List-based", "Signal + data quality gate"),
-            ("Reply routing as governed workflow", "Manual", "Automated"),
-        ],
         "faqs": [
             ("Does Pipeleap replace HubSpot?", "No. HubSpot is the system of record. Pipeleap governs the enrichment, qualification, and deduplication layer before contacts enter HubSpot."),
             ("Can Pipeleap trigger HubSpot sequences?", "Yes. Once a contact passes Pipeleap's ICP qualification gate, it can trigger a HubSpot sequence enrollment automatically via API."),
@@ -321,13 +272,6 @@ TOOLS_DATA: list[dict] = [
             "ZoomInfo returns incomplete data, and writing the final enriched record to CRM with "
             "deduplication and field validation enforced."
         ),
-        "comparison_rows": [
-            ("Contact and account database depth", "Enterprise-grade (NA focus)", "Uses connected providers"),
-            ("Intent data (Streaming Intent)", "Yes", "Ingests as signal trigger"),
-            ("Enrichment waterfall fallback", "Not native", "Native multi-provider"),
-            ("CRM write-back with deduplication", "Via native integration", "Governed workflow step"),
-            ("Per-match cost governance", "Manual budget controls", "Threshold-based routing"),
-        ],
         "faqs": [
             ("Does Pipeleap replace ZoomInfo?", "No. ZoomInfo is the data source. Pipeleap orchestrates when and how ZoomInfo is queried, what happens when it misses, and how the result is written to CRM."),
             ("When should ZoomInfo be used over Clay in a waterfall?", "ZoomInfo has higher match rates on large North American accounts. Clay is more flexible for international contacts and custom research. Pipeleap's waterfall routes each contact to the right provider based on account region and data completeness targets."),

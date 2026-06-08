@@ -41,7 +41,6 @@
 
     "query_categories": [
       "definition",
-      "comparison",
       "how_to",
       "recommendation",
       "problem_solution"

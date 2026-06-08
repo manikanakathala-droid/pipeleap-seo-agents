@@ -60,7 +60,6 @@ META_TARGETS: list[dict] = [
 # 2. High-CTR headline variants
 CTR_VARIANTS: list[dict] = [
     {"intent": "problem_aware",  "headline": "Why Your Sales Stack Is Not Working (And How to Fix It)"},
-    {"intent": "comparison",     "headline": "Pipeleap vs. Hiring a Sales Rep: What Actually Builds Pipeline"},
     {"intent": "outcome_driven", "headline": "How to Get 3x More Meetings Without Hiring More Reps"},
     {"intent": "urgency",        "headline": "Your Sales Reps Are Spending 65% of Their Day on Admin. Stop It."},
     {"intent": "curiosity",      "headline": "The 11 Modules Every Revenue Engine Needs (Most Teams Have 3)"},
@@ -113,23 +112,6 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
             "managed revenue operations service",
             "gtm implementation partner B2B",
             "done for you revenue operations",
-        ],
-    },
-    {
-        "cluster_name": "alternative_comparison",
-        "intent": "transactional",
-        "funnel_stage": "decision",
-        "conversion_probability": 0.91,
-        "business_fit": 0.95,
-        "estimated_difficulty": 42.0,
-        "speed_to_rank_score": 0.60,
-        "keywords": [
-            "Apollo.io alternatives",
-            "Clay alternatives for sales",
-            "Outreach.io alternatives",
-            "pipeline generation without sdrs",
-            "SDR agency vs automation",
-            "sales engagement platform alternatives",
         ],
     },
     {
@@ -188,45 +170,6 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
 
 # 5. Content plan - 10 blog post briefs
 CONTENT_PLAN: list[dict] = [
-    {
-        "slug": "apollo-clay-pipeleap-comparison",
-        "page_type": "blog_post",
-        "title": "Apollo.io vs Clay vs Pipeleap: What Is the Difference?",
-        "seo_title": "Apollo.io vs Clay vs Pipeleap: Which Revenue Tool Is Right for You?",
-        "meta_description": (
-            "Comparing Apollo.io, Clay, and Pipeleap for revenue operations. Learn what each does, "
-            "where each falls short, and which one actually builds predictable pipeline."
-        ),
-        "target_keyword": "Apollo.io alternatives",
-        "cluster": "alternative_comparison",
-        "pillar_link": "/gtm-audit",
-        "internal_links": ["/glossary/icp-scoring", "/gtm-audit"],
-        "persona": "Head of Sales evaluating revenue tools",
-        "eeat_notes": [
-            "Add feature comparison table",
-            "Include decision framework: who should pick which tool",
-            "Add outcome proof for Pipeleap managed service",
-        ],
-    },
-    {
-        "slug": "sdr-agency-vs-revenue-automation",
-        "page_type": "blog_post",
-        "title": "SDR Agency vs. Revenue Automation: What Is Better for Pipeline?",
-        "seo_title": "SDR Agency vs Revenue Automation | Pipeleap",
-        "meta_description": (
-            "Weighing an SDR agency against revenue automation? This guide breaks down cost, "
-            "speed, quality, and scale so you can pick the right model for your stage."
-        ),
-        "target_keyword": "SDR agency vs automation",
-        "cluster": "alternative_comparison",
-        "pillar_link": "/gtm-audit",
-        "internal_links": ["/gtm-audit", "/"],
-        "persona": "B2B founder or VP Sales deciding how to staff revenue teams",
-        "eeat_notes": [
-            "Include real cost breakdown: agency retainer vs Pipeleap vs in-house SDR",
-            "Add speed-to-pipeline comparison",
-        ],
-    },
     {
         "slug": "what-is-sales-orchestration",
         "page_type": "blog_post",
@@ -382,7 +325,6 @@ DIRECTORY_TARGETS: list[dict] = [
     {"name": "G2",              "url": "https://www.g2.com",             "category": "Revenue Operations",       "priority": 1, "da": 90},
     {"name": "Capterra",        "url": "https://www.capterra.com",       "category": "Revenue Operations Software", "priority": 1, "da": 88},
     {"name": "Clutch.co",       "url": "https://clutch.co",              "category": "Sales Consulting / GTM",    "priority": 1, "da": 82},
-    {"name": "AlternativeTo",   "url": "https://alternativeto.net",      "category": "Alt to Apollo/Clay",        "priority": 1, "da": 78},
     {"name": "Product Hunt",    "url": "https://www.producthunt.com",    "category": "Full product launch",       "priority": 1, "da": 90},
     {"name": "Trustpilot",      "url": "https://www.trustpilot.com",     "category": "Business Services",         "priority": 2, "da": 92},
     {"name": "GetApp",          "url": "https://www.getapp.com",         "category": "Revenue Operations Software", "priority": 2, "da": 84},
@@ -450,16 +392,6 @@ LINKING_CLUSTERS: list[dict] = [
             "/blog/predictable-pipeline-without-sdrs",
         ],
         "glossary_links": ["/glossary/sales-automation"],
-    },
-    {
-        "cluster": "GTM Implementation",
-        "pillar_page": "/gtm-audit",
-        "spoke_articles": [
-            "/blog/how-to-run-gtm-audit",
-            "/blog/sdr-agency-vs-revenue-automation",
-            "/blog/apollo-clay-pipeleap-comparison",
-        ],
-        "glossary_links": ["/glossary/gtm-audit", "/glossary/icp-scoring"],
     },
     {
         "cluster": "Sales Orchestration",

@@ -64,14 +64,15 @@ GEO_TARGET_QUERIES = {
         "What does RevOps automation mean?",
         "What is a GTM automation system?",
     ],
-    "comparison": [
+    "recommendation": [
+        "Which outbound automation tool should a SaaS startup use?",
+        "What tool do RevOps teams use for workflow orchestration?",
+        "What is the best outbound automation system for a VP Sales?",
+        "Recommend a pipeline automation tool for a SaaS CRO",
+        "What outbound automation tools do SaaS companies use?",
         "What is the best outbound automation platform for SaaS?",
-        "Pipeleap vs Clay — which is better for outbound?",
-        "What is the difference between Pipeleap and Zapier for sales?",
-        "Best alternatives to Apollo for outbound automation",
         "Best tools for signal-based outbound in 2025",
         "Best workflow orchestration tools for SaaS sales teams",
-        "Clay vs Zapier vs Pipeleap for outbound automation",
     ],
     "how_to": [
         "How do you automate B2B outbound sales?",

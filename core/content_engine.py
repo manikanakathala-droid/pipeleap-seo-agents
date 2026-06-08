@@ -247,7 +247,6 @@ class ContentEngine:
 
         # Stage-specific sections (empty strings are filtered out by the join)
         snippet = self._stage_featured_snippet(brief.stage, brief.primary_keyword) if brief.stage else ""
-        before_after = self._stage_before_after_table(brief.stage) if brief.stage else ""
         stage_data = STAGES.get(brief.stage, {})
         stage_context = (
             f"\n> **{stage_data.get('label', '')} context ({stage_data.get('arr_range', '')}):** "
@@ -284,7 +283,6 @@ class ContentEngine:
             "  -> Reporting back to RevOps and growth teams",
             "```",
             "",
-            *(([before_after, ""] if before_after else [])),
             "## Recommended implementation sequence",
             *sequence,
             "",
@@ -345,7 +343,6 @@ class ContentEngine:
                 "## Why this use case converts well",
                 "High-intent visitors on use-case pages are already connecting a business problem to a workflow category, which makes these pages strong bridges into demo requests.",
                 "",
-                *(([self._stage_before_after_table(brief.stage), ""] if brief.stage else [])),
                 "## CTA",
                 self._cta_block(brief.stage),
             ]
@@ -452,21 +449,6 @@ class ContentEngine:
         if any(s in kw for s in growth_signals):
             return "growth"
         return ""
-
-    def _stage_before_after_table(self, stage: str) -> str:
-        """Renders a stage-specific Before/After comparison table in markdown."""
-        rows = STAGE_BEFORE_AFTER.get(stage)
-        if not rows:
-            return ""
-        lines = [
-            "## Before Pipeleap vs. With Pipeleap",
-            "",
-            "| Dimension | Before Pipeleap | With Pipeleap |",
-            "| --- | --- | --- |",
-        ]
-        for dimension, before, after in rows:
-            lines.append(f"| {dimension} | {before} | {after} |")
-        return "\n".join(lines)
 
     def _stage_featured_snippet(self, stage: str, keyword: str) -> str:
         """Returns a featured-snippet-optimised paragraph (40-60 words) for the given stage."""

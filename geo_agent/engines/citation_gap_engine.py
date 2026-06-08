@@ -132,11 +132,9 @@ class CitationGapEngine:
             # No content, no AI Overview detected (or no SERP data)
             status = "no_content"
             action = f"Create answer-block page for: '{query}'"
-            score = 0.40 + (0.20 if category in ("comparison", "recommendation") else 0.0)
+            score = 0.40 + (0.20 if category in ("recommendation",) else 0.0)
 
         # Boost score for high-value categories
-        if category == "comparison":
-            score = min(1.0, score + 0.15)
         if category == "recommendation":
             score = min(1.0, score + 0.10)
         if has_ai_overview:
@@ -148,7 +146,7 @@ class CitationGapEngine:
             query=query,
             query_category=category,
             ai_engine="google_ai_overview" if has_ai_overview else "all",
-            expected_position="should be cited" if category != "comparison" else "should be top-3",
+            expected_position="should be cited",
             current_status=status,
             recommended_action=action,
             priority_score=round(score, 3),

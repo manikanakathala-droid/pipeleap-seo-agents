@@ -164,7 +164,6 @@ def _build_template_content(tool: dict) -> dict:
         "features": features,
         "pros": pros,
         "cons": cons,
-        "alternatives": [],
         "useCases": use_cases,
         "pipeLeapContext": "",
         "faqs": faqs,
@@ -339,7 +338,6 @@ class ToolsPageGenerator:
         page.features = content["features"]
         page.pros = content["pros"]
         page.cons = content["cons"]
-        page.alternatives = content["alternatives"]
         page.use_cases = content["useCases"]
         page.pipeleap_context = ""
         page.faqs = content["faqs"]

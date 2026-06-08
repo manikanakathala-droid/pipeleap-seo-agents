@@ -1129,9 +1129,6 @@ class SEOOSAgent:
             if submit:
                 plan.append(f"Submit {len(submit)} new/updated pages in GSC URL Inspection")
 
-        if result.competitor_insights:
-            plan.append(f"Begin comparison page for {result.competitor_insights[0]['competitor']} — targets transactional 'alternatives' cluster")
-
         gsc_high = [i for i in result.gsc_insights if i.get("severity") == "High"]
         if gsc_high:
             plan.append(f"Address {len(gsc_high)} High-severity GSC signal(s): position drops and impression decay — see gsc_insights.json")
