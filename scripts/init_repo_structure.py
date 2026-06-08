@@ -22,7 +22,6 @@ JSON_SCAFFOLDS = {
     "seo/internal-links.json": [],
     "seo/keywords.json": [],
     "seo/indexing-queue.json": [],
-    "seo/competitor-insights.json": [],
     "seo/run-log.json": [],
 }
 

@@ -15,9 +15,8 @@ Output paths:
   /seo/internal-links.json            — internal linking map (merge by URL)
   /seo/keywords.json                  — keyword research (append by run_id)
   /seo/technical-audit.md             — technical audit log (append by run_id)
-  /seo/indexing-queue.json            — indexing actions (append, mark status)
-  /seo/competitor-insights.json       — competitor analysis (append by run_id)
-  /seo/run-log.json                   — master log of every run
+  /seo/indexing-queue.json         — indexing actions (append, mark status)
+
 
 STRICT RULES:
   - Never modify /src/, /public/, or any core website path
@@ -65,7 +64,6 @@ def _ensure_structure() -> None:
     _init_json("seo/internal-links.json", [])
     _init_json("seo/keywords.json", [])
     _init_json("seo/indexing-queue.json", [])
-    _init_json("seo/competitor-insights.json", [])
     _init_json("seo/run-log.json", [])
 
 
@@ -416,28 +414,6 @@ def write_indexing_queue(run_id: str, actions: list[dict]) -> str:
     return "seo/indexing-queue.json"
 
 
-# ── 8. Competitor insights ────────────────────────────────────────────────────
-
-def write_competitor_insights(run_id: str, insights: list[dict]) -> str:
-    """
-    Append competitor analysis to /seo/competitor-insights.json
-    Versioned by run_id — all runs retained.
-    """
-    path = _safe_path("seo/competitor-insights.json")
-    existing: list[dict] = json.loads(path.read_text(encoding="utf-8"))
-
-    block = {
-        "run_id": run_id,
-        "generated_at": _now(),
-        "insights": insights,
-    }
-    existing.append(block)
-
-    path.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info("Competitor insights written for run %s", run_id)
-    return "seo/competitor-insights.json"
-
-
 # ── 9. Run log ────────────────────────────────────────────────────────────────
 
 def write_run_log(run_id: str, result_summary: dict) -> str:
@@ -527,13 +503,6 @@ def write_all(run_id: str, result: dict, repo_root: str | Path = ".") -> list[st
             written.append(write_indexing_queue(run_id, result["indexing_actions"]))
         except Exception as exc:
             logger.error("Indexing queue write failed: %s", exc)
-
-    # Competitor insights
-    if result.get("competitor_insights"):
-        try:
-            written.append(write_competitor_insights(run_id, result["competitor_insights"]))
-        except Exception as exc:
-            logger.error("Competitor write failed: %s", exc)
 
     # Run log — always last
     try:

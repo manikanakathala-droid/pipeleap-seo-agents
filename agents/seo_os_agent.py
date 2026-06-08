@@ -69,7 +69,6 @@ class SEOOSResult:
     content_generated: list[dict] = field(default_factory=list)
     pages_optimized: list[dict] = field(default_factory=list)
     linking_suggestions: list[dict] = field(default_factory=list)
-    competitor_insights: list[dict] = field(default_factory=list)
     indexing_actions: list[dict] = field(default_factory=list)
     gsc_insights: list[dict] = field(default_factory=list)
     content_gaps: list[dict] = field(default_factory=list)
@@ -93,7 +92,6 @@ class SEOOSResult:
             "content_generated": self.content_generated,
             "pages_optimized": self.pages_optimized,
             "linking_suggestions": self.linking_suggestions,
-            "competitor_insights": self.competitor_insights,
             "indexing_actions": self.indexing_actions,
             "gsc_insights": self.gsc_insights,
             "content_gaps": self.content_gaps,
@@ -1225,16 +1223,7 @@ class SEOOSAgent:
         for link in result.linking_suggestions[:5]:
             lines.append(f"- `{link.get('from_page','')}` → `{link.get('to_page','')}` via \"{link.get('anchor_text','')}\"")
 
-        lines += ["", "---", "", "## 8. Competitor Insights"]
-        for comp in result.competitor_insights:
-            lines += [
-                f"**{comp['competitor']}**",
-                f"- Keywords to target: {', '.join(comp.get('keyword_gaps_to_target', [])[:2])}",
-                f"- Content to publish: {comp.get('content_to_outrank','')}",
-                "",
-            ]
-
-        lines += ["", "---", "", "## 9. Indexing Actions"]
+        lines += ["", "---", "", "## 8. Indexing Actions"]
         for action in result.indexing_actions[:6]:
             status = action.get("status", "")
             status_str = f" → **{status}**" if status else ""
