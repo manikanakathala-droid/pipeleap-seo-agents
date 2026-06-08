@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from geo_agent.data.answer_templates import DEFINITION_ANSWERS, COMPARISON_ANSWERS, HOWTO_ANSWERS, RECOMMENDATION_ANSWERS
+from geo_agent.data.answer_templates import DEFINITION_ANSWERS, HOWTO_ANSWERS, RECOMMENDATION_ANSWERS
 from geo_agent.data.geo_entities import PIPELEAP_ENTITY, GEO_TARGET_QUERIES
 
 
@@ -143,7 +143,6 @@ class AnswerBlockEngine:
         query_lower = query.lower()
         stores = {
             "definition":     DEFINITION_ANSWERS,
-            "comparison":     COMPARISON_ANSWERS,
             "how_to":         HOWTO_ANSWERS,
             "recommendation": RECOMMENDATION_ANSWERS,
         }
