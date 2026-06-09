@@ -1180,5 +1180,35 @@
       "outputs/20260608T222250Z/seo_os_report.json",
       "outputs/20260608T222250Z/daily_briefing.md"
     ]
+  },
+  {
+    "run_id": "20260609T141654Z",
+    "generated_at": "2026-06-09T14:17:36.076409+00:00",
+    "seo_score": 99,
+    "mode": "change_response",
+    "website_changes": {
+      "run_id": "20260609T141654Z",
+      "previous_run_id": "20260608T222250Z",
+      "new_pages": 0,
+      "updated_pages": 1,
+      "deleted_pages": 0,
+      "unchanged_pages": 0,
+      "broken_links": 0,
+      "orphan_pages": 0,
+      "missing_from_sitemap": 0,
+      "has_changes": true
+    },
+    "safe_actions": 3,
+    "dev_review_items": 0,
+    "content_generated": 0,
+    "keywords_researched": 20,
+    "indexing_actions": 0,
+    "errors": [
+      "content_engine: name 'case_study_clusters' is not defined"
+    ],
+    "output_files": [
+      "outputs/20260609T141654Z/seo_os_report.json",
+      "outputs/20260609T141654Z/daily_briefing.md"
+    ]
   }
 ]

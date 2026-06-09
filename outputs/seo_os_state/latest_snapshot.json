@@ -1,7 +1,7 @@
 {
-  "run_id": "20260608T222250Z",
+  "run_id": "20260609T141654Z",
   "site_url": "https://www.pipeleap.com",
-  "captured_at": "2026-06-08T22:22:50.445790+00:00",
+  "captured_at": "2026-06-09T14:16:54.497486+00:00",
   "total_pages": 1,
   "sitemap_urls": [
     "https://www.pipeleap.com/",
@@ -12,7 +12,6 @@
     "https://www.pipeleap.com/blog/ai-outbound-sales-agents",
     "https://www.pipeleap.com/blog/ai-sales-workflow-automation",
     "https://www.pipeleap.com/blog/automated-outbound",
-    "https://www.pipeleap.com/blog/clay-sales-navigator",
     "https://www.pipeleap.com/blog/cut-sales-admin-work-in-half",
     "https://www.pipeleap.com/blog/how-to-automate-outbound-emails",
     "https://www.pipeleap.com/blog/how-to-automate-sales-workflows",
@@ -275,11 +274,11 @@
   "pages": [
     {
       "url": "https://www.pipeleap.com/",
-      "title": "Pipeleap | Sales Automation Platform for B2B Sales Teams",
-      "meta_description": "Eliminate non-selling work. Pipeleap builds your full revenue operations layer: lead intelligence, sequences, and pipeline generation for B2B teams.",
-      "h1": "Transform Your Outbound Sales Motion Into a Predictable Revenue Engine",
+      "title": "Pipeleap - Sales Operations Platform",
+      "meta_description": "Pipeleap helps sales teams reclaim selling time by automating sales operations and eliminating manual work. Our sales productivity software removes CRM admin...",
+      "h1": "60% of rep time goes to non-selling work. Pipeleap runs it. Your team closes.",
       "h2s": [],
-      "word_count": 29,
+      "word_count": 40,
       "internal_links": [],
       "external_links": [],
       "canonical": "https://www.pipeleap.com/",
@@ -291,9 +290,9 @@
       ],
       "in_sitemap": true,
       "status_code": 200,
-      "response_time_ms": 176,
-      "content_hash": "37506bd7f703dab12597afbe5c86c2cc4a4b853071039248fe5e62f6e5a7f004",
-      "captured_at": "2026-06-08T22:22:50.445790+00:00"
+      "response_time_ms": 70,
+      "content_hash": "617779aa5441f1c2695b9a7e255d300316e1281d9ae6feaad390c462b43c7b5e",
+      "captured_at": "2026-06-09T14:16:54.497486+00:00"
     }
   ],
   "errors": []
