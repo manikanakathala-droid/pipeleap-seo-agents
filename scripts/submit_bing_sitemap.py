@@ -112,7 +112,17 @@ if not api_key:
 
 # ── 2. GetFeeds → RemoveFeed stale entries ──────────────────────────
 print("\n--- Cleaning stale sitemap feeds from Bing ---")
-ok, feeds_result = _api("GetFeeds", method="GET", data={"siteUrl": SITE_URL})
+# GetFeeds uses GET with query params
+try:
+    feeds_url = f"{API_BASE}/GetFeeds?apikey={api_key}&siteUrl={SITE_URL}"
+    r = requests.get(feeds_url, timeout=30)
+    feeds_result = r.json() if r.text.strip() else {}
+    ok = r.ok
+    print(f"  GetFeeds: HTTP {r.status_code}")
+except Exception as e:
+    print(f"  GetFeeds failed: {e}")
+    ok = False
+    feeds_result = {}
 if ok and "d" in feeds_result:
     feeds = feeds_result["d"]
     if feeds:
@@ -164,17 +174,23 @@ print(f"  Fresh (not yet submitted via SubmitUrlBatch): {len(fresh_urls)} URLs")
 if fresh_urls:
     submit_batch = fresh_urls[:BATCH_QUOTA]
     print(f"  Submitting first {len(submit_batch)} URLs (quota allows {BATCH_QUOTA}) ...")
-    ok, _ = _api("SubmitUrlBatch", data={"siteUrl": SITE_URL, "urlList": submit_batch})
+    ok, result = _api("SubmitUrlBatch", data={"siteUrl": SITE_URL, "urlList": submit_batch})
+    error_code = result.get("ErrorCode") if isinstance(result, dict) else None
     if ok:
         already_submitted.update(submit_batch)
         _save_bing_submitted(already_submitted)
-        print(f"  ✓ {len(submit_batch)} URLs marked as submitted")
+        print(f"  OK - {len(submit_batch)} URLs marked as submitted")
+    elif error_code == 2:
+        # Quota exhausted - mark these as submitted so we don't retry them
+        print(f"  Quota exhausted (daily limit {BATCH_QUOTA} reached). Marking batch as submitted.")
+        already_submitted.update(submit_batch)
+        _save_bing_submitted(already_submitted)
     else:
         failed += 1
 
     skipped = len(fresh_urls) - len(submit_batch)
     if skipped > 0:
-        print(f"  ⏳ {skipped} URLs deferred to next run (quota full)")
+        print(f"  ~ {skipped} URLs deferred to next run (quota full)")
 else:
     print("  No fresh URLs to submit — all already submitted via SubmitUrlBatch before.")
 
