@@ -25,6 +25,7 @@ Output: structured JSON report + human-readable daily briefing
 
 import json
 import logging
+import re
 import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -67,6 +68,7 @@ class SEOOSResult:
     dev_review_items: list[dict] = field(default_factory=list)
     keyword_opportunities: list[dict] = field(default_factory=list)
     content_generated: list[dict] = field(default_factory=list)
+    tools_generated: list[dict] = field(default_factory=list)
     pages_optimized: list[dict] = field(default_factory=list)
     linking_suggestions: list[dict] = field(default_factory=list)
     indexing_actions: list[dict] = field(default_factory=list)
@@ -90,6 +92,7 @@ class SEOOSResult:
             "dev_review_items": self.dev_review_items,
             "keyword_opportunities": self.keyword_opportunities,
             "content_generated": self.content_generated,
+            "tools_generated": self.tools_generated,
             "pages_optimized": self.pages_optimized,
             "linking_suggestions": self.linking_suggestions,
             "indexing_actions": self.indexing_actions,
@@ -275,6 +278,16 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("Content engine skipped: %s", exc)
             result.errors.append(f"content_engine: {exc}")
+
+        # ── Step 6b: Tool Directory Engine ────────────────────────────────────
+        self.logger.info("Step 6b: Tool directory engine")
+        try:
+            tool_results = self._run_tool_engine()
+            result.tools_generated = tool_results
+            self._write_json(output_dir / "tools_generated.json", tool_results)
+        except Exception as exc:
+            self.logger.warning("Tool engine skipped: %s", exc)
+            result.errors.append(f"tool_engine: {exc}")
 
         # ── Step 7: On-Page Optimisation ─────────────────────────────────────
         self.logger.info("Step 7: On-page optimisation")
@@ -712,6 +725,123 @@ class SEOOSAgent:
             len(generated), len(generated) - 3,
         )
         return generated
+
+    def _run_tool_engine(self) -> list[dict]:
+        """Generate tool entries for categories that need them."""
+        from core.tool_content_engine import ToolContentEngine
+        from connectors.github_publisher import GitHubPublisher
+
+        import json
+        from pathlib import Path
+
+        exec_cfg = self.config.get("execution", {})
+        tools_per_run = exec_cfg.get("tools_per_run", 0)
+        if not tools_per_run or tools_per_run <= 0:
+            self.logger.info("Tool generation disabled (tools_per_run=%d)", tools_per_run)
+            return []
+
+        frontend_dir = Path(__file__).resolve().parent.parent / "temp_frontend_repo"
+        tools_data_dir = frontend_dir / "src" / "data" / "tools"
+
+        if not tools_data_dir.exists():
+            self.logger.warning("Tools data directory not found at %s", tools_data_dir)
+            return []
+
+        # ── Read existing tool slugs ──
+        existing_slugs: set[str] = set()
+        existing_names: set[str] = set()
+        for ts_file in tools_data_dir.glob("*.ts"):
+            if ts_file.name in ("index.ts", "categories.ts"):
+                continue
+            text = ts_file.read_text(encoding="utf-8")
+            for m in re.finditer(r"slug:\s*`([^`]+)`", text):
+                existing_slugs.add(m.group(1))
+            for m in re.finditer(r"name:\s*`([^`]+)`", text):
+                existing_names.add(m.group(1).lower())
+
+        self.logger.info(
+            "ToolEngine: %d existing slugs, %d existing names",
+            len(existing_slugs), len(existing_names),
+        )
+
+        # ── Read existing category slugs ──
+        cat_file = tools_data_dir / "categories.ts"
+        existing_cats: set[str] = set()
+        if cat_file.exists():
+            text = cat_file.read_text(encoding="utf-8")
+            for m in re.finditer(r"slug:\s*`([^`]+)`", text):
+                existing_cats.add(m.group(1))
+
+        # ── Determine which categories need tools ──
+        from core.tool_content_engine import CATEGORY_DESCRIPTIONS
+
+        needed_cats: list[str] = []
+        for cat_slug in CATEGORY_DESCRIPTIONS:
+            cat_file_path = tools_data_dir / f"{cat_slug}.ts"
+            count_in_cat = 0
+            if cat_file_path.exists():
+                text = cat_file_path.read_text(encoding="utf-8")
+                count_in_cat = len(re.findall(r"slug:\s*`", text))
+            target = 40
+            if count_in_cat < target:
+                needed_cats.append(cat_slug)
+
+        self.logger.info(
+            "ToolEngine: %d/%d categories need tools (target=%d per cat)",
+            len(needed_cats), len(CATEGORY_DESCRIPTIONS), target,
+        )
+
+        if not needed_cats:
+            self.logger.info("ToolEngine: all categories at target — nothing to generate")
+            return []
+
+        engine = ToolContentEngine(self.config, self.logger)
+        publisher = GitHubPublisher()
+
+        # Round-robin across needed categories
+        total_new = 0
+        results: list[dict] = []
+        per_cat = max(1, tools_per_run // len(needed_cats))
+
+        for cat_slug in needed_cats:
+            if total_new >= tools_per_run:
+                break
+
+            batch = engine.generate(
+                category_slug=cat_slug,
+                count=per_cat,
+                existing_slugs=existing_slugs,
+                existing_names=existing_names,
+            )
+
+            if not batch:
+                continue
+
+            # Write to local TS files
+            publisher.publish_tool_data_local(
+                tools=batch,
+                category_slug=cat_slug,
+                frontend_dir=str(frontend_dir),
+            )
+
+            for t in batch:
+                slug = t.get("slug", "?")
+                existing_slugs.add(slug)
+                existing_slugs.add(f"tools/{cat_slug}/{slug}")
+                existing_names.add(t.get("name", "").lower())
+                results.append({
+                    "type": "tool",
+                    "slug": slug,
+                    "name": t.get("name", ""),
+                    "categorySlug": cat_slug,
+                    "tagline": t.get("tagline", ""),
+                    "status": "generated",
+                })
+            total_new += len(batch)
+            self.logger.info("ToolEngine: %d tools generated for category %s", len(batch), cat_slug)
+
+        self.logger.info("ToolEngine complete: %d new tools across %d categories", total_new, len(results))
+        return results
 
     def _run_onpage_optimizer(self, snapshot: SiteSnapshot, diff: SiteDiff) -> list[dict]:
         from modules.pipeleap_seo_engine.data.serp_strategy import META_TARGETS

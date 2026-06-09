@@ -464,6 +464,165 @@ class GitHubPublisher:
 
         return sections
 
+    # ── Local file tool data writer ─────────────────────────────────────────
+
+    def publish_tool_data_local(
+        self,
+        tools: list[dict[str, Any]],
+        category_slug: str,
+        frontend_dir: str = "temp_frontend_repo",
+    ) -> bool:
+        """Write tool entries to local TS data files. Creates/updates category data file, index.ts, and categories.ts."""
+        import os
+        from pathlib import Path
+
+        base = Path(frontend_dir) / "src" / "data" / "tools"
+        cat_file = base / f"{category_slug}.ts"
+        index_file = base / "index.ts"
+        categories_file = base / "categories.ts"
+
+        # ── 1) Write / update the category data file ──
+        var_name = category_slug.replace("-", "_") + "Tools"
+        ts_lines = [
+            'import type { Tool } from "@/types/tool";',
+            "",
+            f"export const {var_name}: Tool[] = [",
+        ]
+        for t in tools:
+            ts_lines.append(self._dict_to_ts_tool(t, indent=2))
+        ts_lines.append("];")
+        ts_lines.append("")
+
+        if cat_file.exists():
+            existing = cat_file.read_text(encoding="utf-8")
+            for t in tools:
+                if t.get("slug") and f"slug: `{t['slug']}`" in existing:
+                    self.logger.warning("Tool slug `%s` already exists in %s — skipping", t["slug"], cat_file.name)
+                    continue
+            pos = existing.rfind("];")
+            if pos != -1:
+                new_entries = []
+                for t in tools:
+                    if t.get("slug") and f"slug: `{t['slug']}`" not in existing:
+                        new_entries.append(self._dict_to_ts_tool(t, indent=2))
+                if new_entries:
+                    before = existing[:pos].rstrip()
+                    if not before.endswith(","):
+                        before += ","
+                    existing = before + "\n  " + "\n  ".join(new_entries) + ",\n" + existing[pos:]
+                cat_file.write_text(existing, encoding="utf-8")
+        else:
+            cat_file.write_text("\n".join(ts_lines), encoding="utf-8")
+
+        self.logger.info("Wrote %d tools to %s", len(tools), cat_file)
+
+        # ── 2) Update index.ts ──
+        if index_file.exists():
+            idx_content = index_file.read_text(encoding="utf-8")
+            import_line = f'import {{ {var_name} }} from "./{category_slug}";'
+            spread_line = f"  ...{var_name},"
+
+            if import_line not in idx_content:
+                last_import = idx_content.rfind('import {')
+                if last_import != -1:
+                    nxt = idx_content.find("\n", last_import)
+                    if nxt != -1:
+                        idx_content = idx_content[:nxt+1] + import_line + "\n" + idx_content[nxt+1:]
+                end_marker = "];"
+                pos = idx_content.find(end_marker)
+                if pos != -1:
+                    before_export = idx_content[:pos].rstrip()
+                    if spread_line not in idx_content:
+                        if not before_export.endswith(","):
+                            before_export += ","
+                        idx_content = before_export + "\n" + spread_line + "\n" + idx_content[pos:]
+                index_file.write_text(idx_content, encoding="utf-8")
+                self.logger.info("Updated index.ts with %s", import_line)
+
+        # ── 3) Ensure category exists in categories.ts ──
+        self._ensure_category(category_slug, categories_file)
+
+        return True
+
+    def _dict_to_ts_tool(self, t: dict[str, Any], indent: int = 2) -> str:
+        """Convert a tool dict to a formatted TypeScript object literal."""
+        pad = "  " * indent
+        inner = "  " * (indent + 1)
+        fields = [
+            f"{pad}{{",
+            f"{inner}slug: `{self._ts_escape(t.get('slug', ''))}`,",
+            f"{inner}name: `{self._ts_escape(t.get('name', ''))}`,",
+            f"{inner}categorySlug: `{self._ts_escape(t.get('categorySlug', ''))}`,",
+            f"{inner}tagline: `{self._ts_escape(t.get('tagline', ''))}`,",
+            f"{inner}description: `{self._ts_escape(t.get('description', ''))}`,",
+            f"{inner}longDescription: `{self._ts_escape(t.get('longDescription', ''))}`,",
+            f"{inner}website: `{self._ts_escape(t.get('website', ''))}`,",
+        ]
+
+        pricing = t.get("pricing", {})
+        has_free = "true" if pricing.get("hasFree", False) else "false"
+        starting = pricing.get("startingAt", "")
+        if starting:
+            fields.append(f"{inner}pricing: {{ model: `{pricing.get('model', 'Contact')}`, startingAt: `{starting}`, hasFree: {has_free} }},")
+        else:
+            fields.append(f"{inner}pricing: {{ model: `{pricing.get('model', 'Contact')}`, hasFree: {has_free} }},")
+
+        for arr_field in ("bestFor", "features", "pros", "cons", "alternatives", "useCases"):
+            items = t.get(arr_field, [])
+            quoted = ", ".join(f"`{self._ts_escape(i)}`" for i in items)
+            fields.append(f"{inner}{arr_field}: [{quoted}],")
+
+        fields.append(f"{inner}pipeLeapContext: `{self._ts_escape(t.get('pipeLeapContext', ''))}`,")
+
+        faqs = t.get("faqs", [])
+        if faqs:
+            faq_lines = [f"{inner}faqs: ["]
+            for f in faqs:
+                faq_lines.append(f"{inner}  {{ q: `{self._ts_escape(f.get('q', ''))}`, a: `{self._ts_escape(f.get('a', ''))}` }},")
+            faq_lines.append(f"{inner}],")
+            fields.extend(faq_lines)
+        else:
+            fields.append(f"{inner}faqs: [],")
+
+        fields.append(f"{inner}publishedAt: `{t.get('publishedAt', '2026-06-09')}`,")
+        fields.append(f"{pad}}},")
+        return "\n".join(fields)
+
+    @staticmethod
+    def _ts_escape(s: str) -> str:
+        return s.replace("\\", "\\\\").replace("`", "\\`").replace("${", "\\${")
+
+    def _ensure_category(self, category_slug: str, categories_file: Path) -> None:
+        if not categories_file.exists():
+            return
+        content = categories_file.read_text(encoding="utf-8")
+        if f"slug: `{category_slug}`" in content:
+            return
+        from core.tool_content_engine import CATEGORY_DESCRIPTIONS
+        desc = CATEGORY_DESCRIPTIONS.get(category_slug, category_slug.replace("-", " ").title())
+        cat_name = category_slug.replace("-", " ").title()
+        plural = cat_name + ("s" if not cat_name.endswith("s") else "")
+        cat_entry = f"""  {{
+    slug: `{category_slug}`,
+    name: `{cat_name}`,
+    pluralName: `{plural}`,
+    metaDescription: `The best {desc.lower()} for sales teams.`,
+    intro: `Browse our curated list of {desc.lower()} to find the right fit for your sales stack.`,
+    body: `This category covers {desc.lower()} that help sales operations teams build a complete outbound motion.`,
+    tools: [],
+    relatedCategories: [],
+    pipeLeapAngle: `Pipeleap orchestrates the workflow around {desc.lower()} — routing signals, syncing data, and governing the flow between tools.`,
+    faqs: [],
+  }},"""
+        pos = content.rfind("];")
+        if pos != -1:
+            before = content[:pos].rstrip()
+            if before.rstrip().endswith(","):
+                before = before.rstrip()
+            content = before + "\n" + cat_entry + "\n" + content[pos:]
+            categories_file.write_text(content, encoding="utf-8")
+            self.logger.info("Added category `%s` to categories.ts", category_slug)
+
     def _tool_entry(self, page: Any) -> dict[str, Any]:
         ga = self._get_attr
         slug = ga(page, "slug", "")

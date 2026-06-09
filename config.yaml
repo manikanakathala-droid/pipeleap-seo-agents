@@ -37,6 +37,8 @@
     "use_renderer": true,
     "landing_pages_per_run": 10,
     "blog_posts_per_run": 0,
+    "tools_per_run": 50,
+    "tool_generation_enabled": true,
     "use_case_pages_per_run": 5,
     "case_studies_per_run": 3,
     "output_dir": "outputs",
