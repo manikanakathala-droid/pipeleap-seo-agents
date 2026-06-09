@@ -2,7 +2,7 @@
 Full rebuild of all 5 sitemap files (index + 4 sub-sitemaps) from hardcoded URL data.
 Commits all 5 files to the launchpad repo, then re-submits to GSC + Yandex IndexNow.
 """
-import base64, os, re, requests
+import base64, json, os, re, requests
 from datetime import datetime
 
 TOKEN  = os.getenv("GITHUB_TOKEN", "")
@@ -15,6 +15,28 @@ HEADERS = {
     "X-GitHub-Api-Version": "2022-11-28",
 }
 TODAY = datetime.now().strftime("%Y-%m-%d")
+
+# ── Persistent lastmod store ───────────────────────────────────────────
+LASTMOD_PATH = os.path.join(os.path.dirname(__file__), "..", "outputs", "sitemap_lastmod.json")
+lastmod_store: dict[str, str] = {}
+if os.path.exists(LASTMOD_PATH):
+    try:
+        with open(LASTMOD_PATH, "r") as f:
+            lastmod_store = json.load(f)
+    except Exception as e:
+        print(f"  Warning: could not load {LASTMOD_PATH}: {e}")
+
+def get_lastmod(url: str) -> str:
+    """Return stored lastmod if known, otherwise today (saved for future runs)."""
+    if url not in lastmod_store:
+        lastmod_store[url] = TODAY
+    return lastmod_store[url]
+
+def save_lastmod_store() -> None:
+    os.makedirs(os.path.dirname(LASTMOD_PATH), exist_ok=True)
+    with open(LASTMOD_PATH, "w") as f:
+        json.dump(lastmod_store, f, indent=2)
+    print(f"  Saved {len(lastmod_store)} lastmod entries to {LASTMOD_PATH}")
 
 NS = 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
 
@@ -99,25 +121,26 @@ for route in static_routes_no_param:
 for slug in case_study_slugs:
     core_pages.append((f"https://www.pipeleap.com/case-studies/{slug}", "monthly", "0.7"))
 
-pages_entries = [url(loc, TODAY, changefreq, priority) for loc, changefreq, priority in core_pages]
+pages_entries = [url(loc, get_lastmod(loc), changefreq, priority) for loc, changefreq, priority in core_pages]
 pages_xml = urlset(pages_entries)
 
-blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", TODAY, "weekly") for slug in blog_slugs]
+blog_entries = [url(f"https://www.pipeleap.com/blog/{slug}", get_lastmod(f"https://www.pipeleap.com/blog/{slug}"), "weekly") for slug in blog_slugs]
 blog_xml = urlset(blog_entries)
 
-glossary_entries = [url_inline(f"https://www.pipeleap.com/glossary/{slug}", TODAY, priority="0.6") for slug in glossary_slugs]
+glossary_entries = [url_inline(f"https://www.pipeleap.com/glossary/{slug}", get_lastmod(f"https://www.pipeleap.com/glossary/{slug}"), priority="0.6") for slug in glossary_slugs]
 glossary_xml = urlset(glossary_entries)
 
-tool_entries = [url(f"https://www.pipeleap.com/tools/{slug}", TODAY, priority="0.8") for slug in tool_categories]
+tool_entries = [url(f"https://www.pipeleap.com/tools/{slug}", get_lastmod(f"https://www.pipeleap.com/tools/{slug}"), priority="0.8") for slug in tool_categories]
 for cat, tools in tools_by_category.items():
     for tool_slug in tools:
-        tool_entries.append(url_inline(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}", TODAY))
+        tool_entries.append(url_inline(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}", get_lastmod(f"https://www.pipeleap.com/tools/{cat}/{tool_slug}")))
 tools_xml = urlset(tool_entries)
 
 # ── Build sitemap index ───────────────────────────────────────────────
 index_xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex {NS}>\n'
 for sub in ["pages", "blog", "tools", "glossary"]:
-    index_xml += sitemap_entry(f"https://www.pipeleap.com/sitemap-{sub}.xml", TODAY) + "\n"
+    url_idx = f"https://www.pipeleap.com/sitemap-{sub}.xml"
+    index_xml += sitemap_entry(url_idx, get_lastmod(url_idx)) + "\n"
 index_xml += "</sitemapindex>\n"
 
 # ── Commit all 5 files ───────────────────────────────────────────────
@@ -156,6 +179,8 @@ for path, content, msg in files:
 
 total = len(core_pages) + len(blog_slugs) + len(glossary_slugs) + len(tool_entries)
 print(f"\nTotal: {total} URLs across 4 sub-sitemaps")
+
+save_lastmod_store()
 
 # ── Re-submit to GSC (clean stale entries first) ──────────────────────
 print("\nCleaning stale sitemaps from Google Search Console ...")

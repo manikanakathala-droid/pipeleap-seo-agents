@@ -101,6 +101,8 @@ def _validate_tool(entry: dict, existing_slugs: set[str]) -> list[str]:
         errors.append("description missing or >160 chars")
     if not entry.get("longDescription"):
         errors.append("Missing longDescription")
+    elif len(entry.get("longDescription", "")) < 200:
+        errors.append(f"longDescription too short ({len(entry.get('longDescription', ''))} chars, need >=200)")
     if not entry.get("website"):
         errors.append("Missing website")
 
