@@ -157,21 +157,52 @@ for path, content, msg in files:
 total = len(core_pages) + len(blog_slugs) + len(glossary_slugs) + len(tool_entries)
 print(f"\nTotal: {total} URLs across 4 sub-sitemaps")
 
-# ── Re-submit to GSC ──────────────────────────────────────────────────
-print("\nRe-submitting sitemap index to Google Search Console ...")
+# ── Re-submit to GSC (clean stale entries first) ──────────────────────
+print("\nCleaning stale sitemaps from Google Search Console ...")
+GSC_SITE = "sc-domain:pipeleap.com"
+CURRENT_GSC_SITEMAPS = {
+    "https://www.pipeleap.com/sitemap.xml",
+    "https://www.pipeleap.com/sitemap-pages.xml",
+    "https://www.pipeleap.com/sitemap-blog.xml",
+    "https://www.pipeleap.com/sitemap-tools.xml",
+    "https://www.pipeleap.com/sitemap-glossary.xml",
+}
 try:
     from google.oauth2 import service_account
     from googleapiclient.discovery import build
+    from googleapiclient.errors import HttpError
     creds = service_account.Credentials.from_service_account_file(
         "credentials/gsc_service_account.json",
         scopes=["https://www.googleapis.com/auth/webmasters"],
     )
     svc = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+
+    # List existing sitemaps
+    listed = svc.sitemaps().list(siteUrl=GSC_SITE).execute()
+    existing = listed.get("sitemap", [])
+    stale_count = 0
+    for entry in existing:
+        path = entry.get("path", "")
+        if path not in CURRENT_GSC_SITEMAPS:
+            print(f"  STALE: {path} — deleting ...")
+            try:
+                svc.sitemaps().delete(siteUrl=GSC_SITE, feedpath=path).execute()
+                print(f"    Deleted {path}")
+                stale_count += 1
+            except HttpError as e:
+                print(f"    Delete error: {e}")
+        else:
+            print(f"  CURRENT: {path} — keeping")
+    if stale_count == 0:
+        print("  No stale sitemaps found.")
+
+    # Submit current sitemaps
+    print("\nSubmitting current sitemaps to GSC ...")
     for sub in ["pages", "blog", "tools", "glossary"]:
         url_sub = f"https://www.pipeleap.com/sitemap-{sub}.xml"
-        svc.sitemaps().submit(siteUrl="sc-domain:pipeleap.com", feedpath=url_sub).execute()
+        svc.sitemaps().submit(siteUrl=GSC_SITE, feedpath=url_sub).execute()
         print(f"  OK sitemap-{sub}.xml submitted to GSC")
-    svc.sitemaps().submit(siteUrl="sc-domain:pipeleap.com",
+    svc.sitemaps().submit(siteUrl=GSC_SITE,
                           feedpath="https://www.pipeleap.com/sitemap.xml").execute()
     print("  OK sitemap index submitted to GSC")
 except Exception as e:

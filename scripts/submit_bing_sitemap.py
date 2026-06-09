@@ -1,5 +1,6 @@
 """
 Submit sitemap to Bing via Webmaster API + IndexNow + URL batch.
+Cleans stale feeds, dedups URL submission, and persists bing_submitted_urls.json.
 
 Usage:
     python scripts/submit_bing_sitemap.py
@@ -9,19 +10,41 @@ Requires:
   - IndexNow key deployed at site root
 """
 import json, os, re, sys, time
+from pathlib import Path
 
 import requests
 
 SITE_URL      = "https://www.pipeleap.com"
 SITEMAP_URL   = "https://www.pipeleap.com/sitemap.xml"
-LOCAL_SITEMAP_DIR = os.path.join(os.path.dirname(__file__), "..", "temp_frontend_repo", "public")
+
+# Resolve launchpad public dir — works locally (temp_frontend_repo) and in CI (pipeleap-launchpad)
+_script_dir = os.path.dirname(__file__)
+_launchpad_candidates = [
+    os.path.join(_script_dir, "..", "temp_frontend_repo", "public"),
+    os.path.join(_script_dir, "..", "pipeleap-launchpad", "public"),
+    os.path.join(_script_dir, "..", "public"),
+]
+LOCAL_SITEMAP_DIR = next((p for p in _launchpad_candidates if os.path.isdir(p)), _launchpad_candidates[0])
 LOCAL_SITEMAP = os.path.join(LOCAL_SITEMAP_DIR, "sitemap.xml")
 UA            = "pipeleap-seo-bot/1.0"
 INDEXNOW_KEY  = "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55"
 API_BASE      = "https://ssl.bing.com/webmaster/api.svc/json"
 
+BING_SUBMITTED_FILE = Path("outputs/bing_submitted_urls.json")
+BATCH_QUOTA = 100  # Bing's daily SubmitUrlBatch limit
+
+# Current expected sitemap feed URLs
+CURRENT_FEEDS = {
+    SITEMAP_URL,
+    "https://www.pipeleap.com/sitemap-pages.xml",
+    "https://www.pipeleap.com/sitemap-blog.xml",
+    "https://www.pipeleap.com/sitemap-tools.xml",
+    "https://www.pipeleap.com/sitemap-glossary.xml",
+}
+
 failed = 0
 api_key = os.environ.get("BING_API_KEY", "")
+
 
 def _api(endpoint, method="POST", data=None):
     url = f"{API_BASE}/{endpoint}?apikey={api_key}"
@@ -33,6 +56,7 @@ def _api(endpoint, method="POST", data=None):
     except Exception as e:
         print(f"    Failed: {e}")
         return False, {"error": str(e)}
+
 
 def _get_all_sitemap_urls():
     """Get all URLs from local sitemap index + sub-sitemaps."""
@@ -56,6 +80,27 @@ def _get_all_sitemap_urls():
 
     return all_urls, sub_urls_full
 
+
+def _load_bing_submitted():
+    """Load previously Bing-submitted URLs from bing_submitted_urls.json."""
+    if BING_SUBMITTED_FILE.exists():
+        try:
+            data = json.loads(BING_SUBMITTED_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, list):
+                return set(data)
+        except Exception:
+            pass
+    return set()
+
+
+def _save_bing_submitted(urls: set):
+    """Persist Bing-submitted URL set to bing_submitted_urls.json."""
+    BING_SUBMITTED_FILE.parent.mkdir(parents=True, exist_ok=True)
+    BING_SUBMITTED_FILE.write_text(
+        json.dumps(sorted(urls), indent=2), encoding="utf-8"
+    )
+
+
 # ── 1. Get all URLs first ──────────────────────────────────────────
 print("Loading sitemap URLs ...")
 all_urls, sub_sitemap_urls = _get_all_sitemap_urls()
@@ -65,7 +110,30 @@ if not api_key:
     print("No BING_API_KEY set — can only use IndexNow")
     sys.exit(1)
 
-# ── 2. Submit sitemap index + each sub-sitemap individually ────────
+# ── 2. GetFeeds → RemoveFeed stale entries ──────────────────────────
+print("\n--- Cleaning stale sitemap feeds from Bing ---")
+ok, feeds_result = _api("GetFeeds", method="GET", data={"siteUrl": SITE_URL})
+if ok and "d" in feeds_result:
+    feeds = feeds_result["d"]
+    if feeds:
+        for feed in feeds:
+            feed_url = feed.get("Url", "")
+            feed_name = feed_url.rsplit("/", 1)[-1]
+            if feed_url not in CURRENT_FEEDS:
+                print(f"  STALE: {feed_name} — removing ...")
+                rm_ok, _ = _api("RemoveFeed", data={"siteUrl": SITE_URL, "feedUrl": feed_url})
+                if rm_ok:
+                    print(f"    Removed {feed_name}")
+                else:
+                    failed += 1
+            else:
+                print(f"  CURRENT: {feed_name} — keeping")
+    else:
+        print("  No existing feeds found.")
+else:
+    print("  Could not list feeds.")
+
+# ── 3. Submit sitemap index + each sub-sitemap individually ────────
 print("\n--- Submitting sitemap index + sub-sitemaps to Bing ---")
 
 all_feeds = [SITEMAP_URL] + sub_sitemap_urls
@@ -76,7 +144,7 @@ for feed_url in all_feeds:
     if not ok:
         failed += 1
 
-# ── 3. FetchUrl - force Bing to immediately crawl each sub-sitemap --
+# ── 4. FetchUrl - force Bing to immediately crawl each sub-sitemap --
 print("\n--- Forcing Bing to fetch sub-sitemaps immediately ---")
 for feed_url in sub_sitemap_urls:
     name = feed_url.rsplit("/", 1)[-1]
@@ -86,23 +154,33 @@ for feed_url in sub_sitemap_urls:
         failed += 1
     time.sleep(0.5)
 
-# ── 4. SubmitUrlBatch - push all 266 URLs directly ────────────────
-print(f"\n--- Submitting {len(all_urls)} URLs via SubmitUrlBatch ---")
-BATCH_SIZE = 100  # 100 per batch for reliability
-ok_count = 0
-for i in range(0, len(all_urls), BATCH_SIZE):
-    batch = all_urls[i:i + BATCH_SIZE]
-    print(f"  Batch {i//BATCH_SIZE + 1}: {len(batch)} URLs ...")
-    ok, _ = _api("SubmitUrlBatch", data={"siteUrl": SITE_URL, "urlList": batch})
+# ── 5. SubmitUrlBatch - deduped, respects Bing's 100/day quota ────
+print(f"\n--- SubmitUrlBatch (Bing quota: {BATCH_QUOTA}/day) ---")
+already_submitted = _load_bing_submitted()
+print(f"  Already submitted (historical): {len(already_submitted)} URLs")
+fresh_urls = [u for u in all_urls if u not in already_submitted]
+print(f"  Fresh (not yet submitted via SubmitUrlBatch): {len(fresh_urls)} URLs")
+
+if fresh_urls:
+    submit_batch = fresh_urls[:BATCH_QUOTA]
+    print(f"  Submitting first {len(submit_batch)} URLs (quota allows {BATCH_QUOTA}) ...")
+    ok, _ = _api("SubmitUrlBatch", data={"siteUrl": SITE_URL, "urlList": submit_batch})
     if ok:
-        ok_count += len(batch)
+        already_submitted.update(submit_batch)
+        _save_bing_submitted(already_submitted)
+        print(f"  ✓ {len(submit_batch)} URLs marked as submitted")
     else:
         failed += 1
-    time.sleep(0.5)
 
-print(f"\n  SubmitUrlBatch: {ok_count}/{len(all_urls)} URLs accepted")
+    skipped = len(fresh_urls) - len(submit_batch)
+    if skipped > 0:
+        print(f"  ⏳ {skipped} URLs deferred to next run (quota full)")
+else:
+    print("  No fresh URLs to submit — all already submitted via SubmitUrlBatch before.")
 
-# ── 5. IndexNow (redundant but harmless) ──────────────────────────
+print(f"\n  Total tracked in bing_submitted_urls.json: {len(already_submitted)}")
+
+# ── 6. IndexNow (all 266, no quota) ─────────────────────────────────
 print("\n--- IndexNow (Bing) ---")
 ok_count = 0
 for i in range(0, len(all_urls), 500):
