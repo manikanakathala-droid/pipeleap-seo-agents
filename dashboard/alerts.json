@@ -1,42 +1,6 @@
 {
-  "last_updated": "2026-06-08T21:21:20.024564+00:00",
+  "last_updated": "2026-06-09T03:31:35.843290+00:00",
   "active_alerts": [
-    {
-      "issue_type": "warning",
-      "page_url": "https://www.pipeleap.com/",
-      "date": "2026-06-06",
-      "title": "Missing canonical",
-      "description": "The page does not define a canonical URL.",
-      "source": "audit_warroom",
-      "created_at": "2026-06-06T03:30:32.893769+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com/",
-      "date": "2026-06-06",
-      "title": "No structured data (JSON-LD) detected",
-      "description": "The page has no JSON-LD schema markup. Structured data is required for rich results (FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews.",
-      "source": "audit_warroom",
-      "created_at": "2026-06-06T03:30:32.893781+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com",
-      "date": "2026-06-06",
-      "title": "No WebSite structured data detected",
-      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
-      "source": "audit_warroom",
-      "created_at": "2026-06-06T03:30:32.893786+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com/",
-      "date": "2026-06-06",
-      "title": "Meta description too long (239 chars)",
-      "description": "Meta descriptions over 160 characters are truncated by Google, cutting off the CTA.",
-      "source": "audit_warroom",
-      "created_at": "2026-06-06T03:30:32.893790+00:00"
-    },
     {
       "issue_type": "warning",
       "page_url": "https://www.pipeleap.com/",
@@ -90,7 +54,71 @@
       "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
       "source": "audit_warroom",
       "created_at": "2026-06-08T21:21:20.024561+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-06-09",
+      "title": "Thin content \u2014 below 300 words",
+      "description": "Page body contains only 40 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-06-09T03:31:35.842936+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-06-09",
+      "title": "No favicon detected on any crawled page",
+      "description": "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. Google displays the site favicon next to search results \u2014 a missing favicon means Google falls back to a generic globe ic",
+      "source": "audit_warroom",
+      "created_at": "2026-06-09T03:31:35.842947+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-06-09",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-06-09T03:31:35.842952+00:00"
     }
   ],
-  "alert_history": []
+  "alert_history": [
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-06-06",
+      "title": "Missing canonical",
+      "description": "The page does not define a canonical URL.",
+      "source": "audit_warroom",
+      "created_at": "2026-06-06T03:30:32.893769+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-06-06",
+      "title": "No structured data (JSON-LD) detected",
+      "description": "The page has no JSON-LD schema markup. Structured data is required for rich results (FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-06-06T03:30:32.893781+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-06-06",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-06-06T03:30:32.893786+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-06-06",
+      "title": "Meta description too long (239 chars)",
+      "description": "Meta descriptions over 160 characters are truncated by Google, cutting off the CTA.",
+      "source": "audit_warroom",
+      "created_at": "2026-06-06T03:30:32.893790+00:00"
+    }
+  ]
 }
