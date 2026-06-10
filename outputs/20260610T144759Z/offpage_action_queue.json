@@ -1,0 +1,242 @@
+{
+  "directory_queue": [
+    {
+      "name": "G2",
+      "url": "https://www.g2.com",
+      "category": "Revenue Operations",
+      "priority": 1,
+      "da": 90,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Operations. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Product Hunt",
+      "url": "https://www.producthunt.com",
+      "category": "Full product launch",
+      "priority": 1,
+      "da": 90,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Full product launch. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Capterra",
+      "url": "https://www.capterra.com",
+      "category": "Revenue Operations Software",
+      "priority": 1,
+      "da": 88,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Operations Software. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Clutch.co",
+      "url": "https://clutch.co",
+      "category": "Sales Consulting / GTM",
+      "priority": 1,
+      "da": 82,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Sales Consulting / GTM. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Trustpilot",
+      "url": "https://www.trustpilot.com",
+      "category": "Business Services",
+      "priority": 2,
+      "da": 92,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Business Services. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "GetApp",
+      "url": "https://www.getapp.com",
+      "category": "Revenue Operations Software",
+      "priority": 2,
+      "da": 84,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Operations Software. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Software Advice",
+      "url": "https://www.softwareadvice.com",
+      "category": "Revenue Operations",
+      "priority": 2,
+      "da": 80,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Operations. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Futurepedia",
+      "url": "https://www.futurepedia.io",
+      "category": "Revenue Operations AI",
+      "priority": 2,
+      "da": 55,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Operations AI. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "SourceForge",
+      "url": "https://sourceforge.net",
+      "category": "Revenue Software",
+      "priority": 3,
+      "da": 82,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Revenue Software. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    },
+    {
+      "name": "Indie Hackers",
+      "url": "https://www.indiehackers.com",
+      "category": "Founder story",
+      "priority": 3,
+      "da": 74,
+      "status": "pending",
+      "action_notes": "Submit listing in category: Founder story. Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+    }
+  ],
+  "guest_post_pitches": [
+    {
+      "publication": "HubSpot Blog",
+      "url": "https://blog.hubspot.com",
+      "da": 93,
+      "pitch_angle": "How B2B Teams Are Using AI to Automate Revenue Operations at Scale",
+      "contact": "https://blog.hubspot.com/marketing/guest-blogging-guidelines",
+      "email_subject": "Contributor idea for HubSpot Blog: How B2B Teams Are Using AI to Automate Revenue Operations at Scale",
+      "email_body": "Hi HubSpot Blog team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: How B2B Teams Are Using AI to Automate Revenue Operations at Scale\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    },
+    {
+      "publication": "G2 Learning Hub",
+      "url": "https://learn.g2.com",
+      "da": 90,
+      "pitch_angle": "Revenue Operations: A Practical Guide for B2B Teams",
+      "contact": "content@g2.com",
+      "email_subject": "Contributor idea for G2 Learning Hub: Revenue Operations: A Practical Guide for B2B Teams",
+      "email_body": "Hi G2 Learning Hub team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: Revenue Operations: A Practical Guide for B2B Teams\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    },
+    {
+      "publication": "Sales Hacker",
+      "url": "https://www.saleshacker.com",
+      "da": 76,
+      "pitch_angle": "The Death of the Point-Tool Stack: Why Managed Revenue Operations Is Winning",
+      "contact": "contributors@saleshacker.com",
+      "email_subject": "Contributor idea for Sales Hacker: The Death of the Point-Tool Stack: Why Managed Revenue Operations Is Winning",
+      "email_body": "Hi Sales Hacker team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: The Death of the Point-Tool Stack: Why Managed Revenue Operations Is Winning\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    },
+    {
+      "publication": "Close.com Blog",
+      "url": "https://www.close.com/blog",
+      "da": 72,
+      "pitch_angle": "How to Automate Prospecting Without Losing the Human Element",
+      "contact": "https://www.close.com/blog/write-for-us",
+      "email_subject": "Contributor idea for Close.com Blog: How to Automate Prospecting Without Losing the Human Element",
+      "email_body": "Hi Close.com Blog team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: How to Automate Prospecting Without Losing the Human Element\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    },
+    {
+      "publication": "Demand Gen Report",
+      "url": "https://www.demandgenreport.com",
+      "da": 68,
+      "pitch_angle": "GTM Implementation in 2025: What Has Changed and What Has Not",
+      "contact": "editorial@demandgenreport.com",
+      "email_subject": "Contributor idea for Demand Gen Report: GTM Implementation in 2025: What Has Changed and What Has Not",
+      "email_body": "Hi Demand Gen Report team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: GTM Implementation in 2025: What Has Changed and What Has Not\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    },
+    {
+      "publication": "Predictable Revenue",
+      "url": "https://predictablerevenue.com",
+      "da": 66,
+      "pitch_angle": "Why Revenue Operations Compounds: The Case for a Managed Engine",
+      "contact": "hello@predictablerevenue.com",
+      "email_subject": "Contributor idea for Predictable Revenue: Why Revenue Operations Compounds: The Case for a Managed Engine",
+      "email_body": "Hi Predictable Revenue team,\n\nI wanted to pitch a contributor piece aligned to what your audience cares about most right now.\n\nWorking title: Why Revenue Operations Compounds: The Case for a Managed Engine\n\nWhat the piece covers:\n- Why solution evaluation is the defining challenge for B2B revenue teams in 2025\n- A practical framework your readers can apply immediately\n- Real workflow architecture diagrams and implementation steps\n- Outcome data from teams that have made the shift\n\nWhy it fits your readers:\n- Written for operators, not evaluators \u2014 implementation-first, not vendor-first\n- Addresses demand around managed outbound and AI-assisted GTM\n- No product pitch in the body \u2014 the value is in the framework\n\nHappy to send a full outline within 48 hours.\n\nBest,\nRajiv Maanik, Pipeleap (https://www.pipeleap.com)",
+      "status": "pending"
+    }
+  ],
+  "authority_actions": [
+    {
+      "tier": 1,
+      "tactic": "Sales Hacker guest post",
+      "action_detail": "Use the guest post pitch template from OffPageEngine. Target DA 70+ publications. Vary anchor text per BACKLINK_ANCHOR_VARIANTS.",
+      "priority_score": 90.0,
+      "status": "pending"
+    },
+    {
+      "tier": 1,
+      "tactic": "LinkedIn Pulse article by Rajeev",
+      "action_detail": "Use LinkedIn brief from OffPageEngine. Post Monday insight + Thursday how-to. Start The Outbound Letter newsletter \u2014 weekly, indexes on Google.",
+      "priority_score": 90.0,
+      "status": "pending"
+    },
+    {
+      "tier": 1,
+      "tactic": "Podcast: 30 Minutes to Presidents Club, The Sales Evangelist, Make It Happen Mondays",
+      "action_detail": "Pitch: 30 Minutes to Presidents Club, The Sales Evangelist, Make It Happen Mondays. Lead with: how Pipeleap reduces SDR admin from 65% to under 20% of their day. Request show notes link to pipeleap.com.",
+      "priority_score": 90.0,
+      "status": "pending"
+    },
+    {
+      "tier": 1,
+      "tactic": "Product Hunt full launch",
+      "action_detail": "Full Product Hunt launch. Prep: hunter with 500+ followers, 50 upvotes in first hour. Generates ~50 high-DA backlinks automatically.",
+      "priority_score": 90.0,
+      "status": "pending"
+    },
+    {
+      "tier": 1,
+      "tactic": "Clutch client reviews leading to editorial coverage",
+      "action_detail": "Clutch client reviews leading to editorial coverage",
+      "priority_score": 90.0,
+      "status": "pending"
+    },
+    {
+      "tier": 2,
+      "tactic": "HARO / Connectively daily responses for sales, AI, GTM queries",
+      "action_detail": "Check HARO / Connectively daily for queries tagged: sales automation, AI in sales, GTM strategy, outbound prospecting. Respond within 1 hour of alert for best placement odds.",
+      "priority_score": 60.0,
+      "status": "pending"
+    },
+    {
+      "tier": 2,
+      "tactic": "LinkedIn Newsletter: The Pipeline Letter",
+      "action_detail": "Use LinkedIn brief from OffPageEngine. Post Monday insight + Thursday how-to. Start The Outbound Letter newsletter \u2014 weekly, indexes on Google.",
+      "priority_score": 60.0,
+      "status": "pending"
+    },
+    {
+      "tier": 2,
+      "tactic": "Partner co-marketing with Clay, Apollo, HubSpot for directory mentions",
+      "action_detail": "Partner co-marketing with Clay, Apollo, HubSpot for directory mentions",
+      "priority_score": 60.0,
+      "status": "pending"
+    },
+    {
+      "tier": 3,
+      "tactic": "Consistent NAP across all directories",
+      "action_detail": "Consistent NAP across all directories",
+      "priority_score": 30.0,
+      "status": "pending"
+    },
+    {
+      "tier": 3,
+      "tactic": "Engage on high-traffic LinkedIn posts in sales and GTM",
+      "action_detail": "Use LinkedIn brief from OffPageEngine. Post Monday insight + Thursday how-to. Start The Outbound Letter newsletter \u2014 weekly, indexes on Google.",
+      "priority_score": 30.0,
+      "status": "pending"
+    },
+    {
+      "tier": 3,
+      "tactic": "Natural brand mentions in r/sales, RevOps Co-op Slack, Quora",
+      "action_detail": "Natural brand mentions in r/sales, RevOps Co-op Slack, Quora",
+      "priority_score": 30.0,
+      "status": "pending"
+    }
+  ],
+  "brand_monitoring_setup": [
+    "Pipeleap",
+    "pipeleap.com",
+    "revenue operations Pipeleap",
+    "GTM implementation partner B2B",
+    "managed revenue operations"
+  ]
+}
