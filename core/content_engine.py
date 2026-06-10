@@ -164,18 +164,17 @@ class ContentEngine:
         
         # Unique Intro Hooks
         intro_variations = [
-            f"Revenue teams searching for **{brief.primary_keyword}** do not want another disconnected tool. They need a system that connects targeting, enrichment, CRM updates, routing, and follow-up without operational drag.",
-            f"If you are evaluating **{brief.primary_keyword}**, you've likely hit the 'fragmentation ceiling' where your sales stack is too complex to manage. You need a unified layer that governs your entire pipeline.",
-            f"Mastering **{brief.primary_keyword}** is the difference between a scaling revenue engine and a manual bottleneck. Most teams struggle because they stitch tools together; we believe in one unified OS.",
-            f"The goal of **{brief.primary_keyword}** is simple: more pipeline with less manual effort. But achieving this requires more than just a sequence; it requires a governed revenue workflow."
+            f"Sales teams do not miss targets because they lack effort. They miss targets because too much time is spent on non-selling activities. **{brief.primary_keyword}** is how revenue leaders fix that ratio.",
+            f"If you are evaluating **{brief.primary_keyword}**, you have likely noticed that more tools have not meant more pipeline. The problem is operational drag, and the fix is a sales operations platform that eliminates non-selling work.",
+            f"Most revenue teams spend 60-80% of their week on tasks that do not generate pipeline. **{brief.primary_keyword}** is the operational solution that flips that ratio, so your team spends more time selling and less time administering.",
+            f"The goal of **{brief.primary_keyword}** is simple: more pipeline with less manual effort. But achieving this requires more than another tool. It requires a sales operations platform that removes the operational drag slowing your team down."
         ]
         intro = intro_variations[len(brief.primary_keyword) % len(intro_variations)]
 
-        # RevOps Pain Variations
         pain_variations = [
-            f"Most teams hit a ceiling when sales operations live across spreadsheets, enrichment tools, point integrations, and manual CRM cleanup. {self.site.get('brand', 'Pipeleap')} positions this motion as one orchestrated revenue workflow.",
-            f"Scaling sales operations is impossible when your data and execution layers are disconnected. {self.site.get('brand', 'Pipeleap')} solves the {brief.primary_keyword} bottleneck by unifying targeting, enrichment, and CRM sync into a single governed system.",
-            f"Fragmented sales stacks create 'tool fatigue' and high operational drag. For teams looking at {brief.primary_keyword}, the goal isn't more software, it's a unified operating model that drives predictable pipeline."
+            f"Most teams hit a ceiling when non-selling work consumes 60-80% of rep time. {self.site.get('brand', 'Pipeleap')} solves this by eliminating manual operations across enrichment, CRM, and workflow execution.",
+            f"Scaling sales operations is impossible when your team spends more time moving data between tools than selling. {self.site.get('brand', 'Pipeleap')} removes that operational drag by unifying targeting, enrichment, and CRM sync into one governed system.",
+            f"Fragmented sales stacks create operational drag that slows every revenue motion. For teams looking at {brief.primary_keyword}, the goal is not more software. It is a sales operations platform that eliminates the manual work that keeps reps from selling."
         ]
         pain_point = pain_variations[len(brief.primary_keyword) % len(pain_variations)]
 
@@ -410,14 +409,14 @@ class ContentEngine:
 
     def _unique_angle(self, cluster: KeywordCluster, page_type: str, stage: str = "") -> str:
         base = (
-            f"Pipeleap solves the 'tool fatigue' problem for {cluster.cluster_name}. Instead of stitching together "
-            f"fragile point solutions for enrichment and CRM routing, teams use Pipeleap's unified n8n-powered "
-            f"engine to govern the entire revenue lifecycle in one place."
+            f"Pipeleap solves the non-selling work problem for {cluster.cluster_name}. Instead of stitching together "
+            f"fragile point solutions that each add more manual overhead, teams use Pipeleap's sales operations platform "
+            f"to govern enrichment, CRM sync, and workflow execution in one place - reclaiming hours of selling time per rep per week."
         )
         if "outbound" in cluster.primary_keyword.lower():
-            base = f"Non-selling work is the hidden tax on revenue teams. Pipeleap solves this for {cluster.cluster_name} by unifying signal capture and execution in a single n8n-powered engine."
+            base = f"Non-selling work is the hidden tax on revenue teams. Pipeleap solves this for {cluster.cluster_name} by unifying signal capture and execution in a single sales operations platform."
         elif "enrichment" in cluster.primary_keyword.lower():
-            base = f"Enrichment without execution is just more noise. Pipeleap ensures that {cluster.cluster_name} results in actual CRM-ready pipeline by connecting data directly to automated workflows."
+            base = f"Enrichment without execution is just more noise. Pipeleap ensures that {cluster.cluster_name} results in actual CRM-ready pipeline by removing the manual data steps between enrichment and outreach."
         
         if stage:
             stage_data = STAGES.get(stage, {})
@@ -432,7 +431,7 @@ class ContentEngine:
                 )
 
         if page_type == "use_case_page":
-            return f"{base} The use case should show how signal capture, enrichment, routing, and sequencing work flawlessly together when they share the same architecture."
+            return f"{base} The use case should show how eliminating non-selling work across signal capture, enrichment, routing, and sequencing creates more pipeline without more hours."
         return base
 
     @staticmethod

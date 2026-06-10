@@ -202,6 +202,19 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("Auto-fix skipped: %s", exc)
 
+        # ── Step 4h: Event-Triggered Content Detection ─────────────────────────
+        self.logger.info("Step 4h: Event-triggered content detection")
+        try:
+            event_opportunities = self._detect_event_content_opportunities()
+            if event_opportunities:
+                self.logger.info("Event-triggered: %d content opportunities detected", len(event_opportunities))
+                result.keyword_opportunities = self._merge_keyword_opportunities(
+                    result.keyword_opportunities, event_opportunities
+                )
+                self._write_json(output_dir / "event_content_opportunities.json", event_opportunities)
+        except Exception as exc:
+            self.logger.warning("Event content detection skipped: %s", exc)
+
         # ── Step 4b: GSC Performance Audit ───────────────────────────────────
         self.logger.info("Step 4b: GSC performance audit")
         raw_gsc_rows: list[dict] = []
@@ -1098,6 +1111,110 @@ class SEOOSAgent:
 
         insights.sort(key=lambda x: (0 if x["severity"] == "High" else 1, -x.get("impressions", 0)))
         return insights[:20], current_rows
+
+    def _detect_event_content_opportunities(self) -> list[dict]:
+        """Detect upcoming sales events and generate targeted content opportunities."""
+        now = datetime.now(timezone.utc)
+        month = now.month
+        day = now.day
+
+        events: list[dict] = []
+
+        # SKO season (Jan-Feb): sales kickoff planning
+        if month in (1, 2):
+            events.append({
+                "keyword": "sales kickoff productivity initiatives",
+                "type": "event_trigger",
+                "cluster": "sales productivity",
+                "difficulty": 25,
+                "conversion_probability": 0.6,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 65,
+                "coverage_status": "pending",
+            })
+            events.append({
+                "keyword": "reduce non-selling time before sales kickoff",
+                "type": "event_trigger",
+                "cluster": "reducing non-selling time",
+                "difficulty": 20,
+                "conversion_probability": 0.5,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 60,
+                "coverage_status": "pending",
+            })
+
+        # QBR cycles (Mar, Jun, Sep, Dec — quarter-end)
+        if month in (3, 6, 9, 12) and day >= 15:
+            events.append({
+                "keyword": "QBR sales process improvements",
+                "type": "event_trigger",
+                "cluster": "sales workflow operations",
+                "difficulty": 28,
+                "conversion_probability": 0.65,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 70,
+                "coverage_status": "pending",
+            })
+            events.append({
+                "keyword": "pipeline review operational bottlenecks",
+                "type": "event_trigger",
+                "cluster": "sales workflow operations",
+                "difficulty": 22,
+                "conversion_probability": 0.55,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 62,
+                "coverage_status": "pending",
+            })
+
+        # Mid-year review (Jun-Jul)
+        if month in (6, 7):
+            events.append({
+                "keyword": "mid year sales productivity review",
+                "type": "event_trigger",
+                "cluster": "sales productivity",
+                "difficulty": 24,
+                "conversion_probability": 0.6,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 64,
+                "coverage_status": "pending",
+            })
+
+        # Revenue planning (Nov-Dec)
+        if month in (11, 12):
+            events.append({
+                "keyword": "revenue planning operational efficiency",
+                "type": "event_trigger",
+                "cluster": "sales workflow operations",
+                "difficulty": 30,
+                "conversion_probability": 0.7,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 75,
+                "coverage_status": "pending",
+            })
+
+        # Pipeline review (always relevant, boosted quarter-end)
+        if month in (1, 4, 7, 10) and day <= 15:
+            events.append({
+                "keyword": "pipeline review meeting preparation",
+                "type": "event_trigger",
+                "cluster": "sales productivity",
+                "difficulty": 18,
+                "conversion_probability": 0.5,
+                "recommended_page_type": "blog_post",
+                "revenue_priority": 55,
+                "coverage_status": "pending",
+            })
+
+        return events
+
+    @staticmethod
+    def _merge_keyword_opportunities(existing: list[dict], new: list[dict]) -> list[dict]:
+        seen = {kw.get("keyword", "") for kw in existing if kw.get("keyword")}
+        for item in new:
+            if item.get("keyword", "") not in seen:
+                existing.append(item)
+                seen.add(item["keyword"])
+        return existing
 
     def _build_indexing_actions(self, diff: SiteDiff, snapshot: SiteSnapshot) -> list[dict]:
         from connectors.gsc_connector import GoogleSearchConsoleConnector

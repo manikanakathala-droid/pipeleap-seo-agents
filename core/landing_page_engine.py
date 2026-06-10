@@ -44,22 +44,22 @@ class LandingPageEngine:
 
         # Stage-specific headline and framing
         if stage == "early":
-            title = f"{keyword_title} — Build Pipeline Before You Hire Your First Rep"
+            title = f"{keyword_title} - Eliminate Non-Selling Work Before You Scale"
             target_persona = "Founders and early-stage teams"
         elif stage == "growth":
-            title = f"{keyword_title} — Scale Your Team's Outbound Without Adding Headcount"
+            title = f"{keyword_title} - Reclaim 11 Hours Per Rep Per Week"
             target_persona = "VP Sales and sales managers at growth-stage companies"
         elif stage == "scale":
-            title = f"{keyword_title} — One Orchestration Layer for Enterprise Revenue Teams"
+            title = f"{keyword_title} - Sales Operations Platform for Enterprise Revenue Teams"
             target_persona = "CROs and sales ops leaders"
         else:
-            title = f"{keyword_title} for Revenue Teams That Need More Qualified Pipeline"
+            title = f"{keyword_title} for Revenue Teams That Need More Selling Time"
             target_persona = "Sales ops teams and growth operators"
 
-        seo_title = f"{keyword_title} | Pipeleap Revenue Automation"
+        seo_title = f"{keyword_title} | Pipeleap Sales Operations Platform"
         meta_description = (
-            f"Launch {keyword} with Pipeleap's operational layer for enrichment, CRM governance, and "
-            f"CRM routing, and demo-driving execution."
+            f"Launch {keyword} with Pipeleap's sales operations platform for enrichment, CRM governance, "
+            f"routing, and automated execution - reclaiming selling time for your team."
         )[:158]
 
         # Stage context callout

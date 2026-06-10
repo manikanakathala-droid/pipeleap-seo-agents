@@ -217,17 +217,34 @@
         "improve sales capacity",
         "revenue operations best practices"
       ],
-      "category_creation": [
-        "outbound operating system",
-        "sales operations layer",
-        "outbound workflow engine",
-        "sales execution infrastructure",
-        "revenue workflow platform",
-        "sales orchestration platform",
-        "sales operating system",
-        "autonomous sales operations",
-        "outbound infrastructure",
-        "revenue productivity infrastructure"
+      "reducing_non_selling_time": [
+        "reduce non-selling time in sales",
+        "eliminate manual sales work",
+        "sales productivity improvement",
+        "increase selling time for reps",
+        "reduce sales admin burden",
+        "sales workflow operations platform",
+        "eliminate repetitive sales tasks",
+        "streamline sales workflows",
+        "remove operational bottlenecks in sales",
+        "reduce administrative burden on revenue teams",
+        "help sales teams hit quota",
+        "improve sales efficiency",
+        "reduce operational drag in sales",
+        "sales process optimization",
+        "eliminate non-selling activities"
+      ],
+      "event_trigger": [
+        "sales kickoff productivity initiatives",
+        "QBR sales process improvements",
+        "sales cadence workflow optimization",
+        "pipeline review operational bottlenecks",
+        "revenue planning operational efficiency",
+        "sales productivity goals 2027",
+        "quarterly business review sales ops",
+        "pipeline review meeting preparation",
+        "mid year sales productivity review",
+        "sales ops readiness for SKO"
       ],
       "agentic_ai": [
         "AI sales agent",
@@ -270,6 +287,30 @@
       ]
     },
     "topic_map": {
+      "reducing non-selling time": [
+        "non-selling time",
+        "selling time ratio",
+        "admin burden",
+        "rep productivity",
+        "non-selling activities",
+        "administrative work in sales"
+      ],
+      "sales productivity": [
+        "sales productivity",
+        "sales efficiency",
+        "team performance",
+        "quota attainment",
+        "pipeline velocity",
+        "revenue productivity"
+      ],
+      "sales workflow operations": [
+        "sales workflow operations",
+        "sales process optimization",
+        "operational drag",
+        "sales bottlenecks",
+        "workflow governance",
+        "sales operations layer"
+      ],
       "outbound automation": [
         "outbound automation",
         "cold outreach",
@@ -369,6 +410,27 @@
       ]
     },
     "semantic_expansions": {
+      "reducing non-selling time": [
+        "reclaim selling time",
+        "eliminate admin work",
+        "reduce manual CRM tasks",
+        "automate non-selling activities",
+        "sales time optimization"
+      ],
+      "sales productivity": [
+        "improve sales capacity",
+        "increase quota attainment",
+        "boost rep productivity",
+        "sales performance optimization",
+        "revenue team efficiency"
+      ],
+      "sales workflow operations": [
+        "governed workflow layer",
+        "sales operations platform",
+        "workflow orchestration",
+        "automated sales process",
+        "operational layer for sales"
+      ],
       "outbound automation": [
         "multistep outbound workflows",
         "sales sequencing automation",
