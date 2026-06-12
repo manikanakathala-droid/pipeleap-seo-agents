@@ -390,7 +390,7 @@ class AdaptiveActionEngine:
                 description=(
                     "Growth mode: run linking cluster map from serp_strategy.py. "
                     "Ensure every spoke article links to its pillar page. "
-                    "Add missing anchor text links from blog posts to /gtm-audit."
+                    "Add missing anchor text links from blog posts to /sales-ops-audit."
                 ),
                 estimated_impact="medium",
                 auto_executable=True,

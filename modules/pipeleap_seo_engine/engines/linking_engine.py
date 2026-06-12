@@ -7,7 +7,7 @@ Revenue path rules (added alongside existing rules):
   - BOFU/objection pages → top MOFU use-case and role pages (show value before conversion ask)
   - Glossary pages → most relevant MOFU use-case page (educate → consider)
   - Integration pages → comparison pages (consideration → decision)
-  - All BOFU pages → GTM audit page (direct conversion link)
+  - All BOFU pages → sales ops audit page (direct conversion link)
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from modules.pipeleap_seo_engine.models import GrowthPage
 
-AUDIT_URL = "https://pipeleap.com/gtm-audit"
+AUDIT_URL = "https://pipeleap.com/sales-ops-audit"
 
 
 class GrowthLinkingEngine:
@@ -32,7 +32,7 @@ class GrowthLinkingEngine:
     - BOFU/objection pages → top MOFU use-case + role pages
     - Glossary pages → most relevant use-case page
     - Integration pages → comparison pages for the same tool
-    - All BOFU/SQL pages → GTM audit CTA link
+    - All BOFU/SQL pages → sales ops audit CTA link
     """
 
     PILLAR_SLUG = "saas-workflow-orchestration"
@@ -125,13 +125,13 @@ class GrowthLinkingEngine:
                     "url": f"/blog/{matching_comp.slug}",
                 })
 
-        # All BOFU/SQL pages get a direct GTM audit link
+        # All BOFU/SQL pages get a direct sales ops audit link
         for bofu_page in bofu_pages:
             audit_entry = {
-                "anchor": "get a free GTM audit",
+                "anchor": "get a free sales ops audit",
                 "url": f"{AUDIT_URL}?utm_source=organic&utm_medium=seo&utm_campaign=linking_engine&utm_content={bofu_page.slug}",
             }
-            already = any("gtm-audit" in l["url"] for l in link_map[bofu_page.slug])
+            already = any("sales-ops-audit" in l["url"] for l in link_map[bofu_page.slug])
             if not already:
                 link_map[bofu_page.slug].append(audit_entry)
 

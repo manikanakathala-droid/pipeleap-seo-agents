@@ -32,10 +32,10 @@ META_TARGETS: list[dict] = [
         ),
     },
     {
-        "path": "/gtm-audit",
-        "title": "Free GTM Audit for B2B Sales Teams | Pipeleap",
+        "path": "/sales-ops-audit",
+        "title": "Free Sales Ops Audit | Pipeleap",
         "meta_description": (
-            "Get a full audit of your revenue engine - targeting, messaging, workflows, and "
+            "Get a full audit of your sales operations - targeting, messaging, workflows, and "
             "pipeline health. Identify what is broken and get a fix plan in under 2 weeks."
         ),
     },
@@ -69,7 +69,7 @@ CTR_VARIANTS: list[dict] = [
 FAQ_RICH_RESULT_TOPICS: list[str] = [
     "What is revenue operations?",
     "How long does it take to build a working revenue system?",
-    "What is a GTM audit and why does it matter?",
+    "What is a sales ops audit and why does it matter?",
     "What is ICP scoring in sales?",
     "How does AI personalisation improve reply rates in cold outreach?",
     "What is the difference between a sales engagement platform and a sales operations platform?",
@@ -123,7 +123,7 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
             "how to build a revenue system",
             "how to automate B2B prospecting",
             "how to write cold outreach that gets replies",
-            "how to do a GTM audit",
+            "how to do a sales ops audit",
             "what is sales orchestration",
             "how to build predictable pipeline",
         ],
@@ -187,18 +187,18 @@ CONTENT_PLAN: list[dict] = [
         ],
     },
     {
-        "slug": "how-to-run-gtm-audit",
+        "slug": "how-to-run-sales-ops-audit",
         "page_type": "blog_post",
-        "title": "How to Run a GTM Audit in 5 Steps",
-        "seo_title": "How to Run a GTM Audit: 5-Step Framework for B2B Sales Teams",
+        "title": "How to Run a Sales Ops Audit in 5 Steps",
+        "seo_title": "How to Run a Sales Ops Audit: 5-Step Framework",
         "meta_description": (
-            "A GTM audit identifies exactly where your pipeline is leaking. Follow this 5-step "
+            "A sales ops audit identifies exactly where your pipeline is leaking. Follow this 5-step "
             "framework to audit targeting, messaging, workflows, and pipeline health."
         ),
-        "target_keyword": "how to do a GTM audit",
+        "target_keyword": "how to do a sales ops audit",
         "cluster": "how_to",
-        "pillar_link": "/gtm-audit",
-        "internal_links": ["/gtm-audit", "/glossary/icp-scoring"],
+        "pillar_link": "/sales-ops-audit",
+        "internal_links": ["/sales-ops-audit", "/glossary/icp-scoring"],
         "persona": "Head of Sales who suspects pipeline is underperforming",
         "eeat_notes": [
             "Include inline audit checklist",
@@ -217,7 +217,7 @@ CONTENT_PLAN: list[dict] = [
         "target_keyword": "predictable pipeline",
         "cluster": "solution_evaluation",
         "pillar_link": "/",
-        "internal_links": ["/", "/gtm-audit"],
+        "internal_links": ["/", "/sales-ops-audit"],
         "persona": "Founder frustrated with headcount not delivering pipeline results",
         "eeat_notes": [
             "Open with cost of SDR hire vs automation ROI",
@@ -255,7 +255,7 @@ CONTENT_PLAN: list[dict] = [
         "target_keyword": "ICP scoring",
         "cluster": "how_to",
         "pillar_link": "/glossary/icp-scoring",
-        "internal_links": ["/glossary/icp-scoring", "/gtm-audit"],
+        "internal_links": ["/glossary/icp-scoring", "/sales-ops-audit"],
         "persona": "SDR manager or RevOps analyst building lead qualification",
         "eeat_notes": [
             "Include a sample scoring rubric with firmographic and behavioural signals",
@@ -291,7 +291,7 @@ CONTENT_PLAN: list[dict] = [
         "target_keyword": "manual prospecting cost",
         "cluster": "problem_pain",
         "pillar_link": "/",
-        "internal_links": ["/", "/gtm-audit"],
+        "internal_links": ["/", "/sales-ops-audit"],
         "persona": "Sales leader trying to justify automation investment",
         "eeat_notes": [
             "Build a cost calculator: hours per rep x hourly rate x number of reps",

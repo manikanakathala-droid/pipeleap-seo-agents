@@ -44,7 +44,7 @@ TITLE_TEMPLATES: dict[str, list[str]] = {
         "{keyword}: Features, Pricing, and Use Cases",
     ],
     "transactional": [
-        "{keyword} — Get a Free GTM Audit",
+        "{keyword} — Get a Free Sales Ops Audit",
         "Book a {keyword} Demo — See It Live in 30 Minutes",
         "{keyword} for SaaS: See How It Works for Your Team",
         "Pipeleap {keyword} — Start Building Predictable Pipeline",
@@ -247,7 +247,7 @@ class CTREngine:
         if stage in ("BOFU", "SQL"):
             return (
                 f"Book a Pipeleap demo for {kw}. "
-                f"We'll map your exact workflow in 30 minutes — free GTM audit included."
+                f"We'll map your exact workflow in 30 minutes — free sales ops audit included."
             )[:160]
         return existing_meta[:160]
 

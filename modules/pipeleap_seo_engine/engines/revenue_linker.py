@@ -2,12 +2,12 @@
 Revenue Path Linker — TOFU → MOFU → BOFU → SQL internal linking engine.
 
 This engine injects funnel-progression links into generated page markdown.
-Every page should pull readers one stage closer to a demo or GTM audit.
+Every page should pull readers one stage closer to a demo.
 
 Rules:
   TOFU pages  → link to 1–2 MOFU pages (use case or role) + 1 BOFU page
   MOFU pages  → link to 1–2 BOFU pages (comparison or demo) + 1 objection page
-  BOFU pages  → link directly to GTM audit CTA + 1 objection page (trust)
+  BOFU pages  → link directly to sales ops audit CTA + 1 objection page (trust)
   Glossary    → link to the most relevant MOFU use-case page
   All pages   → avoid linking DOWN the funnel (BOFU → TOFU creates confusion)
 
@@ -29,7 +29,7 @@ from modules.pipeleap_seo_engine.data.funnel_stages import (
 )
 
 SITE_URL = "https://pipeleap.com"
-AUDIT_URL = f"{SITE_URL}/gtm-audit"
+AUDIT_URL = f"{SITE_URL}/sales-ops-audit"
 
 
 # ── Revenue path link rules ────────────────────────────────────────────────────
@@ -45,13 +45,13 @@ FUNNEL_LINK_RULES: dict[str, dict] = {
         "link_to_stages":   [],
         "max_stage_links":  0,
         "include_audit":    True,
-        "audit_anchor":     "get a free GTM audit",
+        "audit_anchor":     "get a free sales ops audit",
     },
     "BOFU": {
         "link_to_stages":   [],
         "max_stage_links":  0,
         "include_audit":    True,
-        "audit_anchor":     "get your free GTM audit and workflow blueprint",
+        "audit_anchor":     "get your free sales ops audit and workflow blueprint",
     },
     "SQL": {
         "link_to_stages":   [],
@@ -67,24 +67,24 @@ NURTURE_BLOCKS: dict[str, str] = {
         "\n\n---\n\n"
         "**Next step:** If you're evaluating whether Pipeleap fits your outbound motion, "
         "the resources on our site show it in practice — "
-        "or [get a free GTM audit]({audit_url}) to map your workflow gaps in 48 hours.\n"
+        "or [get a free sales ops audit]({audit_url}) to get a workflow blueprint in 48 hours.\n"
     ),
     "MOFU": (
         "\n\n---\n\n"
         "**Ready to see this for your team?** "
-        "[Get a free GTM audit]({audit_url}) — we'll map your exact workflow and "
+        "[Get a free sales ops audit]({audit_url}) — we'll map your exact workflow and "
         "show you the 3 highest-leverage automation points for your stack.\n\n"
         "_Most teams have a working automated workflow running within 2 weeks of their audit._\n"
     ),
     "BOFU": (
         "\n\n---\n\n"
-        "**[Get your free GTM audit →]({audit_url})**\n\n"
+        "**[Get your free sales ops audit →]({audit_url})**\n\n"
         "We'll review your current outbound motion, identify your workflow gaps, "
         "and deliver a custom workflow blueprint — within 48 hours, no commitment required.\n"
     ),
     "SQL": (
         "\n\n---\n\n"
-        "**[Book your Pipeleap demo →]({audit_url})**\n\n"
+        "**[Book your Pipeleap demo →]({demo_url})**\n\n"
         "30 minutes. We'll walk through a live workflow built specifically for your use case.\n"
     ),
 }
@@ -165,7 +165,7 @@ class RevenueLinkingEngine:
             if len(links) >= max_links:
                 break
 
-        # Always add GTM audit link for MOFU/BOFU/SQL
+        # Always add sales ops audit link for MOFU/BOFU/SQL
         if rule.get("include_audit") and rule.get("audit_anchor"):
             audit_link = {
                 "anchor": rule["audit_anchor"],
@@ -214,11 +214,12 @@ class RevenueLinkingEngine:
         if not template:
             return ""
         audit_url = f"{AUDIT_URL}?utm_source=organic&utm_medium=seo&utm_campaign=nurture_{stage.lower()}"
-        return template.format(audit_url=audit_url, mofu_url=mofu_url)
+        demo_url = f"{self.site_url}/contact?utm_source=organic&utm_medium=seo&utm_campaign=nurture_{stage.lower()}"
+        return template.format(audit_url=audit_url, demo_url=demo_url, mofu_url=mofu_url)
 
     @staticmethod
     def _already_has_nurture(markdown: str) -> bool:
-        return "Get your free GTM audit" in markdown or "Book your Pipeleap demo" in markdown
+        return "get your free sales ops audit" in markdown.lower() or "Book your Pipeleap demo" in markdown
 
     # ── Anchor text generation ────────────────────────────────────────────────
 

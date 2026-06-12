@@ -80,7 +80,7 @@ class CMSConnector:
         ("/",               "1.0", "daily"),
         ("/services",       "0.9", "weekly"),
         ("/how-it-works",   "0.9", "weekly"),
-        ("/gtm-audit",      "0.9", "weekly"),
+        ("/sales-ops-audit",      "0.9", "weekly"),
         ("/pricing",        "0.9", "weekly"),
         ("/about",          "0.8", "monthly"),
         ("/contact",        "0.8", "monthly"),

@@ -43,29 +43,26 @@ def commit_file(path, content, sha, message):
 # ── Patches ──────────────────────────────────────────────────────────────────
 
 PATCHES = [
-    # ── GTMAudit.tsx ─────────────────────────────────────────────────────────
+    # ── SalesOpsAudit.tsx ─────────────────────────────────────────────────────
     {
-        "path": "src/pages/GTMAudit.tsx",
-        "message": "seo: add Service schema (free offer) to /gtm-audit",
+        "path": "src/pages/SalesOpsAudit.tsx",
+        "message": "seo: add WebPage schema to /sales-ops-audit",
         "find": '''      <SEO
-        title="Free GTM Audit for Outbound Sales"
-        description="Get a free GTM audit for your outbound sales process. Pipeleap identifies pipeline bottlenecks and recommends automation strategies to scale revenue."
-        path="/gtm-audit"
+        title="Free Sales Ops Audit | Pipeleap"
+        description="Get a free sales ops audit for your outbound sales process. Pipeleap identifies pipeline bottlenecks and recommends automation strategies to scale revenue."
+        path="/sales-ops-audit"
       />''',
         "replace": '''      <SEO
-        title="Free GTM Audit for Outbound Sales"
-        description="Get a free GTM audit for your outbound sales process. Pipeleap identifies pipeline bottlenecks and recommends automation strategies to scale revenue."
-        path="/gtm-audit"
+        title="Free Sales Ops Audit | Pipeleap"
+        description="Get a free sales ops audit for your outbound sales process. Pipeleap identifies pipeline bottlenecks and recommends automation strategies to scale revenue."
+        path="/sales-ops-audit"
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "Service",
-          "name": "Free GTM Automation Audit",
-          "provider": { "@type": "Organization", "name": "Pipeleap", "url": "https://www.pipeleap.com" },
-          "description": "A complimentary 20-minute audit examining outbound workflow efficiency, lead sourcing, campaigns, CRM configuration, and automation opportunities. Deliverables include workflow assessment, pipeline problem identification, automation roadmap, and tech stack recommendations.",
-          "url": "https://www.pipeleap.com/gtm-audit",
-          "areaServed": "Worldwide",
-          "serviceType": "GTM Automation Consulting",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+          "@type": "WebPage",
+          "name": "Free Sales Operations Audit",
+          "url": "https://www.pipeleap.com/sales-ops-audit",
+          "description": "A complimentary audit examining outbound workflow efficiency, lead sourcing, campaigns, CRM configuration, and automation opportunities. Deliverables include workflow assessment, pipeline problem identification, and automation roadmap.",
+          "about": { "@type": "Thing", "name": "Sales operations audit" }
         }}
       />''',
     },

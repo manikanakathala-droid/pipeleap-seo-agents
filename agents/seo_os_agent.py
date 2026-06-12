@@ -862,7 +862,7 @@ class SEOOSAgent:
         optimised: list[dict] = []
         page_index = snapshot.page_index()
 
-        priority_paths = ["/gtm-audit", "/", "/pricing"]
+        priority_paths = ["/sales-ops-audit", "/", "/pricing"]
         for path in priority_paths:
             url = self.site_url + path
             page = page_index.get(url) or page_index.get(self.site_url + path + "/")
@@ -961,7 +961,7 @@ class SEOOSAgent:
 
         slugs.update([
             "index", "services", "how-it-works", "results",
-            "gtm-audit", "pricing", "about", "contact", "faq", "privacy",
+            "sales-ops-audit", "pricing", "about", "contact", "faq", "privacy",
         ])
         return slugs
 

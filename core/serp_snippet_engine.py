@@ -161,7 +161,7 @@ class SerpSnippetEngine:
 
     def _build_faq_briefs(self, gsc_page_data: list[dict]) -> list[FaqRichResultBrief]:
         briefs: list[FaqRichResultBrief] = []
-        faq_pages = ["/faq", "/gtm-audit", "/"]
+        faq_pages = ["/faq", "/sales-ops-audit", "/"]
 
         for path in faq_pages:
             questions = [q for q in FAQ_RICH_RESULT_TOPICS if self._question_fits_page(q, path)]
@@ -182,8 +182,8 @@ class SerpSnippetEngine:
         q = question.lower()
         if path == "/faq":
             return True
-        if path == "/gtm-audit":
-            return any(kw in q for kw in ["gtm", "audit", "implementation", "partner"])
+        if path == "/sales-ops-audit":
+            return any(kw in q for kw in ["sales ops", "audit", "implementation", "partner"])
         if path == "/":
             return any(kw in q for kw in ["outbound", "automation", "pipeline", "automated"])
         return False

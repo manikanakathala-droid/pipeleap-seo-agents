@@ -139,7 +139,7 @@ class GrowthKeywordEngine:
         "pipeleap login",
         "pipeleap reviews",
         "pipeleap platform",
-        "pipeleap gtm audit",
+        "pipeleap sales ops audit",
         "pipeleap revenue operations",
         "pipeleap workflow orchestration",
     ]

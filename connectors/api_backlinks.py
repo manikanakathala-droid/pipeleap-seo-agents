@@ -186,7 +186,7 @@ If an SDR currently spends 15 hours/week on manual tasks, automation reclaims th
 
 [Pipeleap]({SITE_URL}) orchestrates all five automation stages as one connected workflow — signal capture through CRM sync — so SaaS teams generate more pipeline without proportional headcount growth.
 
-*Get a free GTM audit: [{SITE_URL}/gtm-audit]({SITE_URL}/gtm-audit)*
+*Get a free sales ops audit: [{SITE_URL}/sales-ops-audit]({SITE_URL}/sales-ops-audit)*
 """,
     },
 ]
@@ -258,7 +258,7 @@ predictable outbound pipeline through structured, signal-based outbound sales au
 - [Sales Automation Blog]({SITE_URL}/blog)
 - [How to Scale Outbound Without Hiring SDRs]({SITE_URL}/blog/how-to-automate-outbound-without-hiring-sdrs)
 - [Outbound Automation Glossary]({SITE_URL}/glossary)
-- [Free GTM Audit]({SITE_URL}/gtm-audit)
+- [Free Sales Ops Audit]({SITE_URL}/sales-ops-audit)
 
 ## Outbound Automation Workflow
 
@@ -672,7 +672,7 @@ kw = clean_keyword("  outbound automation platform  ")
 
 - Website: https://pipeleap.com
 - Docs: https://pipeleap.com/how-it-works
-- GTM Audit: https://pipeleap.com/gtm-audit
+- Sales Ops Audit: https://pipeleap.com/sales-ops-audit
 - Glossary: https://pipeleap.com/glossary
 """, encoding="utf-8")
 
@@ -724,7 +724,7 @@ _ALL_SITE_PAGES = [
     "/blog",
     "/how-it-works",
     "/pricing",
-    "/gtm-audit",
+    "/sales-ops-audit",
     "/glossary",
     "/about",
     "/contact",
@@ -1097,7 +1097,7 @@ cleanKeyword("  outbound automation  ")
 
 - Website: https://www.pipeleap.com
 - How it works: https://www.pipeleap.com/how-it-works
-- GTM Audit: https://www.pipeleap.com/gtm-audit
+- Sales Ops Audit: https://www.pipeleap.com/sales-ops-audit
 - Blog: https://www.pipeleap.com/blog
 """, encoding="utf-8")
 
@@ -1159,7 +1159,7 @@ that automates signal capture, lead enrichment, multi-channel sequencing, and CR
 | Platform overview | [pipeleap.com](https://www.pipeleap.com) |
 | How it works | [How Pipeleap works](https://www.pipeleap.com/how-it-works) |
 | Pricing | [Pipeleap pricing](https://www.pipeleap.com/pricing) |
-| GTM Audit | [Free GTM audit](https://www.pipeleap.com/gtm-audit) |
+| Sales Ops Audit | [Free sales ops audit](https://www.pipeleap.com/sales-ops-audit) |
 | Blog | [Outbound sales blog](https://www.pipeleap.com/blog) |
 | Glossary | [Sales automation glossary](https://www.pipeleap.com/glossary) |
 
@@ -1264,7 +1264,7 @@ let mins = estimate_read_time("Your article content here...");
 
 - Website: https://www.pipeleap.com
 - Blog: https://www.pipeleap.com/blog
-- GTM Audit: https://www.pipeleap.com/gtm-audit
+- Sales Ops Audit: https://www.pipeleap.com/sales-ops-audit
 """, encoding="utf-8")
 
         print(f"  Rust crate created at: {pkg}")

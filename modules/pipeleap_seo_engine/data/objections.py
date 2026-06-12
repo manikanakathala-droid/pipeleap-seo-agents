@@ -49,7 +49,7 @@ UNIVERSAL_OBJECTIONS: list[dict] = [
     {
         "objection": "We're not ready for automation — our process isn't documented yet.",
         "rebuttal": (
-            "That's actually the ideal time to implement Pipeleap. The GTM audit process documents your "
+            "That's actually the ideal time to implement Pipeleap. The sales ops audit process documents your "
             "current workflow, identifies the 3–5 highest-leverage automation points, and builds a governed "
             "workflow model before bad habits scale. Teams that wait until they're 'ready' usually wait until "
             "a painful quarter forces the issue."
@@ -60,12 +60,12 @@ UNIVERSAL_OBJECTIONS: list[dict] = [
     {
         "objection": "How long does implementation actually take?",
         "rebuttal": (
-            "Most SaaS teams have a working automated workflow running within 2 weeks of their GTM audit. "
+            "Most SaaS teams have a working automated workflow running within 2 weeks of their sales ops audit. "
             "Week 1: audit and workflow design. Week 2: build and test. Week 3: live with monitoring. "
             "There is no lengthy integration project — Pipeleap connects to your existing CRM, enrichment "
             "tools, and sequencer rather than replacing them."
         ),
-        "proof_point": "Average time from GTM audit to first automated outbound run: 12 business days.",
+        "proof_point": "Average time from sales ops audit to first automated outbound run: 12 business days.",
         "internal_link": "/blog/how-it-works",
     },
     {
@@ -187,13 +187,13 @@ PRICING_OBJECTIONS: list[dict] = [
     {
         "objection": "What's the ROI if we're not sure outbound will work for our ICP?",
         "rebuttal": (
-            "The GTM audit process includes ICP validation as a first step. Before building any workflow, "
+            "The sales ops audit process includes ICP validation as a first step. Before building any workflow, "
             "we map whether your ICP is reachable via the signals available, what enrichment data exists, "
             "and what response rates are realistic for your category. "
             "If outbound isn't the right channel, we'll tell you before you invest further."
         ),
-        "proof_point": "Pipeleap's GTM audit includes a channel-fit assessment — we've redirected 15% of audits toward inbound or product-led motions instead.",
-        "internal_link": "/gtm-audit",
+        "proof_point": "Pipeleap's sales ops audit includes a channel-fit assessment — we've redirected 15% of audits toward inbound or product-led motions instead.",
+        "internal_link": "/sales-ops-audit",
     },
 ]
 

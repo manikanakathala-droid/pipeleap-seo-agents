@@ -354,7 +354,7 @@ class GrowthContentEngine:
             ),
             "BOFU": (
                 "Every week that revenue runs on manual execution is a week of compounding "
-                "pipeline inefficiency. The GTM audit maps exactly where your workflow breaks "
+                "pipeline inefficiency. The sales ops audit maps exactly where your workflow breaks "
                 "down and delivers a custom automation blueprint — within 48 hours."
             ),
             "SQL": (
@@ -717,7 +717,7 @@ class GrowthContentEngine:
             url = match.group(2)
             
             # 1. Always keep conversion links (audit, demo, pipeleap.com root)
-            if "gtm-audit" in url or url.endswith("pipeleap.com") or url.endswith("pipeleap.com/"):
+            if "sales-ops-audit" in url or url.endswith("pipeleap.com") or url.endswith("pipeleap.com/"):
                 continue
                 
             # 2. Keep up to 3 glossary links

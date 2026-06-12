@@ -158,7 +158,7 @@ class GlobalMarketGenerator:
             "",
             f"## Get started with Pipeleap for {modifier} SaaS",
             "",
-            f"Book a free GTM audit to see how your {modifier} team can eliminate non-selling work "
+            f"Book a free sales ops audit to see how your {modifier} team can eliminate non-selling work "
             f"with workflow governance.",
         ]
         return "\n".join(s for s in sections if s is not None)

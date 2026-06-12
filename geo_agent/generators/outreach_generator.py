@@ -190,7 +190,7 @@ Content angles:
 
 {angles}
 
-**Option B — Ad placement:** Standard sponsor slot with our GTM audit as the CTA
+**Option B — Ad placement:** Standard sponsor slot with our sales ops audit as the CTA
 (free audit, high-value offer for your readers).
 
 We can customise content to your audience's specific pain points — happy to share a

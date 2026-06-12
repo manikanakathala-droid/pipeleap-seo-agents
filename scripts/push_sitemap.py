@@ -106,7 +106,7 @@ core_pages = [
 # Add routes from App.tsx, filtering out param routes
 route_priorities = {
     'services': ('monthly', '0.9'), 'how-it-works': ('monthly', '0.8'),
-    'gtm-audit': ('monthly', '0.9'), 'pricing': ('monthly', '0.8'),
+    'sales-ops-audit': ('monthly', '0.9'), 'pricing': ('monthly', '0.8'),
     'about': ('monthly', '0.7'), 'contact': ('monthly', '0.8'),
     'faq': ('monthly', '0.7'), 'blog': ('weekly', '0.9'),
     'glossary': ('monthly', '0.8'), 'tools': ('weekly', '0.9'),
