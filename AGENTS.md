@@ -291,3 +291,21 @@ When enabled, template-built content passes through `core/humanize.py` transform
 **Relevant Files:**
 - `agents/seo_os_agent.py` — Blog publish step (line ~374) and backlink URL mapping (line ~395)
 - `connectors/github_publisher.py` — `publish_blog_post()` writes to blog-articles.ts
+
+### 20. Platform positioning rebrand + full agency-language sweep (June 25)
+**Problem:** Site-wide language positioned Pipeleap as a managed service/agency/partner rather than a software product. "Book a Strategy Call", "retainer", "SwaS", "built and operated", "We deploy", "We run this for you", "GTM implementation partner", "revenue operations" gave the impression of a services company.
+
+**Batch 3 — Platform rebrand (commits `6c11e57` agents, `cd8dc0f`/`6b625e7` launchpad):**
+- `/services` → `/platform` (301 redirect), Navbar/Footer "Services" → "Platform"
+- Pricing: "retainer" → "subscription", "engagement model" → "pricing model"
+- PricingTiers: removed "Optional retainer", "Dedicated strategist", "Weekly strategy sessions", "Email infrastructure setup"
+- Services.tsx rewritten as Platform page — `SoftwareApplication` schema, NEPQ body, platform FAQ
+- Index.tsx: "We connect your stack" → "Connects your stack", "Pipeleap builds" → "Pipeleap is"
+- About.tsx: "partner" language removed ×9, "we built" → "Pipeleap"
+- Terms.tsx: "consulting services" → "Platform subscription", "statement of work" → "subscription agreement"
+- Footer.tsx: "We build" → "Pipeleap is", Services section → Platform section
+- App.tsx: route `/platform`, backward-compatible `/services`
+
+**Batch 4 — Full agency-language sweep (commits `f81e5b2` agents, `9832c95` launchpad):**
+- **Launchpad (16 files)**: All "Book a Strategy Call" → "Book a Demo" (Navbar, Index, HowItWorks, SalesOperationsPlatform, BlogArticle, Contact, etc.). FAQ.tsx: 7 consulting-style "We" answers → "Pipeleap"/"The platform". GTMAudit.tsx: schema `Service` → `WebPage`, "What We Analyze" → "What Gets Analyzed". Contact.tsx: "strategy call" → "demo" (×4), "Let's Build Your Outbound Engine" → "See Pipeleap in Action". Integrations.tsx: "Book a strategy call" → "Book a Demo".
+- **Agents (11 files)**: `listing_content.md` — retainer→subscription, SwaS→SaaS, managed service→platform. `serp_strategy.py` — META_TARGETS, FAQ, keyword clusters, brand monitoring, anchor variants all cleaned of revenue/GTM/managed language. `offpage_engine.py` — 4 CTAs (We run→Pipeleap runs, We built→Pipeleap is, We deploy→Deploys). `push_lovable_seo.py` — built and managed, Done-for-you, GTM Partner→Founder. `outreach_generator.py` — we build workflow→sales operations platform, client→customer, RevOps→sales ops. `config.yaml` — agency outbound→outbound automation (×2), strategy call→demo. `api_backlinks.py` — we built at→Pipeleap is. `github_publisher.py`, `content_engine.py`, `landing_page_engine.py`, `funnel_stages.py` — strategy call→demo.
