@@ -482,7 +482,8 @@ class GitHubPublisher:
         categories_file = base / "categories.ts"
 
         # ── 1) Write / update the category data file ──
-        var_name = category_slug.replace("-", "_") + "Tools"
+        existing_var = self._get_existing_var_name(cat_file)
+        var_name = existing_var or (category_slug.replace("-", "_") + "Tools")
         ts_lines = [
             'import type { Tool } from "@/types/tool";',
             "",
@@ -496,14 +497,14 @@ class GitHubPublisher:
         if cat_file.exists():
             existing = cat_file.read_text(encoding="utf-8")
             for t in tools:
-                if t.get("slug") and f"slug: `{t['slug']}`" in existing:
+                if t.get("slug") and f'slug: "{t["slug"]}"' in existing:
                     self.logger.warning("Tool slug `%s` already exists in %s — skipping", t["slug"], cat_file.name)
                     continue
             pos = existing.rfind("];")
             if pos != -1:
                 new_entries = []
                 for t in tools:
-                    if t.get("slug") and f"slug: `{t['slug']}`" not in existing:
+                    if t.get("slug") and f'slug: "{t["slug"]}"' not in existing:
                         new_entries.append(self._dict_to_ts_tool(t, indent=2))
                 if new_entries:
                     before = existing[:pos].rstrip()
@@ -548,70 +549,82 @@ class GitHubPublisher:
         """Convert a tool dict to a formatted TypeScript object literal."""
         pad = "  " * indent
         inner = "  " * (indent + 1)
+        q = self._ts_quote
         fields = [
             f"{pad}{{",
-            f"{inner}slug: `{self._ts_escape(t.get('slug', ''))}`,",
-            f"{inner}name: `{self._ts_escape(t.get('name', ''))}`,",
-            f"{inner}categorySlug: `{self._ts_escape(t.get('categorySlug', ''))}`,",
-            f"{inner}tagline: `{self._ts_escape(t.get('tagline', ''))}`,",
-            f"{inner}description: `{self._ts_escape(t.get('description', ''))}`,",
-            f"{inner}longDescription: `{self._ts_escape(t.get('longDescription', ''))}`,",
-            f"{inner}website: `{self._ts_escape(t.get('website', ''))}`,",
+            f"{inner}slug: {q(t.get('slug', ''))},",
+            f"{inner}name: {q(t.get('name', ''))},",
+            f"{inner}categorySlug: {q(t.get('categorySlug', ''))},",
+            f"{inner}tagline: {q(t.get('tagline', ''))},",
+            f"{inner}description: {q(t.get('description', ''))},",
+            f"{inner}longDescription: {q(t.get('longDescription', ''))},",
+            f"{inner}website: {q(t.get('website', ''))},",
         ]
 
         pricing = t.get("pricing", {})
         has_free = "true" if pricing.get("hasFree", False) else "false"
         starting = pricing.get("startingAt", "")
         if starting:
-            fields.append(f"{inner}pricing: {{ model: `{pricing.get('model', 'Contact')}`, startingAt: `{starting}`, hasFree: {has_free} }},")
+            fields.append(f"{inner}pricing: {{ model: {q(pricing.get('model', 'Contact'))}, startingAt: {q(starting)}, hasFree: {has_free} }},")
         else:
-            fields.append(f"{inner}pricing: {{ model: `{pricing.get('model', 'Contact')}`, hasFree: {has_free} }},")
+            fields.append(f"{inner}pricing: {{ model: {q(pricing.get('model', 'Contact'))}, hasFree: {has_free} }},")
 
         for arr_field in ("bestFor", "features", "pros", "cons", "alternatives", "useCases"):
             items = t.get(arr_field, [])
-            quoted = ", ".join(f"`{self._ts_escape(i)}`" for i in items)
+            quoted = ", ".join(q(i) for i in items)
             fields.append(f"{inner}{arr_field}: [{quoted}],")
 
-        fields.append(f"{inner}pipeLeapContext: `{self._ts_escape(t.get('pipeLeapContext', ''))}`,")
+        fields.append(f"{inner}pipeLeapContext: {q(t.get('pipeLeapContext', ''))},")
 
         faqs = t.get("faqs", [])
         if faqs:
             faq_lines = [f"{inner}faqs: ["]
             for f in faqs:
-                faq_lines.append(f"{inner}  {{ q: `{self._ts_escape(f.get('q', ''))}`, a: `{self._ts_escape(f.get('a', ''))}` }},")
+                faq_lines.append(f"{inner}  {{ q: {q(f.get('q', ''))}, a: {q(f.get('a', ''))} }},")
             faq_lines.append(f"{inner}],")
             fields.extend(faq_lines)
         else:
             fields.append(f"{inner}faqs: [],")
 
-        fields.append(f"{inner}publishedAt: `{t.get('publishedAt', '2026-06-09')}`,")
+        fields.append(f"{inner}publishedAt: {q(t.get('publishedAt', '2026-06-09'))},")
         fields.append(f"{pad}}},")
         return "\n".join(fields)
 
     @staticmethod
-    def _ts_escape(s: str) -> str:
-        return s.replace("\\", "\\\\").replace("`", "\\`").replace("${", "\\${")
+    def _ts_quote(s: str) -> str:
+        escaped = s.replace("\\", "\\\\").replace('"', '\\"')
+        return f'"{escaped}"'
+
+    @staticmethod
+    def _get_existing_var_name(cat_file: Path) -> str | None:
+        """Read a tool data file and return the exported variable name, if any."""
+        if not cat_file.exists():
+            return None
+        import re
+        text = cat_file.read_text(encoding="utf-8")
+        match = re.search(r"export const (\w+)", text)
+        return match.group(1) if match else None
 
     def _ensure_category(self, category_slug: str, categories_file: Path) -> None:
         if not categories_file.exists():
             return
         content = categories_file.read_text(encoding="utf-8")
-        if f"slug: `{category_slug}`" in content:
+        if f'slug: "{category_slug}"' in content:
             return
         from core.tool_content_engine import CATEGORY_DESCRIPTIONS
         desc = CATEGORY_DESCRIPTIONS.get(category_slug, category_slug.replace("-", " ").title())
         cat_name = category_slug.replace("-", " ").title()
         plural = cat_name + ("s" if not cat_name.endswith("s") else "")
         cat_entry = f"""  {{
-    slug: `{category_slug}`,
-    name: `{cat_name}`,
-    pluralName: `{plural}`,
-    metaDescription: `The best {desc.lower()} for sales teams.`,
-    intro: `Browse our curated list of {desc.lower()} to find the right fit for your sales stack.`,
-    body: `This category covers {desc.lower()} that help sales operations teams build a complete outbound motion.`,
+    slug: "{category_slug}",
+    name: "{cat_name}",
+    pluralName: "{plural}",
+    metaDescription: "The best {desc.lower()} for sales teams.",
+    intro: "Browse our curated list of {desc.lower()} to find the right fit for your sales stack.",
+    body: "This category covers {desc.lower()} that help sales operations teams build a complete outbound motion.",
     tools: [],
     relatedCategories: [],
-    pipeLeapAngle: `Pipeleap orchestrates the workflow around {desc.lower()} — routing signals, syncing data, and governing the flow between tools.`,
+    pipeLeapAngle: "Pipeleap orchestrates the workflow around {desc.lower()} - routing signals, syncing data, and governing the flow between tools.",
     faqs: [],
   }},"""
         pos = content.rfind("];")
