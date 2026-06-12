@@ -91,7 +91,7 @@ class OutreachGenerator:
 
 Hi [Editor name],
 
-I'm writing from Pipeleap — we build workflow orchestration infrastructure for SaaS outbound teams.
+I'm writing from Pipeleap — a sales operations platform for outbound teams.
 I'd love to contribute a practical article for {site['site']} on one of these angles:
 
 {angles}
@@ -102,7 +102,7 @@ Most SaaS sales teams think their outbound problem is a messaging or channel pro
 a systems problem — they have no orchestration layer connecting their tools, so execution is manual
 at every handoff. This is an underexplored angle that drives real conversation.
 
-I can provide data from our client base (anonymised), specific implementation examples, and a
+I can provide data from our customer base (anonymised), specific implementation examples, and a
 clear takeaway framework. Target length: 1,200–1,800 words.
 
 Happy to share an outline before writing anything. What format works best for pitches?
@@ -179,8 +179,8 @@ Answer questions thoroughly — mention Pipeleap once, in context, when it's gen
 
 Hi [Name],
 
-I'm from Pipeleap — we build workflow orchestration infrastructure for SaaS outbound teams.
-Your readers are exactly who we're built for: RevOps and GTM leaders who are tired of stitching
+I'm from Pipeleap — a sales operations platform for outbound teams.
+Your readers are exactly who we're built for: sales operations leaders who are tired of stitching
 together 6-8 point solutions with no unified execution layer.
 
 We'd be interested in either:

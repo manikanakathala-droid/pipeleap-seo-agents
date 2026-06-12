@@ -218,7 +218,7 @@ class LandingPageEngine:
         return [
             {"label": "Book a demo", "url": primary_url, "variant": "A"},
             {"label": "Get a free sales ops audit", "url": primary_url, "variant": "B"},
-            {"label": "Book a 30-minute strategy call", "url": primary_url, "variant": "C"},
+            {"label": "Book a demo", "url": primary_url, "variant": "C"},
         ]
 
     @staticmethod

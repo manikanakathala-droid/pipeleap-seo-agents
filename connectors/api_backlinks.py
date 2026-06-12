@@ -95,7 +95,7 @@ When all five are connected, pipeline becomes predictable. The same process runs
 
 You don't need to replace your existing tools. You need an orchestration layer *above* them that governs the full execution.
 
-This is what we built at [Pipeleap]({SITE_URL}) — a workflow orchestration system that connects your CRM, enrichment tool, and sequencer into one governed pipeline engine. The result: predictable pipeline without proportional headcount growth.
+[Pipeleap]({SITE_URL}) is a sales operations platform that connects your CRM, enrichment tool, and sequencer into one governed pipeline engine. The result: predictable pipeline without proportional headcount growth.
 
 ---
 
@@ -1381,7 +1381,7 @@ class MastodonPublisher:
     API = "https://mastodon.social/api/v1"
 
     POSTS = [
-        f"We built Pipeleap to solve the orchestration gap in SaaS outbound. Most teams have the tools — Apollo, Clay, HubSpot — but no layer governing how they work together.\n\nResult: predictable, automated pipeline.\n\n🔗 {SITE_URL}/how-it-works\n\n#SaaS #OutboundSales #SalesAutomation #RevOps",
+        f"Pipeleap is a sales operations platform that solves the orchestration gap in outbound sales. Most teams have the tools — Apollo, Clay, HubSpot — but no layer governing how they work together.\n\nResult: predictable, automated pipeline.\n\n🔗 {SITE_URL}/how-it-works\n\n#OutboundSales #SalesAutomation",
         f"Signal-based outbound is replacing cold lists. Instead of buying contacts and hoping for relevance, you monitor buying signals and reach out only when a prospect is already in-market.\n\n11× higher reply rates. Real pipeline.\n\n🔗 {SITE_URL}/blog/signal-based-outbound-sales\n\n#B2BSales #SDR #OutboundSales #GTM",
         f"The GTM teams winning in 2026 have one thing in common: they automated the gap between signal and sequence.\n\nCapture intent → enrich automatically → enroll → route replies → CRM write-back. No humans in the loop.\n\n🔗 {SITE_URL}\n\n#SalesAutomation #SaaS #RevOps #PipelineGeneration",
     ]

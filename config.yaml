@@ -392,7 +392,7 @@
       ],
       "industry guides": [
         "saas sales",
-        "agency outbound",
+        "outbound automation",
         "b2b sales for ecommerce",
         "enterprise sales"
       ],
@@ -498,7 +498,7 @@
       ],
       "industry guides": [
         "b2b saas sales playbook",
-        "agency outbound automation guide",
+        "outbound automation guide",
         "enterprise sales workflow orchestration"
       ],
       "crm deep dives": [
@@ -676,8 +676,8 @@
         "avoid": ["See how it works", "Sign up now"]
       },
       "BOFU": {
-        "primary": "Get a free GTM audit",
-        "secondary": "Book a 30-minute strategy call",
+        "primary": "Book a demo",
+        "secondary": "Book a pipeline consultation",
         "avoid": []
       },
       "SQL": {

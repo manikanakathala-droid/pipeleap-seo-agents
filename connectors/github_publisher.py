@@ -454,7 +454,7 @@ class GitHubPublisher:
 
         if sections and sections[-1].get("type") != "cta":
             last_text = sections[-1].get("text", "")
-            if any(kw in last_text.lower() for kw in ("audit", "strategy call", "book", "get in touch", "talk to us", "schedule")):
+            if any(kw in last_text.lower() for kw in ("audit", "demo", "book", "get in touch", "talk to us", "schedule")):
                 sections[-1] = {"text": last_text, "type": "cta"}
             else:
                 sections.append({"text": "Ready to see what this looks like in your stack?", "type": "cta"})

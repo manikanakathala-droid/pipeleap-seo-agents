@@ -25,9 +25,9 @@ META_TARGETS: list[dict] = [
     },
     {
         "path": "/about",
-        "title": "About Pipeleap - Revenue Operations Built & Operated For You",
+        "title": "About Pipeleap - Sales Operations Platform",
         "meta_description": (
-            "We deploy your revenue system and run it as a managed service. "
+            "Pipeleap is a sales operations platform that orchestrates CRM, enrichment, and execution. "
             "No tool sprawl, no setup Saturdays. One working engine that gets smarter over time."
         ),
     },
@@ -51,8 +51,8 @@ META_TARGETS: list[dict] = [
         "path": "/pricing",
         "title": "Revenue Operations Pricing | Pipeleap",
         "meta_description": (
-            "Pipeleap pricing for managed revenue operations and GTM implementation. "
-            "Built and operated for B2B teams - no seat licences, no duct tape."
+            "Pipeleap pricing for sales operations platform. "
+            "No seat licences, no duct tape."
         ),
     },
 ]
@@ -72,9 +72,9 @@ FAQ_RICH_RESULT_TOPICS: list[str] = [
     "What is a GTM audit and why does it matter?",
     "What is ICP scoring in sales?",
     "How does AI personalisation improve reply rates in cold outreach?",
-    "What is the difference between a sales engagement platform and a managed revenue service?",
+    "What is the difference between a sales engagement platform and a sales operations platform?",
     "How many touches does it take to book a B2B sales meeting?",
-    "What does a GTM implementation partner do?",
+    "What does a sales operations platform do?",
     "Can sales workflows be fully automated?",
     "How do I fix an unpredictable sales pipeline?",
 ]
@@ -106,12 +106,9 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
         "estimated_difficulty": 46.0,
         "speed_to_rank_score": 0.55,
         "keywords": [
-            "revenue operations platform",
+            "sales operations platform",
             "best AI sales tools 2026",
             "sales workflow automation software",
-            "managed revenue operations service",
-            "gtm implementation partner B2B",
-            "done for you revenue operations",
         ],
     },
     {
@@ -147,7 +144,7 @@ SERP_KEYWORD_CLUSTERS: list[dict] = [
             "lead enrichment",
             "crm automation",
             "sales workflow",
-            "revenue operations",
+            "sales operations",
         ],
     },
     {
@@ -413,9 +410,9 @@ LINKEDIN_CADENCE: dict = {
             "day": "Monday",
             "format": "insight",
             "prompt_template": (
-                "Share one non-obvious observation about revenue operations or GTM. "
+                "Share one non-obvious observation about sales operations. "
                 "Open with a counter-intuitive statement. "
-                "End: We run this entire system for B2B teams at Pipeleap. Link in bio."
+                "End: Pipeleap runs the entire system for sales teams. Link in bio."
             ),
         },
         {
@@ -424,7 +421,7 @@ LINKEDIN_CADENCE: dict = {
             "prompt_template": (
                 "Share an exact playbook or internal sequence Pipeleap uses. "
                 "Be specific: step numbers, tool names, outcomes. "
-                "CTA: We deploy this for clients in 2 to 4 weeks. DM me if you want to see it."
+                "CTA: Deploys in 2 to 4 weeks. DM me if you want to see it."
             ),
         },
     ],
@@ -497,16 +494,10 @@ GSC_CTR_RULES: list[dict] = [
 BRAND_MONITORING_QUERIES: list[str] = [
     "Pipeleap",
     "pipeleap.com",
-    "revenue operations Pipeleap",
-    "GTM implementation partner B2B",
-    "managed revenue operations",
 ]
 
 BACKLINK_ANCHOR_VARIANTS: list[str] = [
-    "revenue operations",
-    "GTM implementation partner",
-    "managed revenue operations",
+    "sales operations platform",
     "Pipeleap",
-    "revenue operations system",
-    "revenue orchestration platform",
+    "sales orchestration platform",
 ]

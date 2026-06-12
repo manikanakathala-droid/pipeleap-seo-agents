@@ -74,7 +74,7 @@ PATCHES = [
     {
         "path": "src/pages/Pricing.tsx",
         "message": "seo: add PriceSpecification schema to /pricing",
-        "find": "import Navbar from \"@/components/layout/Navbar\";\nimport Footer from \"@/components/layout/Footer\";\nimport SEO from \"@/components/SEO\";\nimport PricingTiers from \"@/components/pricing/PricingTiers\";\n\nconst Pricing = () => {\n  return (\n    <div className=\"min-h-screen\">\n      <SEO\n        title=\"Sales Automation Pricing | Pipeleap\"\n        description=\"Pipeleap pricing for outbound sales automation. Done-for-you outbound engine - lead intelligence, sequences, and pipeline generation for B2B revenue teams.\"\n        path=\"/pricing\"\n      />",
+        "find": "import Navbar from \"@/components/layout/Navbar\";\nimport Footer from \"@/components/layout/Footer\";\nimport SEO from \"@/components/SEO\";\nimport PricingTiers from \"@/components/pricing/PricingTiers\";\n\nconst Pricing = () => {\n  return (\n    <div className=\"min-h-screen\">\n      <SEO\n        title=\"Sales Automation Pricing | Pipeleap\"\n        description=\"Pipeleap pricing for outbound sales automation platform - lead intelligence, sequences, and pipeline generation.\"\n        path=\"/pricing\"\n      />",
         "replace": '''import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SEO from "@/components/SEO";
@@ -85,7 +85,7 @@ const pricingJsonLd = {
   "@type": "WebPage",
   "url": "https://www.pipeleap.com/pricing",
   "name": "Sales Automation Pricing | Pipeleap",
-  "description": "Pipeleap pricing: Starter from $2,500, Growth from $5,000, Advanced from $10,000. Outbound automation systems built and managed for B2B SaaS teams.",
+  "description": "Pipeleap pricing: Starter from $2,500, Growth from $5,000, Advanced from $10,000. Outbound automation platform subscription.",
   "mainEntity": [
     { "@type": "Offer", "name": "Starter", "price": "2500", "priceCurrency": "USD", "description": "Outbound automation for early-stage SaaS teams" },
     { "@type": "Offer", "name": "Growth", "price": "5000", "priceCurrency": "USD", "description": "Full outbound workflow system for scaling SaaS teams" },
@@ -98,7 +98,7 @@ const Pricing = () => {
     <div className="min-h-screen">
       <SEO
         title="Sales Automation Pricing | Pipeleap"
-        description="Pipeleap pricing for outbound sales automation. Done-for-you outbound engine - lead intelligence, sequences, and pipeline generation for B2B revenue teams."
+        description="Pipeleap pricing for outbound sales automation platform - lead intelligence, sequences, and pipeline generation."
         path="/pricing"
         jsonLd={pricingJsonLd}
       />''',
@@ -110,25 +110,25 @@ const Pricing = () => {
         "message": "seo: add Person + Organization schema to /about",
         "find": '''      <SEO
         title="About Pipeleap - Sales Orchestration That Learns"
-        description="Pipeleap deploys your entire outbound system: eleven connected modules, built and operated for you. One working outbound engine."
+        description="About Pipeleap - the sales operations platform that connects CRM, enrichment, and sequencing into one governed engine."
         path="/about"
       />''',
         "replace": '''      <SEO
         title="About Pipeleap - Sales Orchestration That Learns"
-        description="Pipeleap deploys your entire outbound system: eleven connected modules, built and operated for you. One working outbound engine."
+        description="About Pipeleap - the sales operations platform that connects CRM, enrichment, and sequencing into one governed engine."
         path="/about"
         jsonLd={[
           {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "url": "https://www.pipeleap.com/about",
-            "name": "About Pipeleap - GTM Implementation Partner"
+            "name": "About Pipeleap - Sales Operations Platform"
           },
           {
             "@context": "https://schema.org",
             "@type": "Person",
-            "name": "Rajiv Maanik",
-            "jobTitle": "GTM Partner",
+            "name": "Rajeev Manik",
+            "jobTitle": "Founder",
             "worksFor": { "@type": "Organization", "name": "Pipeleap", "url": "https://www.pipeleap.com" },
             "url": "https://www.pipeleap.com/about",
             "sameAs": ["https://www.linkedin.com/company/pipeleap-com"]
@@ -139,7 +139,7 @@ const Pricing = () => {
             "name": "Pipeleap",
             "url": "https://www.pipeleap.com",
             "foundingDate": "2024",
-            "description": "GTM implementation partner that designs and automates outbound sales workflows for B2B SaaS teams.",
+            "description": "Sales operations platform that orchestrates CRM, enrichment, and execution into one governed system.",
             "contactPoint": { "@type": "ContactPoint", "contactType": "sales", "email": "info@pipeleap.com" }
           }
         ]}
@@ -151,20 +151,20 @@ const Pricing = () => {
         "path": "src/pages/Contact.tsx",
         "message": "seo: add ContactPage schema to /contact",
         "find": '''      <SEO
-        title="Contact Pipeleap - Book a Strategy Call"
-        description="Book a strategy call with Pipeleap. Discuss how outbound sales automation and GTM implementation can accelerate your pipeline and revenue growth."
+        title="Contact Pipeleap - Book a Demo"
+        description="Book a demo of Pipeleap - the sales operations platform that connects CRM, enrichment, and sequencing into one governed engine."
         path="/contact"
       />''',
         "replace": '''      <SEO
-        title="Contact Pipeleap - Book a Strategy Call"
-        description="Book a strategy call with Pipeleap. Discuss how outbound sales automation and GTM implementation can accelerate your pipeline and revenue growth."
+        title="Contact Pipeleap - Book a Demo"
+        description="Book a demo of Pipeleap - the sales operations platform that connects CRM, enrichment, and sequencing into one governed engine."
         path="/contact"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "ContactPage",
           "url": "https://www.pipeleap.com/contact",
           "name": "Contact Pipeleap",
-          "description": "Contact Pipeleap to book a strategy call or discuss your outbound automation setup.",
+          "description": "Contact Pipeleap to book a demo of the sales operations platform.",
           "mainEntity": {
             "@type": "Organization",
             "name": "Pipeleap",

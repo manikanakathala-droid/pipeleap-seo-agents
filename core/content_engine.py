@@ -509,7 +509,7 @@ class ContentEngine:
             "BOFU": [
                 {"label": "Book a demo", "url": primary_url, "variant": "A"},
                 {"label": "Get a free sales ops audit", "url": primary_url, "variant": "B"},
-                {"label": "Book a 30-minute strategy call", "url": primary_url, "variant": "C"},
+                {"label": "Book a demo", "url": primary_url, "variant": "C"},
             ],
         }
         return variants_by_funnel.get(funnel_stage, variants_by_funnel["MOFU"])

@@ -141,7 +141,7 @@ class OffPageEngine:
             notes = (
                 "Submit listing in category: " + d["category"] + ". "
                 "Use consistent NAP: Pipeleap, https://pipeleap.com, contact@pipeleap.com. "
-                "Description: Pipeleap builds and operates end-to-end outbound sales systems for B2B teams."
+                "Description: Pipeleap is a sales operations platform that orchestrates outbound sales workflows."
             )
             queue.append(DirectorySubmission(
                 name=d["name"],
@@ -215,7 +215,7 @@ class OffPageEngine:
                     f"The insight nobody says out loud: the more tools you add, the worse the handoff tax gets.\n\n"
                     f"The fix is not another tool. It is one system that owns the entire chain."
                 )
-                cta = "We run this entire system for B2B sales teams at Pipeleap. Link in bio."
+                cta = "Pipeleap runs the entire system for sales teams. Link in bio."
             else:
                 hook = f"Here is the exact sequence we use to go from cold list to CRM opportunity in 72 hours."
                 body = (
@@ -225,9 +225,9 @@ class OffPageEngine:
                     f"Step 4: Route to personalised outreach sequence\n"
                     f"Step 5: Handle reply, book meeting, write back to CRM\n\n"
                     f"The whole thing runs without a rep touching it until the meeting is booked.\n\n"
-                    f"We built this for {primary_kw} — and we operate it for clients end-to-end."
+                    f"Pipeleap is built for {primary_kw}."
                 )
-                cta = "We deploy this for clients in 2 to 4 weeks. DM me if you want to see it."
+                cta = "Deploys in 2 to 4 weeks. DM me if you want to see it."
 
             briefs.append(LinkedInBrief(
                 week_number=week_number,
