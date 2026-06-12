@@ -68,12 +68,12 @@
 |---|---|
 | Company Name | Pipeleap |
 | URL | `https://www.pipeleap.com` |
-| Description | B2B outbound sales orchestration platform. Operates as a managed service — deployment partner builds the system in 2-4 weeks, runs it as a monthly retainer. |
-| Industry | Sales Automation / Revenue Operations |
+| Description | Sales operations platform that eliminates non-selling work - enrichment, CRM sync, routing, and execution in one governed system. |
+| Industry | Sales Operations |
 | Founded | 2024 |
 | Location | United States |
-| Business Model | SwaS (Software With A Service) |
-| Founders | Rajiv Maanik |
+| Business Model | SaaS |
+| Founders | Rajeev Manik |
 
 ---
 
