@@ -421,7 +421,17 @@ class SEOOSAgent:
         except Exception as exc:
             self.logger.warning("Backlink execution skipped: %s", exc)
 
-        # ── Step 4g: Outreach Brief Generation ──────────────────────────────
+        # ── Step 4g: Package Publishing (npm / PyPI / crates.io) ────────────
+        try:
+            from scripts import publish_packages
+            pp_results = publish_packages.main_in_process(str(output_dir / "backlinks"))
+            self.logger.info("PackagePublisher: %d/%d generated, %d/%d published",
+                pp_results.get("generated", 0), 3,
+                pp_results.get("published", 0), 3)
+        except Exception as exc:
+            self.logger.warning("Package publishing skipped: %s", exc)
+
+        # ── Step 4h: Outreach Brief Generation ──────────────────────────────
         try:
             from core.outreach_engine import OutreachEngine
             oe = OutreachEngine(self.config, output_dir=str(output_dir / "outreach"))
