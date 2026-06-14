@@ -2495,5 +2495,50 @@
     ],
     "safe_to_apply": true,
     "requires_dev_review": false
+  },
+  {
+    "run_id": "20260614T132423Z",
+    "generated_at": "2026-06-14T13:25:02.609108+00:00",
+    "url": "https://www.pipeleap.com/sales-ops-audit",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Free Sales Ops Audit | Pipeleap",
+    "meta_description": "Get a full audit of your sales operations - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+    "recommended_changes": [
+      "Title: update to 'Free Sales Ops Audit | Pipeleap'",
+      "Meta: update to 'Get a full audit of your sales operations - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260614T132423Z",
+    "generated_at": "2026-06-14T13:25:02.609108+00:00",
+    "url": "https://www.pipeleap.com/",
+    "current_title": "Pipeleap - Sales Operations Platform",
+    "current_meta": "Pipeleap helps sales teams reclaim selling time by automating sales operations and eliminating manual work. Our sales productivity software removes CRM admin...",
+    "title": "Revenue Operations & Pipeline Automation | Pipeleap",
+    "meta_description": "Pipeleap builds and runs your entire revenue engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+    "recommended_changes": [
+      "Title: update to 'Revenue Operations & Pipeline Automation | Pipeleap'",
+      "Meta: update to 'Pipeleap builds and runs your entire revenue engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
+  },
+  {
+    "run_id": "20260614T132423Z",
+    "generated_at": "2026-06-14T13:25:02.609108+00:00",
+    "url": "https://www.pipeleap.com/pricing",
+    "current_title": "",
+    "current_meta": "",
+    "title": "Revenue Operations Pricing | Pipeleap",
+    "meta_description": "Pipeleap pricing for sales operations platform. No seat licences, no duct tape.",
+    "recommended_changes": [
+      "Title: update to 'Revenue Operations Pricing | Pipeleap'",
+      "Meta: update to 'Pipeleap pricing for sales operations platform. No seat licences, no duct tape.'"
+    ],
+    "safe_to_apply": true,
+    "requires_dev_review": false
   }
 ]
