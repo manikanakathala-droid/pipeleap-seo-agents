@@ -335,3 +335,18 @@ When enabled, template-built content passes through `core/humanize.py` transform
 - `connectors/indexing_accelerator.py` — dead code removal
 - `core/audit_engine.py` — non-www sitemap URLs
 - `core/adaptive_action_engine.py` — non-www sitemap URL
+
+### 22. Indexing signals silently failing — GSC credentials + Bing API key config path (June 16)
+**Problem:** GSC sitemap submission and Bing Webmaster API were silently failing despite APIs being enabled and API keys set.
+
+**Root causes & fixes:**
+
+| # | Fix | Root Cause | Files Changed |
+|---|---|---|---|
+| 1 | Surface real Google Indexing API error body | `HttpError` handler stripped error to just `HTTP 403` — lost the actual reason | `connectors/gsc_connector.py:288-292` |
+| 2 | `daily_seo_os_run.yml`, `daily_serp_run.yml` use `GSC_SERVICE_ACCOUNT_JSON` secret | Referenced non-existent `GSC_CREDENTIALS` → empty credentials file → all GSC ops failed | `.github/workflows/daily_seo_os_run.yml`, `.github/workflows/daily_serp_run.yml` |
+| 3 | Bing API key fallback reads from `growth_engine.bing_api_key` | Config fallback path pointed to `integrations.bing_api_key` (wrong section) | `connectors/post_publish_hook.py:107` |
+
+**Bing API test:** `https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed` returns HTTP 200 with valid key `f2ce40b491c44f1282976da068df483c` — endpoint is functional.
+
+**Commits:** `fe19a03` (Indexing API error fix), `ecc9726` (workflow secret fix), `bfe4578` (Bing config path fix)
