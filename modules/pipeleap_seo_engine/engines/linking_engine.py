@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from modules.pipeleap_seo_engine.models import GrowthPage
 
-AUDIT_URL = "https://pipeleap.com/sales-ops-audit"
+AUDIT_URL = "https://www.pipeleap.com/sales-ops-audit"
 
 
 class GrowthLinkingEngine:
@@ -122,7 +122,7 @@ class GrowthLinkingEngine:
             if matching_uc:
                 link_map[int_page.slug].append({
                     "anchor": f"Pipeleap for {int_page.integration_partner}",
-                    "url": f"/blog/{matching_comp.slug}",
+                    "url": f"/blog/{matching_uc.slug}",
                 })
 
         # All BOFU/SQL pages get a direct sales ops audit link

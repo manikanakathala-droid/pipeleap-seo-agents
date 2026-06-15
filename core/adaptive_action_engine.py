@@ -371,7 +371,7 @@ class AdaptiveActionEngine:
                 action_id="GM-001",
                 category="content",
                 priority=1,
-                page_url="https://pipeleap.com/blog",
+                page_url="https://www.pipeleap.com/blog",
                 title="Publish next content plan brief",
                 description=(
                     "No site changes detected. Growth mode: publish next queued blog post "
@@ -399,7 +399,7 @@ class AdaptiveActionEngine:
                 action_id="GM-003",
                 category="metadata",
                 priority=2,
-                page_url="https://pipeleap.com/pricing",
+                page_url="https://www.pipeleap.com/pricing",
                 title="Improve low-CTR pages from GSC",
                 description=(
                     "Growth mode: pull pages with >100 impressions and <3% CTR from GSC. "
@@ -425,7 +425,7 @@ class AdaptiveActionEngine:
                 action_id="GM-005",
                 category="content",
                 priority=3,
-                page_url="https://pipeleap.com/glossary",
+                page_url="https://www.pipeleap.com/glossary",
                 title="Add new glossary term from keyword gaps",
                 description=(
                     "Growth mode: pick the top-traffic, low-difficulty keyword from "

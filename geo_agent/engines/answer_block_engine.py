@@ -124,7 +124,7 @@ class AnswerBlockEngine:
 
         score = self.score(answer, query)
         slug = re.sub(r"[^a-z0-9]+", "-", query.lower()).strip("-")[:60]
-        page_url = f"https://pipeleap.com/blog/{slug}"
+        page_url = f"https://www.pipeleap.com/blog/{slug}"
 
         return {
             "query": query,

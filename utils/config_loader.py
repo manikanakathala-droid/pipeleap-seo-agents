@@ -19,13 +19,13 @@ class ConfigError(RuntimeError):
 DEFAULT_CONFIG: dict[str, Any] = {
     "site": {
         "brand": "Pipeleap",
-        "site_url": "https://pipeleap.com",
+        "site_url": "https://www.pipeleap.com",
         "domain": "pipeleap.com",
         "cta": {
             "primary_label": "Book a demo",
             "secondary_label": "See how it works",
-            "primary_url": "https://pipeleap.com/",
-            "secondary_url": "https://pipeleap.com/",
+            "primary_url": "https://www.pipeleap.com/",
+            "secondary_url": "https://www.pipeleap.com/",
         },
         "target_personas": [
             "Founders",

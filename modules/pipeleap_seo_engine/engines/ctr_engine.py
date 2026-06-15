@@ -187,7 +187,7 @@ class CTREngine:
                 f"**{q}**",
                 "",
                 f"See the full answer in our [{topic.replace('_', ' ')} guide]"
-                f"(https://pipeleap.com/blog/{topic.replace('_', '-')}).",
+                f"(https://www.pipeleap.com/blog/{topic.replace('_', '-')}).",
                 "",
             ]
         return "\n".join(lines)

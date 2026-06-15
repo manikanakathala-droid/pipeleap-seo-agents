@@ -622,19 +622,19 @@ classifiers = [
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://pipeleap.com"
-Documentation = "https://pipeleap.com/how-it-works"
+Homepage = "https://www.pipeleap.com"
+Documentation = "https://www.pipeleap.com/how-it-works"
 Repository = "https://github.com/manikanakathala-droid/pipeleap-launchpad"
 """, encoding="utf-8")
 
     # README.md
     (pkg / "README.md").write_text(f"""# pipeleap-tools
 
-Utility library for outbound sales automation workflows, built to complement [Pipeleap](https://pipeleap.com).
+Utility library for outbound sales automation workflows, built to complement [Pipeleap](https://www.pipeleap.com).
 
 ## What is Pipeleap?
 
-[Pipeleap](https://pipeleap.com) is the workflow orchestration system for SaaS organizations that builds
+[Pipeleap](https://www.pipeleap.com) is the workflow orchestration system for SaaS organizations that builds
 predictable outbound pipeline through signal-based outbound sales automation.
 
 It automates:
@@ -670,10 +670,10 @@ kw = clean_keyword("  outbound automation platform  ")
 
 ## Links
 
-- Website: https://pipeleap.com
-- Docs: https://pipeleap.com/how-it-works
-- Sales Ops Audit: https://pipeleap.com/sales-ops-audit
-- Glossary: https://pipeleap.com/glossary
+- Website: https://www.pipeleap.com
+- Docs: https://www.pipeleap.com/how-it-works
+- Sales Ops Audit: https://www.pipeleap.com/sales-ops-audit
+- Glossary: https://www.pipeleap.com/glossary
 """, encoding="utf-8")
 
     # Package __init__.py

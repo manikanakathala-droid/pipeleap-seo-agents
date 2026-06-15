@@ -438,7 +438,7 @@ class GrowthContentEngine:
 
         for q in questions:
             answer = answers.get(q, (
-                f"See Pipeleap's full guide on [workflow orchestration](https://pipeleap.com/blog) "
+                f"See Pipeleap's full guide on [workflow orchestration](https://www.pipeleap.com/blog) "
                 f"for a detailed answer to this question with workflow examples."
             ))
             lines += [f"### {q}", "", answer, ""]
