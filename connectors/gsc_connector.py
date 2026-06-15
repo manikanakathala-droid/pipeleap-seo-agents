@@ -287,8 +287,16 @@ class GoogleSearchConsoleConnector:
                         results.append({"url": url, "ok": False, "error": "empty API response after retries"})
                 except HttpError as exc:
                     status = getattr(exc, "status_code", "?")
-                    self.logger.warning("Indexing API HTTP %s for %s", status, url)
-                    results.append({"url": url, "ok": False, "error": f"HTTP {status}"})
+                    reason = ""
+                    try:
+                        reason = exc._get_reason()
+                    except Exception:
+                        pass
+                    detail = f"HTTP {status}"
+                    if reason:
+                        detail += f" — {reason}"
+                    self.logger.warning("Indexing API HTTP %s for %s: %s", status, url, reason)
+                    results.append({"url": url, "ok": False, "error": detail})
                     break
                 except Exception as exc:
                     self.logger.warning("Indexing API failed for %s: %s", url, exc)
