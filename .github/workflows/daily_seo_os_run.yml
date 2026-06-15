@@ -52,11 +52,11 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Write GSC credentials
-        env:
-          GSC_CREDENTIALS: ${{ secrets.GSC_CREDENTIALS }}
         run: |
           mkdir -p credentials
-          echo "$GSC_CREDENTIALS" > credentials/gsc_service_account.json
+          cat > credentials/gsc_service_account.json <<'EOF'
+          ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          EOF
 
       - name: Restore SEO OS state cache
         uses: actions/cache@v5
