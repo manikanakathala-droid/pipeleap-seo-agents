@@ -1099,6 +1099,7 @@ cleanKeyword("  outbound automation  ")
 - How it works: https://www.pipeleap.com/how-it-works
 - Sales Ops Audit: https://www.pipeleap.com/sales-ops-audit
 - Blog: https://www.pipeleap.com/blog
+- Blog: https://www.pipeleap.com/blog
 """, encoding="utf-8")
 
         print(f"  npm package created at: {pkg}")

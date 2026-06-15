@@ -277,73 +277,20 @@ class BlogContentEngine:
 
     # ── NEPQ opening ─────────────────────────────────────────────────────────
 
-    _EVENT_TRIGGERS: dict[str, str] = {
-        "sales kickoff": "SKO",
-        "sales kick-off": "SKO",
-        "sko": "SKO",
-        "qbr": "QBR",
-        "quarterly business review": "QBR",
-        "pipeline review": "pipeline_review",
-        "revenue planning": "revenue_planning",
-        "sales cadence": "sales_cadence",
-        "mid year": "mid_year",
-        "mid-year": "mid_year",
-        "productivity initiative": "productivity_initiative",
-    }
-
-    def _detect_event_trigger(self, keyword: str) -> str | None:
-        kw_lower = keyword.lower()
-        for trigger, event in self._EVENT_TRIGGERS.items():
-            if trigger in kw_lower:
-                return event
-        return None
-
-    @staticmethod
-    def _variant_index(keyword: str, num: int) -> int:
-        return _zlib.crc32(keyword.encode()) % num
-
-    def _commercial_h2(self, keyword: str) -> str:
-        v = self._variant_index(keyword, 3)
-        variants = [
-            f"## What CROs and VP Sales Operations actually look for when evaluating {keyword}",
-            f"## What sales ops leaders actually look for when evaluating {keyword}",
-            f"## What sales leaders actually look for when evaluating {keyword}",
-        ]
-        return variants[v]
-
     def _nepq_opening(self, keyword: str, intent: str, strategy: dict[str, Any]) -> str:
         depth = strategy.get("depth_mode", "comprehensive")
         trending = depth == "trending"
 
         if intent == "commercial" or "alternative" in keyword or "vs " in keyword:
-            v = self._variant_index(keyword, 4)
-            variants = [
-                (
-                    f"A CRO evaluating {keyword} is not comparing feature lists. "
-                    f"The real question is whether the system will improve pipeline coverage "
-                    f"and forecast accuracy, or add another integration surface to manage."
-                ),
-                (
-                    f"VP of Sales Operations reviewing {keyword} already has a stack. "
-                    f"The question is whether a new system closes the coordination gap "
-                    f"between enrichment, CRM, and workflow tools, or widens it."
-                ),
-                (
-                    f"RevOps leaders evaluating {keyword} are not looking for another tool. "
-                    f"They need to know whether this system reduces the integration tax "
-                    f"between data enrichment and downstream execution."
-                ),
-                (
-                    f"GTM leaders assessing {keyword} are asking one question: "
-                    f"will this consolidate the tech stack or add another silo "
-                    f"that requires manual reconciliation every quarter?"
-                ),
-            ]
-            pain = variants[v]
+            pain = (
+                f"Most VP Sales Ops evaluating {keyword} are not starting from scratch. "
+                f"They already have a stack. The question they are actually asking is whether "
+                f"the new tool will solve the coordination problem the current stack created."
+            )
             cost = (
                 f"The cost of getting this wrong is not a failed tool purchase. "
-                f"It is degraded pipeline coverage, forecast drift, and "
-                f"an integration surface that grows faster than the team can govern."
+                f"It is six months of RevOps time rebuilding integrations, dirty CRM records "
+                f"that corrupt forecast accuracy, and a pipeline number that never closes the gap."
             )
             gap = (
                 f"Most evaluations skip the architecture question entirely. "
@@ -351,33 +298,15 @@ class BlogContentEngine:
                 f"and can that person update it without an engineering ticket?"
             )
         elif keyword.lower().startswith("how to") or keyword.lower().startswith("how "):
-            v = self._variant_index(keyword, 4)
-            variants = [
-                (
-                    f"A Head of Sales searching for {keyword} is not looking for a playbook. "
-                    f"They need a repeatable system that protects pipeline velocity "
-                    f"as the team scales beyond the founder-led sales phase."
-                ),
-                (
-                    f"VP of Sales Strategy researching {keyword} has usually tested the obvious path. "
-                    f"The tool does part of the job. The part it leaves out, multi-layer governance, "
-                    f"CRM write-back, reply routing, is where pipeline leaks."
-                ),
-                (
-                    f"A Director of Sales looking into {keyword} needs to remove manual bottlenecks "
-                    f"without adding headcount. The solution must work for the existing team size."
-                ),
-                (
-                    f"A CRO investigating {keyword} is designing infrastructure "
-                    f"that protects revenue as headcount grows. "
-                    f"Every manual handoff in the current workflow caps scale."
-                ),
-            ]
-            pain = variants[v]
+            pain = (
+                f"The VP of Sales Ops who searches for {keyword} has usually already tried the obvious path. "
+                f"They have a tool. The tool does part of the job. "
+                f"The part it does not do is costing them pipeline."
+            )
             cost = (
                 f"At 10 manual steps per contact, a 500-contact list means 5,000 hand-offs "
                 f"that can break before a single sequence fires. "
-                f"Each break compounds, bad data in CRM, duplicate outreach, replies that go to the wrong rep."
+                f"Each break compounds — bad data in CRM, duplicate outreach, replies that go to the wrong rep."
             )
             gap = (
                 f"The teams that solved {keyword} did not find a better tool. "
@@ -385,75 +314,41 @@ class BlogContentEngine:
                 f"The specific platform matters less than whether all components are governed in one execution layer."
             )
         elif any(t in keyword.lower() for t in ("why ", "problem", "fix", "failing", "broken")):
-            v = self._variant_index(keyword, 3)
-            variants = [
-                (
-                    f"When a VP of Sales Ops hears {keyword} is not working, the root cause "
-                    f"is rarely the tool. It is data architecture, enrichment disconnected from CRM, "
-                    f"CRM disconnected from data enrichment, with no single owner of the full workflow."
-                ),
-                (
-                    f"A CRO told that {keyword} is broken knows the tool is not the problem. "
-                    f"The issue is that no single executive owns the end-to-end flow. "
-                    f"Fragmented ownership guarantees fragmented data."
-                ),
-                (
-                    f"RevOps leaders diagnosing why {keyword} keeps failing "
-                    f"find the same three failure patterns every time: "
-                    f"unchecked intake, disconnected CRM logic, and no feedback loop."
-                ),
-            ]
-            pain = variants[v]
+            pain = (
+                f"When a CRO asks why {keyword} is not working, the answer is almost never the tool. "
+                f"It is the architecture underneath it — and the fact that no single person owns "
+                f"the end-to-end flow."
+            )
             cost = (
                 f"A broken {keyword} system does not announce itself. "
-                f"It shows up as forecast misses, declining reply rates, "
-                f"and revenue teams spending cycles on data quality instead of pipeline."
+                f"It shows up as forecast misses, declining reply rates, and RevOps spending "
+                f"a quarter investigating data quality instead of building pipeline."
             )
             gap = (
                 f"The standard fix is to add another point solution. "
                 f"That extends the integration surface, adds another failure point, "
-                f"and leaves the root problem, no governed execution layer, untouched."
+                f"and leaves the root problem — no governed execution layer — untouched."
             )
         else:
-            v = self._variant_index(keyword, 3)
-            variants = [
-                (
-                    f"CROs and VP Sales Strategy researching {keyword} "
-                    f"are not looking for a definition. "
-                    f"They are evaluating whether this architecture decision "
-                    f"will improve pipeline trajectory over the next two quarters."
-                ),
-                (
-                    f"RevOps leaders researching {keyword} need a governed execution layer "
-                    f"that turns pipeline risk into predictable revenue, "
-                    f"without adding headcount or engineering dependencies."
-                ),
-                (
-                    f"GTM leaders exploring {keyword} are looking for a unified workflow "
-                    f"that connects signal capture, data enrichment, and CRM sync — governing the entire flow "
-                    f"into one accountable system, not a collection of loosely integrated tools."
-                ),
-            ]
-            pain = variants[v]
+            pain = (
+                f"Revenue leaders researching {keyword} are not looking for a definition. "
+                f"They are looking for a system that actually runs in production — "
+                f"one their RevOps team can own without filing engineering tickets every time a workflow breaks."
+            )
             cost = (
                 f"Without a governed approach to {keyword}, the operational ceiling hits fast. "
                 f"Manual steps accumulate, data quality degrades, and the pipeline number "
-                f"becomes a function of how many hours revenue teams can put in, not how good the strategy is."
+                f"becomes a function of how many hours RevOps can put in, not how good the strategy is."
             )
             gap = (
-                f"Most {keyword} implementations fail at the handoff layer, "
+                f"Most {keyword} implementations fail at the handoff layer — "
                 f"between enrichment and CRM, between CRM and sequencer, between sequence and reply routing. "
                 f"Each handoff is owned by a different tool, a different team, and a different failure mode."
             )
 
-        core_message = (
-            "Sales teams do not miss targets because they lack effort. They miss targets "
-            "because too much time is spent on non-selling activities."
-        )
-
         if trending:
-            return _strip_formatting(f"{pain}\n\n{cost}\n\n{core_message}")
-        return _strip_formatting(f"{pain}\n\n{cost}\n\n{gap}\n\n{core_message}")
+            return _strip_formatting(f"{pain}\n\n{cost}")
+        return _strip_formatting(f"{pain}\n\n{cost}\n\n{gap}")
 
     # ── Blog body renderers ───────────────────────────────────────────────────
 
@@ -467,9 +362,6 @@ class BlogContentEngine:
         intent = cluster.intent
         kw_lower = keyword.lower()
 
-        event = self._detect_event_trigger(keyword)
-        if event:
-            return self._blog_event_trigger(keyword, kw_title, cluster, strategy, event)
         if intent == "commercial" or any(t in kw_lower for t in ("alternative", "vs ", "comparison", "best ")):
             return self._blog_commercial(keyword, kw_title, cluster, strategy)
         if kw_lower.startswith("how to") or kw_lower.startswith("how "):
@@ -477,95 +369,6 @@ class BlogContentEngine:
         if any(t in kw_lower for t in ("why ", "problem", "fix", "failing", "broken")):
             return self._blog_problem_diagnosis(keyword, kw_title, cluster, strategy)
         return self._blog_informational(keyword, kw_title, cluster, strategy)
-
-    def _blog_event_trigger(
-        self,
-        keyword: str,
-        kw_title: str,
-        cluster: KeywordCluster,
-        strategy: dict[str, Any],
-        event: str,
-    ) -> str:
-        brand = self.brand
-        snippet = self._snippet_block(keyword, "informational") if strategy["target_featured_snippet"] else ""
-
-        event_names = {
-            "SKO": "sales kickoff",
-            "QBR": "quarterly business review",
-            "pipeline_review": "pipeline review",
-            "revenue_planning": "revenue planning session",
-            "sales_cadence": "sales cadence meeting",
-            "mid_year": "mid-year productivity review",
-            "productivity_initiative": "productivity improvement initiative",
-        }
-        event_name = event_names.get(event, "planning session")
-
-        sections = [
-            f"# {kw_title}",
-            snippet,
-            self._nepq_opening(keyword, cluster.intent, strategy),
-            "",
-            f"## Why {event_name} is the right time to address {keyword}",
-            "",
-            (
-                f"{event_name.title()} is when revenue leadership sets the productivity agenda for the coming period. "
-                f"It is also when the gap between ambition and the current operational reality becomes impossible to ignore. "
-                f"If your team is spending more hours on data entry, CRM updates, and manual routing than on pipeline-building conversations, "
-                f"that gap is costing you revenue."
-            ),
-            "",
-            (
-                f"Most teams approach {event_name} by setting higher activity targets. More calls, more emails, more touches. "
-                f"But if non-selling work consumes 60-80% of rep time, higher targets just mean more hours, not better outcomes. "
-                f"The leverage is not in asking reps to work harder. It is in eliminating the work that does not generate revenue."
-            ),
-            "",
-            f"## The three areas to address in your {event_name} planning",
-            "",
-            (
-                f"**1. CRM data entry and hygiene**\n"
-                f"Every manual CRM update is time a rep is not selling. An operational layer that writes enriched, deduplicated "
-                f"records back to the CRM automatically eliminates this category of non-selling work entirely."
-            ),
-            "",
-            (
-                f"**2. Lead enrichment and qualification routing**\n"
-                f"Manual prospect research and lead list building are the biggest time sinks in outbound. "
-                f"Automated enrichment with ICP-based scoring and routing removes these steps so reps touch only contacts ready for outreach."
-            ),
-            "",
-            (
-                f"**3. Workflow governance and reply handling**\n"
-                f"Without automated reply routing, every positive response requires manual triage. "
-                f"This breaks at 50+ replies per week. A governed workflow layer ensures demo bookings, "
-                f"snoozes, and suppressions happen automatically."
-            ),
-            "",
-            f"## How {brand} supports your {event_name} productivity goals",
-            "",
-            (
-                f"{brand} is the operational layer that removes non-selling work from your team's week. "
-                f"It sits above your existing CRM, enrichment, and sequencing tools, orchestrating them "
-                f"into one governed system. The result is not a new tool for your team to learn. "
-                f"It is the elimination of the manual work that keeps them from selling."
-            ),
-            "",
-            "```text",
-            "Current state:",
-            "  Rep time: 35% selling / 65% non-selling work",
-            "  Pipeline: gated by how many hours the team can work",
-            "",
-            f"After {brand} deployment:",
-            "  Rep time: 80%+ selling / <20% non-selling work",
-            "  Pipeline: driven by workflow velocity, not hours worked",
-            "```",
-            "",
-            self._build_faqs(keyword, "informational"),
-            "",
-            "## Next step",
-            self._cta("TOFU"),
-        ]
-        return "\n".join(s for s in sections if s is not None)
 
     def _blog_how_to(
         self,
@@ -744,7 +547,7 @@ class BlogContentEngine:
             snippet,
             self._nepq_opening(keyword, cluster.intent, strategy),
             "",
-            self._commercial_h2(keyword),
+            f"## What VP Sales Ops and RevOps leads actually compare when evaluating {keyword}",
             "",
             "| Dimension | Why it matters |",
             "| --- | --- |",
