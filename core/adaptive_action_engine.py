@@ -412,7 +412,7 @@ class AdaptiveActionEngine:
                 action_id="GM-004",
                 category="indexing",
                 priority=3,
-                page_url="https://pipeleap.com/sitemap.xml",
+                page_url="https://www.pipeleap.com/sitemap.xml",
                 title="Resubmit sitemap to GSC",
                 description=(
                     "Growth mode: ping GSC sitemap endpoint to trigger a fresh crawl. "

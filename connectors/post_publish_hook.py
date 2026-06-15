@@ -58,16 +58,16 @@ class PostPublishHook:
     def run(
         self,
         sitemap_path: str | Path | None = None,
-        new_slugs: list[str] | None = None,
+        new_slugs_or_assets: list[Any] | None = None,
         output_dir: str | Path | None = None,
     ) -> dict[str, Any]:
         """
         Fire all post-publish signals. Call this after any content publish.
 
         Args:
-            sitemap_path: local path to public/sitemap.xml
-            new_slugs:    slugs published in this run (used to build new_urls list)
-            output_dir:   where to write the signal report (optional)
+            sitemap_path:       local path to public/sitemap.xml
+            new_slugs_or_assets: slugs or dicts with slug+page_type published this run
+            output_dir:         where to write the signal report (optional)
 
         Returns: signal report dict
         """
@@ -76,8 +76,8 @@ class PostPublishHook:
             "signals":  {},
         }
 
-        # Resolve URLs
-        new_urls = self._slug_urls(new_slugs) if new_slugs else []
+        # Resolve URLs — handles both plain strings (backward compat) and dicts with page_type
+        new_urls = self._slug_urls(new_slugs_or_assets) if new_slugs_or_assets else []
         all_sitemap_urls = self._load_sitemap_urls(sitemap_path) if sitemap_path else []
         submit_urls = all_sitemap_urls or new_urls
         # ── Dedup: filter out URLs already submitted across all runs ───────
@@ -213,7 +213,8 @@ class PostPublishHook:
                 slug = item.get("slug", "")
                 if not slug:
                     continue
-                ptype = item.get("page_type", "blog_post") or "blog_post"
+                # Accept both page_type and type keys
+                ptype = item.get("page_type") or item.get("type", "blog_post") or "blog_post"
                 prefix = _PATH_MAP.get(ptype, "/")
                 urls.append(f"{self.site_url}{prefix}{slug}")
             elif item:

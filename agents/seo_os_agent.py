@@ -119,7 +119,7 @@ class SEOOSAgent:
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
         self.logger = logging.getLogger("seo_os_agent")
-        self.site_url = config.get("site", {}).get("site_url", "https://pipeleap.com").rstrip("/")
+        self.site_url = config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
         self.output_root = Path(config.get("execution", {}).get("output_dir", "outputs"))
 
         self.snapshot_engine = SnapshotEngine(config, self.logger)
@@ -338,11 +338,11 @@ class SEOOSAgent:
             from connectors.post_publish_hook import PostPublishHook
             hook = PostPublishHook(self.config, self.logger)
             launchpad_sitemap = Path(__file__).resolve().parent.parent / "temp_frontend_repo" / "public" / "sitemap.xml"
-            new_slugs = [c.get("slug", "") for c in result.content_generated if c.get("slug")]
+            new_content = [c for c in result.content_generated if c.get("slug")]
             pp_report = hook.run(sitemap_path=str(launchpad_sitemap) if launchpad_sitemap.exists() else None,
-                                 new_slugs=new_slugs,
+                                 new_slugs_or_assets=new_content,
                                  output_dir=str(output_dir))
-            self.logger.info("Post-publish signals fired for %d new slugs", len(new_slugs))
+            self.logger.info("Post-publish signals fired for %d new slugs", len(new_content))
         except Exception as exc:
             self.logger.warning("Post-publish signals skipped: %s", exc)
 
@@ -352,7 +352,7 @@ class SEOOSAgent:
             verifier = IndexingVerifier(self.config, self.logger)
             verifier.submitted_urls = hook.submitted_urls if pp_report else set()
             if pp_report:
-                new_urls = [f"{self.site_url}/blog/{s}" for s in new_slugs]
+                new_urls = [f"{self.site_url}/blog/{c.get('slug', '')}" for c in new_content]
                 verification = verifier.verify_post_publish(
                     post_publish_report=pp_report,
                     new_urls=new_urls,

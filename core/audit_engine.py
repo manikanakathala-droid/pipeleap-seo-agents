@@ -73,7 +73,7 @@ class AuditEngine:
                     description="robots.txt was not detected during the crawl.",
                     fix_instructions="Add a robots.txt file that allows key public pages and references the sitemap.",
                     impact_score=58.0,
-                    auto_fix_script="User-agent: *\nAllow: /\nSitemap: https://pipeleap.com/sitemap.xml\n",
+                    auto_fix_script="User-agent: *\nAllow: /\nSitemap: https://www.pipeleap.com/sitemap.xml\n",
                 )
             )
 
@@ -106,7 +106,7 @@ class AuditEngine:
                     ),
                     fix_instructions=(
                         "Add a Sitemap: line to robots.txt pointing to the absolute sitemap URL, e.g.:\n"
-                        "Sitemap: https://pipeleap.com/sitemap.xml"
+                        "Sitemap: https://www.pipeleap.com/sitemap.xml"
                     ),
                     impact_score=52.0,
                 )

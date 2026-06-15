@@ -87,15 +87,14 @@ class GoogleSearchConsoleConnector:
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.logger = logger or logging.getLogger(__name__)
         self.config = config.get("integrations", {}).get("gsc", {})
-        self.site_url = (
+        raw = (
             self.config.get("site_url")
             or config.get("site", {}).get("site_url", "")
-            or os.getenv("GSC_SITE_URL", "")
+            or os.getenv("GSC_SITE_URL", "https://www.pipeleap.com")
         )
-        self.plain_site_url = (
-            config.get("site", {}).get("site_url", "")
-            or os.getenv("GSC_SITE_URL", "")
-        ).rstrip("/")
+        # Normalise to www — GSC property is registered for www.pipeleap.com
+        self.site_url = raw.rstrip("/").replace("https://pipeleap.com", "https://www.pipeleap.com")
+        self.plain_site_url = self.site_url
         self.credentials_path = self.config.get("credentials_path", "")
         self.data_export_path = self.config.get("data_export_path", "")
 

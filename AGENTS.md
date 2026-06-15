@@ -309,3 +309,29 @@ When enabled, template-built content passes through `core/humanize.py` transform
 **Batch 4 — Full agency-language sweep (commits `f81e5b2` agents, `9832c95` launchpad):**
 - **Launchpad (16 files)**: All "Book a Strategy Call" → "Book a Demo" (Navbar, Index, HowItWorks, SalesOperationsPlatform, BlogArticle, Contact, etc.). FAQ.tsx: 7 consulting-style "We" answers → "Pipeleap"/"The platform". GTMAudit.tsx: schema `Service` → `WebPage`, "What We Analyze" → "What Gets Analyzed". Contact.tsx: "strategy call" → "demo" (×4), "Let's Build Your Outbound Engine" → "See Pipeleap in Action". Integrations.tsx: "Book a strategy call" → "Book a Demo".
 - **Agents (11 files)**: `listing_content.md` — retainer→subscription, SwaS→SaaS, managed service→platform. `serp_strategy.py` — META_TARGETS, FAQ, keyword clusters, brand monitoring, anchor variants all cleaned of revenue/GTM/managed language. `offpage_engine.py` — 4 CTAs (We run→Pipeleap runs, We built→Pipeleap is, We deploy→Deploys). `push_lovable_seo.py` — built and managed, Done-for-you, GTM Partner→Founder. `outreach_generator.py` — we build workflow→sales operations platform, client→customer, RevOps→sales ops. `config.yaml` — agency outbound→outbound automation (×2), strategy call→demo. `api_backlinks.py` — we built at→Pipeleap is. `github_publisher.py`, `content_engine.py`, `landing_page_engine.py`, `funnel_stages.py` — strategy call→demo.
+
+### 21. Indexing pipeline audit — 7 root causes fixed (June 15)
+**Trigger:** Comprehensive codebase audit revealed non-www→www inconsistency, dead sitemap ping code, missing tool prerender content, and non-www URL leaks in audit/action engines.
+
+| # | Fix | Root Cause | Files Changed |
+|---|---|---|---|
+| 1 | Default `site_url` → `https://www.pipeleap.com` | `seo_os_agent.py` was sending IndexNow/GSC signals to non-www; Google canonicalised non-www | `agents/seo_os_agent.py:122` |
+| 2 | Post-publish hook accepts dicts with `type` key | `_slug_urls()` broke on dicts without `page_type` key (only `type`) — glossary/tools/case-studies URLS wrongly mapped to `/blog/` | `connectors/post_publish_hook.py:217` |
+| 3 | GSC connector site_url normalisation | `gsc_connector.py` had separate `plain_site_url` fallback chain — never sent www signals | `connectors/gsc_connector.py` |
+| 4 | Tool prerender includes `longDescription` | Static HTML for tool detail pages only had name+tagline — Googlebot saw empty shells | `temp_frontend_repo/scripts/prerender.mjs` |
+| 5 | Removed dead sitemap ping code | `indexing_accelerator.py` iterated an empty `SITEMAP_PING_ENGINES = {}` dict — dead code | `connectors/indexing_accelerator.py` |
+| 6 | Browser-enhance first 30 tool detail pages | Phase 2 enhance skipped ALL tool details — only listing/index pages got full render | `temp_frontend_repo/scripts/prerender.mjs` |
+| 7 | Purged non-www `pipeleap.com` URLs | `audit_engine.py` and `adaptive_action_engine.py` had hardcoded `pipeleap.com/sitemap.xml` (no www) in fix scripts + auto-actions | `core/audit_engine.py:76,109`, `core/adaptive_action_engine.py:415` |
+
+**Root cause chain:** The default `site_url` in seo_os_agent.py was non-www → all IndexNow, GSC sitemap, and Indexing API signals were sent for `pipeleap.com/*` instead of `www.pipeleap.com/*` → Google indexed non-www as canonical → sitemaps/robots/hreflang all used www → confusion → most pages not indexed under www property.
+
+**Remaining:** Google indexed `pipeleap.com/*` (non-www) canonicals before the 301 redirect was stable. Migration to `www.pipeleap.com/*` needs time + external backlink signals (zero referring domains currently).
+
+**Relevant Files:**
+- `agents/seo_os_agent.py` — default site_url
+- `connectors/post_publish_hook.py` — slug URL mapping with type key fallback
+- `connectors/gsc_connector.py` — site_url normalisation
+- `temp_frontend_repo/scripts/prerender.mjs` — tool longDescription + browser enhance for 30 tool detail pages
+- `connectors/indexing_accelerator.py` — dead code removal
+- `core/audit_engine.py` — non-www sitemap URLs
+- `core/adaptive_action_engine.py` — non-www sitemap URL

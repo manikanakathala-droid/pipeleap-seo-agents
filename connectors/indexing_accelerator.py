@@ -28,11 +28,8 @@ except ImportError:
 class IndexingAccelerator:
     """Coordinates all indexing acceleration signals in one call."""
 
-    # Sitemap ping endpoints
-    # NOTE: Google deprecated the /ping endpoint in 2023. Bing deprecated it in 2024.
-    # IndexNow now covers Bing/DuckDuckGo/Yandex without pings.
-    # For Google, use GSC API sitemap submission or IndexNow (Google monitors it).
-    SITEMAP_PING_ENGINES: dict = {}  # deprecated — use IndexNow instead
+    # Sitemap ping endpoints — all deprecated (Google 2023, Bing 2024).
+    # IndexNow + GSC sitemap API cover all major engines.
 
     def __init__(
         self,
@@ -106,10 +103,6 @@ class IndexingAccelerator:
         else:
             report["signals"]["google_indexing_api"] = {"ok": False, "error": "no URLs or GSC not configured"}
 
-        # ── 4. Sitemap ping to Google + Bing ──────────────────────────────────
-        ping_results = self._ping_search_engines()
-        report["signals"]["sitemap_pings"] = ping_results
-
         # ── 5. Backlink action report ─────────────────────────────────────────
         report["backlink_actions"] = self._backlink_action_report()
 
@@ -136,24 +129,6 @@ class IndexingAccelerator:
             )
 
         return report
-
-    # ── Sitemap pings ─────────────────────────────────────────────────────────
-
-    def _ping_search_engines(self) -> dict[str, Any]:
-        if not _HAS_REQUESTS:
-            return {"ok": False, "error": "requests not installed"}
-        results: dict[str, Any] = {}
-        import urllib.parse
-        encoded = urllib.parse.quote(self.sitemap_url, safe="")
-        for engine, url_tmpl in self.SITEMAP_PING_ENGINES.items():
-            url = url_tmpl.format(sitemap_url=encoded)
-            try:
-                r = _requests.get(url, timeout=8, allow_redirects=True)
-                results[engine] = {"ok": r.status_code < 400, "status": r.status_code}
-            except Exception as exc:
-                results[engine] = {"ok": False, "error": str(exc)[:100]}
-            time.sleep(0.3)
-        return results
 
     # ── Backlink action report ────────────────────────────────────────────────
 
