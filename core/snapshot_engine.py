@@ -80,17 +80,25 @@ class SnapshotEngine:
     def __init__(self, config: dict[str, Any], logger) -> None:
         self.config = config
         self.logger = logger
-        self.site_url = config.get("site", {}).get("site_url", "https://pipeleap.com").rstrip("/")
+        self.site_url = config.get("site", {}).get("site_url", "https://www.pipeleap.com").rstrip("/")
         self.max_pages = config.get("execution", {}).get("max_crawl_pages", 80)
 
     def capture(self, run_id: str, previous_snapshot: SiteSnapshot | None = None) -> SiteSnapshot:
         now = datetime.now(timezone.utc).isoformat()
+
+        crawl_enabled = self.config.get("execution", {}).get("crawl_enabled", True)
+        if not crawl_enabled:
+            self.logger.info("Crawl disabled by config — using synthetic snapshot")
+            snap = self._synthetic_snapshot(run_id, now)
+            snap.is_synthetic = True  # type: ignore[attr-defined]
+            return snap
+
         snapshot = SiteSnapshot(run_id=run_id, site_url=self.site_url, captured_at=now)
 
         try:
             from connectors.crawler import SiteCrawler
             crawler = SiteCrawler(self.config, self.logger)
-            crawl_report = crawler.crawl(self.site_url)
+            crawl_report = crawler.crawl(self.site_url, max_pages=self.max_pages)
             sitemap_urls = crawl_report.sitemap_urls or []
             snapshot.robots_present = crawl_report.robots_txt_present
             snapshot.sitemap_urls = sitemap_urls
@@ -123,6 +131,7 @@ class SnapshotEngine:
         except Exception as exc:
             self.logger.warning("Crawler unavailable, using synthetic snapshot: %s", exc)
             snapshot = self._synthetic_snapshot(run_id, now)
+            snapshot.is_synthetic = True  # type: ignore[attr-defined]
 
         snapshot.total_pages = len(snapshot.pages)
         self.logger.info("Snapshot captured: %d pages, %d sitemap URLs", snapshot.total_pages, len(snapshot.sitemap_urls))
@@ -142,10 +151,11 @@ class SnapshotEngine:
             ("/how-it-works",      "How Pipeleap Works",                                           "how it works"),
             ("/services",          "Outbound Sales Services | Pipeleap",                           "services"),
         ]
+        base = self.site_url.rstrip("/")
         pages = []
         for path, title, topic in known_pages:
             pages.append(PageSEOState(
-                url=f"https://pipeleap.com{path}",
+                url=f"{base}{path}",
                 title=title,
                 h1=title.split("|")[0].strip(),
                 word_count=600,
@@ -153,9 +163,9 @@ class SnapshotEngine:
                 status_code=200,
                 captured_at=now,
             ))
-        snap = SiteSnapshot(run_id=run_id, site_url="https://pipeleap.com", captured_at=now)
+        snap = SiteSnapshot(run_id=run_id, site_url=base, captured_at=now)
         snap.pages = pages
         snap.total_pages = len(pages)
         snap.robots_present = True
-        snap.sitemap_urls = [f"https://pipeleap.com{p}" for p, _, _ in known_pages]
+        snap.sitemap_urls = [f"{base}{p}" for p, _, _ in known_pages]
         return snap

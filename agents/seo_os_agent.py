@@ -77,6 +77,7 @@ class SEOOSResult:
     content_gap_clusters: list[dict] = field(default_factory=list)
     latent_keywords: list[dict] = field(default_factory=list)
     risks_and_missed: list[dict] = field(default_factory=list)
+    is_synthetic: bool = False
     seo_score: SEOScore = field(default_factory=SEOScore)
     next_day_plan: list[str] = field(default_factory=list)
     output_files: list[str] = field(default_factory=list)
@@ -101,6 +102,7 @@ class SEOOSResult:
             "content_gap_clusters": self.content_gap_clusters,
             "latent_keywords": self.latent_keywords,
             "risks_and_missed": self.risks_and_missed,
+            "is_synthetic": self.is_synthetic,
             "seo_score": self.seo_score.to_dict(),
             "next_day_plan": self.next_day_plan,
             "output_files": self.output_files,
@@ -146,11 +148,15 @@ class SEOOSAgent:
         previous_snapshot = self._load_previous_snapshot()
         try:
             current_snapshot = self.snapshot_engine.capture(run_id=run_id, previous_snapshot=previous_snapshot)
+            if getattr(current_snapshot, "is_synthetic", False):
+                result.is_synthetic = True
             self._save_snapshot(current_snapshot)
         except Exception as exc:
             self.logger.error("Snapshot failed: %s", exc)
             result.errors.append(f"snapshot: {exc}")
+            result.is_synthetic = True
             current_snapshot = self.snapshot_engine._synthetic_snapshot(run_id, datetime.now(timezone.utc).isoformat())
+            self._save_snapshot(current_snapshot)  # persist so next run has a consistent baseline
 
         # ── Step 2: Diff Engine ───────────────────────────────────────────────
         self.logger.info("Step 2: Change diff")
@@ -1347,6 +1353,11 @@ class SEOOSAgent:
 
         overall = int(tech * 0.30 + content * 0.30 + indexing * 0.25 + authority * 0.15)
 
+        # Cap at 50 when running off synthetic data — score is misleading
+        is_synthetic = getattr(snapshot, "is_synthetic", False) or result.is_synthetic
+        if is_synthetic:
+            overall = min(overall, 50)
+
         score.technical = tech
         score.content = content
         score.indexing = indexing
@@ -1395,6 +1406,9 @@ class SEOOSAgent:
         if result.seo_score.overall < 60:
             plan.append("SEO score below 60 — prioritise technical fixes before content expansion")
 
+        if result.is_synthetic:
+            plan.insert(0, "CRITICAL: Crawler is failing — investigate GitHub Actions logs for snapshot error. Content generation limited until fix.")
+
         return plan[:7]
 
     def _build_daily_briefing(self, result: SEOOSResult, diff: SiteDiff, plan: ExecutionPlan) -> str:
@@ -1423,6 +1437,19 @@ class SEOOSAgent:
         lines = [
             f"# Pipeleap SEO OS — Daily Briefing",
             f"**Run ID:** {result.run_id}  |  **Mode:** {result.mode.upper()}  |  **Generated:** {result.generated_at}",
+            "",
+        ]
+
+        if result.is_synthetic:
+            lines += [
+                "> **⚠ SYNTHETIC MODE — CRAWLER UNAVAILABLE**",
+                "> The live site crawler failed this run. All metrics below are estimated from fallback data.",
+                "> Content generation uses cached keyword pools and may produce fewer pieces than normal.",
+                "> Check GitHub Actions logs for the actual crawler error.",
+                "",
+            ]
+
+        lines += [
             "",
             f"## Score: {score.overall}/100  [{score_bar}]{score_trend}",
             f"| Dimension | Score | Change |",
@@ -1635,6 +1662,7 @@ class SEOOSAgent:
             "top_keywords": [kw.get("keyword", "") for kw in result.keyword_opportunities[:5]],
             "pages_optimized": len(result.pages_optimized),
             "errors": len(result.errors),
+            "is_synthetic": result.is_synthetic,
         }
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry) + "\n")
@@ -1651,9 +1679,9 @@ class SEOOSAgent:
                     line = line.strip()
                     if line:
                         entries.append(json.loads(line))
-            if len(entries) < 2:
+            if not entries:
                 return {}
-            return entries[-2]
+            return entries[-1]
         except Exception:
             return {}
 
