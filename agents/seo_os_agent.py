@@ -1400,26 +1400,80 @@ class SEOOSAgent:
     def _build_daily_briefing(self, result: SEOOSResult, diff: SiteDiff, plan: ExecutionPlan) -> str:
         score = result.seo_score
         score_bar = "█" * (score.overall // 10) + "░" * (10 - score.overall // 10)
+        prev = self._load_previous_run_summary()
+
+        def _trend(current: int, previous_key: str) -> str:
+            p = prev.get(previous_key, 0)
+            if not p:
+                return ""
+            d = current - p
+            if d > 0:
+                return f" ▲ +{d}"
+            if d < 0:
+                return f" ▼ {d}"
+            return "  —"
+
+        score_trend = _trend(score.overall, "seo_score")
+        tech_trend = _trend(score.technical, "technical")
+        content_trend = _trend(score.content, "content")
+        idx_trend = _trend(score.indexing, "indexing")
+        auth_trend = _trend(score.authority, "authority")
+        prev_top = prev.get("top_keywords", [])
 
         lines = [
             f"# Pipeleap SEO OS — Daily Briefing",
             f"**Run ID:** {result.run_id}  |  **Mode:** {result.mode.upper()}  |  **Generated:** {result.generated_at}",
             "",
-            f"## SEO Score: {score.overall}/100  [{score_bar}]",
-            f"| Dimension | Score |",
-            f"|---|---|",
-            f"| Technical | {score.technical}/100 |",
-            f"| Content | {score.content}/100 |",
-            f"| Indexing | {score.indexing}/100 |",
-            f"| Authority | {score.authority}/100 |",
-            "",
-            "---",
-            "",
-            "## 1. Website Changes Detected",
+            f"## Score: {score.overall}/100  [{score_bar}]{score_trend}",
+            f"| Dimension | Score | Change |",
+            f"|---|---|---|",
+            f"| Technical | {score.technical}/100 |{tech_trend} |",
+            f"| Content | {score.content}/100 |{content_trend} |",
+            f"| Indexing | {score.indexing}/100 |{idx_trend} |",
+            f"| Authority | {score.authority}/100 |{auth_trend} |",
         ]
 
+        # ── What Changed Since Yesterday ──────────────────────────────────────
+        deltas: list[str] = []
+        if prev:
+            prev_content = prev.get("content_pieces", 0)
+            cur_content = len(result.content_generated)
+            if cur_content > prev_content:
+                deltas.append(f"**+{cur_content - prev_content}** new content piece(s) generated")
+            elif cur_content < prev_content:
+                deltas.append(f"Content pieces dropped from {prev_content} → {cur_content}")
+            prev_gaps = prev.get("content_gaps", 0)
+            cur_gaps = len(result.content_gaps)
+            if cur_gaps > prev_gaps:
+                deltas.append(f"**+{cur_gaps - prev_gaps}** new content gap(s) detected ({cur_gaps} total)")
+            elif cur_gaps > 0 and cur_gaps == prev_gaps:
+                deltas.append(f"Content gap count unchanged: {cur_gaps} gaps remain open")
+            prev_latent = prev.get("latent_keywords", 0)
+            cur_latent = len(result.latent_keywords)
+            if cur_latent > prev_latent:
+                deltas.append(f"**+{cur_latent - prev_latent}** new latent keyword(s) mined from existing content")
+            prev_actions = prev.get("actions_generated", 0)
+            cur_actions = len(result.safe_actions)
+            if cur_actions > prev_actions:
+                deltas.append(f"**+{cur_actions - prev_actions}** new safe SEO action(s) available")
+            prev_opt = prev.get("pages_optimized", 0)
+            cur_opt = len(result.pages_optimized)
+            if cur_opt > prev_opt:
+                deltas.append(f"**+{cur_opt - prev_opt}** page(s) optimized since last run")
+            if result.errors and len(result.errors) != prev.get("errors", 0):
+                deltas.append(f"**⚠ {len(result.errors)} error(s)** — check logs")
+
+        if not deltas:
+            deltas.append("No measurable changes since last run — growth mode holding steady.")
+
+        lines += ["", "---", "", "## Δ What Changed Since Yesterday"]
+        for d in deltas:
+            lines.append(f"- {d}")
+
+        # ── 1. Website Changes ────────────────────────────────────────────────
         changes = result.website_changes
         if changes.get("has_changes"):
+            lines += ["", "---", "", "## 1. Website Changes"]
             lines += [
                 f"- New pages: **{changes.get('new_pages', 0)}**",
                 f"- Updated pages: **{changes.get('updated_pages', 0)}**",
@@ -1427,67 +1481,83 @@ class SEOOSAgent:
                 f"- Broken links: **{changes.get('broken_links', 0)}**",
                 f"- Orphan pages: **{changes.get('orphan_pages', 0)}**",
             ]
-        else:
-            lines.append("No structural changes detected — growth mode active.")
 
-        lines += ["", "---", "", "## 2. Safe SEO Actions (No Code Impact)"]
-        for action in result.safe_actions[:8]:
-            lines.append(f"- [{action.get('category','').upper()}] **{action.get('title','')}** — `{action.get('page_url','')}`")
+        # ── 2. Safe SEO Actions ──────────────────────────────────────────────
+        if result.safe_actions:
+            lines += ["", "---", "", "## 2. Safe SEO Actions"]
+            for action in result.safe_actions[:8]:
+                lines.append(f"- [{action.get('category','').upper()}] **{action.get('title','')}** — `{action.get('page_url','')}`")
 
+        # ── 3. Dev Review ────────────────────────────────────────────────────
         if result.dev_review_items:
             lines += ["", "---", "", "## 3. REQUIRES DEV REVIEW"]
+            critical_high = [i for i in result.dev_review_items if i.get("severity") in ("Critical", "High")]
             for item in result.dev_review_items:
                 lines.append(f"- **{item.get('title','')}** — `{item.get('page_url','')}` — {item.get('dev_note','')}")
+            if critical_high:
+                lines += ["", "### Critical / High Issues"]
+                for issue in critical_high[:8]:
+                    fix = issue.get("fix_instructions", "")
+                    lines.append(f"- [{issue['severity'].upper()}] **{issue.get('title','')}** — `{issue.get('page_url','')}`")
+                    if fix:
+                        lines.append(f"  > {fix[:120]}{'…' if len(fix) > 120 else ''}")
 
-        critical_high = [i for i in result.dev_review_items if i.get("severity") in ("Critical", "High")]
-        if critical_high:
-            lines += ["", "---", "", "## 3b. Critical / High Technical SEO Issues"]
-            for issue in critical_high[:8]:
-                fix = issue.get("fix_instructions", "")
-                lines.append(f"- [{issue['severity'].upper()}] **{issue.get('title','')}** — `{issue.get('page_url','')}`")
-                lines.append(f"  > {fix[:120]}{'…' if len(fix) > 120 else ''}")
-
-        lines += ["", "---", "", "## 4. Keyword Opportunities (Top 10)"]
-        for kw in result.keyword_opportunities[:10]:
-            t = kw.get("type", "")
-            lines.append(f"- [{t}] **{kw.get('keyword','')}** — cluster: {kw.get('cluster', kw.get('gap_source',''))}")
+        # ── 4. Keywords + Gaps ───────────────────────────────────────────────
+        if result.keyword_opportunities:
+            lines += ["", "---", "", "## 4. Keyword Opportunities"]
+            for kw in result.keyword_opportunities[:10]:
+                t = kw.get("type", "")
+                kw_name = kw.get("keyword", "")
+                new_badge = ""
+                if prev_top and kw_name not in prev_top:
+                    new_badge = " 🆕"
+                lines.append(f"- [{t}]{new_badge} **{kw_name}** — {kw.get('cluster', kw.get('gap_source',''))}")
 
         if result.content_gaps:
-            lines += ["", "---", "", "## 4b. Content Gaps (Uncovered Keywords)"]
+            lines += ["", "---", "", "## 4b. Content Gaps (Uncovered)"]
             for gap in result.content_gaps[:8]:
                 kw = gap.get("keyword", "")
                 diff_val = gap.get("difficulty", "?")
                 lines.append(f"- **{kw}** (difficulty: {diff_val})")
             if len(result.content_gaps) > 8:
-                lines.append(f"- … and {len(result.content_gaps) - 8} more gaps — see content_coverage.json")
+                lines.append(f"- … and {len(result.content_gaps) - 8} more — see content_coverage.json")
 
         if result.latent_keywords:
-            lines += ["", "---", "", "## 4c. Latent Keywords (Mined from Existing Content)"]
+            lines += ["", "---", "", "## 4c. Latent Keywords (Mined from Content)"]
             for lk in result.latent_keywords[:10]:
                 lines.append(f"- **{lk.get('keyword','')}** (freq: {lk.get('frequency',0)}, score: {lk.get('score',0)})")
             if len(result.latent_keywords) > 10:
                 lines.append(f"- … and {len(result.latent_keywords) - 10} more — see latent_keywords.json")
 
-        lines += ["", "---", "", "## 5. Content Generated"]
-        for item in result.content_generated:
-            lines.append(f"- [{item.get('type','')}] **{item.get('title', item.get('slug',''))}**")
+        # ── 5. Content Generated ────────────────────────────────────────────
+        if result.content_generated:
+            lines += ["", "---", "", "## 5. Content Generated"]
+            for item in result.content_generated:
+                lines.append(f"- [{item.get('type','')}] **{item.get('title', item.get('slug',''))}**")
 
-        lines += ["", "---", "", "## 6. Pages Optimized"]
-        for page in result.pages_optimized:
-            lines.append(f"- `{page.get('page_url','')}` — {' | '.join(page.get('optimisation_actions', []))}")
+        # ── 6. Pages Optimized ──────────────────────────────────────────────
+        if result.pages_optimized:
+            lines += ["", "---", "", "## 6. Pages Optimized"]
+            for page in result.pages_optimized:
+                lines.append(f"- `{page.get('page_url','')}` — {' | '.join(page.get('optimisation_actions', []))}")
 
-        lines += ["", "---", "", "## 7. Internal Linking (Top 5)"]
-        for link in result.linking_suggestions[:5]:
-            lines.append(f"- `{link.get('from_page','')}` → `{link.get('to_page','')}` via \"{link.get('anchor_text','')}\"")
+        # ── 7. Internal Linking ─────────────────────────────────────────────
+        if result.linking_suggestions:
+            lines += ["", "---", "", "## 7. Internal Linking"]
+            for link in result.linking_suggestions[:5]:
+                lines.append(f"- `{link.get('from_page','')}` → `{link.get('to_page','')}` via \"{link.get('anchor_text','')}\"")
 
-        lines += ["", "---", "", "## 8. Indexing Actions"]
-        for action in result.indexing_actions[:6]:
-            status = action.get("status", "")
-            status_str = f" → **{status}**" if status else ""
-            lines.append(f"- [{action.get('action','')}] `{action.get('url','')}` — {action.get('reason','')}{status_str}")
+        # ── 8. Indexing Actions ─────────────────────────────────────────────
+        if result.indexing_actions:
+            lines += ["", "---", "", "## 8. Indexing Actions"]
+            for action in result.indexing_actions[:6]:
+                status = action.get("status", "")
+                status_str = f" → **{status}**" if status else ""
+                lines.append(f"- [{action.get('action','')}] `{action.get('url','')}` — {action.get('reason','')}{status_str}")
 
+        # ── 9b. GSC Performance ─────────────────────────────────────────────
         if result.gsc_insights:
-            lines += ["", "---", "", "## 9b. GSC Performance Signals"]
+            lines += ["", "---", "", "## 9. GSC Performance Signals"]
             high = [i for i in result.gsc_insights if i.get("severity") == "High"]
             med  = [i for i in result.gsc_insights if i.get("severity") == "Medium"]
             if high:
@@ -1496,22 +1566,27 @@ class SEOOSAgent:
                     lines.append(f"- [{insight['type'].upper()}] `{insight['page']}`")
                     lines.append(f"  > {insight.get('recommendation', '')}")
             if med:
-                lines.append(f"\n**{len(med)} Medium-severity signal(s):**")
+                lines.append(f"**{len(med)} Medium-severity signal(s):**")
                 for insight in med[:5]:
                     lines.append(f"- [{insight['type'].upper()}] `{insight['page']}`")
                     lines.append(f"  > {insight.get('recommendation', '')}")
 
+        # ── 10. Risks ───────────────────────────────────────────────────────
         if result.risks_and_missed:
             lines += ["", "---", "", "## 10. Risks / Missed Opportunities"]
             for risk in result.risks_and_missed:
                 sev = risk.get("severity","").upper()
                 lines.append(f"- [{sev}] **{risk.get('type','')}** — {risk.get('description','')}")
 
+        # ── 11. Tomorrow's Plan ─────────────────────────────────────────────
         lines += ["", "---", "", "## 11. Tomorrow's Plan"]
-        for i, item in enumerate(result.next_day_plan, 1):
-            lines.append(f"{i}. {item}")
+        if result.next_day_plan:
+            for i, item in enumerate(result.next_day_plan, 1):
+                lines.append(f"{i}. {item}")
+        else:
+            lines.append("No actionable items — system idle.")
 
-        lines += ["", "---", f"*SEO OS v{SEOOSAgent.VERSION} — Safe Mode — {result.run_id}*"]
+        lines += ["", "---", f"*SEO OS v{SEOOSAgent.VERSION} — {result.mode} — {result.run_id}*"]
         return "\n".join(lines)
 
     # ── State persistence ──────────────────────────────────────────────────────
@@ -1547,14 +1622,40 @@ class SEOOSAgent:
             "run_id": run_id,
             "generated_at": result.generated_at,
             "seo_score": result.seo_score.overall,
+            "technical": result.seo_score.technical,
+            "content": result.seo_score.content,
+            "indexing": result.seo_score.indexing,
+            "authority": result.seo_score.authority,
             "mode": result.mode,
             "actions_generated": len(result.safe_actions),
             "dev_items": len(result.dev_review_items),
             "content_pieces": len(result.content_generated),
+            "content_gaps": len(result.content_gaps),
+            "latent_keywords": len(result.latent_keywords),
+            "top_keywords": [kw.get("keyword", "") for kw in result.keyword_opportunities[:5]],
+            "pages_optimized": len(result.pages_optimized),
             "errors": len(result.errors),
         }
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry) + "\n")
+
+    def _load_previous_run_summary(self) -> dict:
+        """Load the most recent completed run from learning log for trend comparison."""
+        log_path = self._state_dir / "learning_log.jsonl"
+        if not log_path.exists():
+            return {}
+        try:
+            entries = []
+            with open(log_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        entries.append(json.loads(line))
+            if len(entries) < 2:
+                return {}
+            return entries[-2]
+        except Exception:
+            return {}
 
     @staticmethod
     def _write_json(path: Path, data: Any) -> None:
