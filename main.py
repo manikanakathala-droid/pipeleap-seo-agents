@@ -41,6 +41,19 @@ def main() -> int:
     result = orchestrator.run_once()
     print(json.dumps(result, indent=2))
 
+    # Regenerate sitemap from local checkout so new content appears in XML
+    sitemap_local = "pipeleap-launchpad"
+    if Path(sitemap_local).exists():
+        try:
+            from scripts.push_sitemap import build_sitemaps
+            sitemaps = build_sitemaps(local_dir=sitemap_local)
+            public_dir = Path(sitemap_local) / "public"
+            for filename, xml_content in sitemaps.items():
+                (public_dir / filename).write_text(xml_content, encoding="utf-8")
+            print(f"Sitemap rebuilt — {len(sitemaps)} files written to {public_dir}")
+        except Exception as exc:
+            print(f"Sitemap regeneration skipped: {exc}")
+
     # Fire all indexing and backlink signals after every SEO agent run
     from connectors.post_publish_hook import PostPublishHook
     import logging
@@ -49,7 +62,7 @@ def main() -> int:
     
     # Pass generated assets to ensure indexing signals target all content types
     new_assets = result.get("assets_generated", [])
-    hook.run(sitemap_path=sitemap_path, new_slugs=new_assets, output_dir="outputs/post_publish")
+    hook.run(sitemap_path=sitemap_path, new_slugs_or_assets=new_assets, output_dir="outputs/post_publish")
     return 0
 
 

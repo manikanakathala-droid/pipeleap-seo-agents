@@ -137,10 +137,10 @@ jobs:
             exit 1
           fi
 
-      - name: Rebuild all sitemaps with today's lastmod dates
+      - name: Rebuild all sitemaps from local checkout
         env:
           GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GH_PAT }}
-        run: python scripts/push_sitemap.py
+        run: python scripts/push_sitemap.py --local-dir pipeleap-launchpad --commit
 
       - name: Trigger Vercel deploy
         run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}

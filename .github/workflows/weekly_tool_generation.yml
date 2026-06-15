@@ -122,6 +122,11 @@ jobs:
             exit 1
           fi
 
+      - name: Regenerate and commit sitemap with new content
+        run: python scripts/push_sitemap.py --local-dir pipeleap-launchpad --commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN || secrets.GH_PAT }}
+
       - name: Upload generation artifacts
         if: always()
         uses: actions/upload-artifact@v7

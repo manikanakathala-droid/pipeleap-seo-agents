@@ -132,6 +132,9 @@ jobs:
             echo "No audit-duplicates script found, skipping."
           fi
 
+      - name: Regenerate sitemap from local checkout
+        run: python scripts/push_sitemap.py --local-dir pipeleap-launchpad
+
       - name: Validate TypeScript compilation before commit
         run: |
           cd pipeleap-launchpad
