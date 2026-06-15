@@ -272,8 +272,8 @@ class SiteCrawler:
                 if response.status_code >= 500:
                     self.logger.warning("HTTP 5xx error at %s. Slowing down crawl to avoid overloading server.", url)
                     time.sleep(5)
-            except requests.RequestException as exc:
-                crawl_errors.append(f"{url}: {exc}")
+            except Exception as exc:
+                crawl_errors.append(f"{url}: {type(exc).__name__}: {exc}")
                 continue
 
             content_type = response.headers.get("Content-Type", "")
@@ -400,8 +400,8 @@ class SiteCrawler:
                     for line in robots_rules
                     if line.lower().startswith("sitemap:")
                 )
-        except requests.RequestException as exc:
-            self.logger.warning("robots.txt fetch failed: %s", exc)
+        except Exception as exc:
+            self.logger.warning("robots.txt fetch failed: %s — %s: %s", type(exc).__name__, exc, getattr(exc, 'response', ''))
 
         if not sitemap_urls:
             sitemap_urls.append(urljoin(site_root, "/sitemap.xml"))

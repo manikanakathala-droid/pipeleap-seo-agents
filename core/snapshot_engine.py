@@ -129,9 +129,12 @@ class SnapshotEngine:
                 snapshot.pages.append(state)
 
         except Exception as exc:
-            self.logger.warning("Crawler unavailable, using synthetic snapshot: %s", exc)
+            import traceback
+            tb = traceback.format_exc()
+            self.logger.warning("Crawler unavailable, using synthetic snapshot\n  type=%s\n  msg=%s\n  traceback=%s", type(exc).__name__, exc, tb)
             snapshot = self._synthetic_snapshot(run_id, now)
             snapshot.is_synthetic = True  # type: ignore[attr-defined]
+            snapshot.crawl_diagnostics = {"error_type": type(exc).__name__, "error_msg": str(exc)}  # type: ignore[attr-defined]
 
         snapshot.total_pages = len(snapshot.pages)
         self.logger.info("Snapshot captured: %d pages, %d sitemap URLs", snapshot.total_pages, len(snapshot.sitemap_urls))
