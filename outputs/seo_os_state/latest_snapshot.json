@@ -1,7 +1,7 @@
 {
-  "run_id": "20260614T132423Z",
+  "run_id": "20260615T165102Z",
   "site_url": "https://www.pipeleap.com",
-  "captured_at": "2026-06-14T13:24:23.607952+00:00",
+  "captured_at": "2026-06-15T16:51:02.002051+00:00",
   "total_pages": 1,
   "sitemap_urls": [
     "https://www.pipeleap.com/",
@@ -32,6 +32,7 @@
     "https://www.pipeleap.com/glossary/ai-sdr",
     "https://www.pipeleap.com/glossary/annual-contract-value",
     "https://www.pipeleap.com/glossary/annual-recurring-revenue",
+    "https://www.pipeleap.com/glossary/artisan-ai-review",
     "https://www.pipeleap.com/glossary/average-deal-size",
     "https://www.pipeleap.com/glossary/average-selling-price",
     "https://www.pipeleap.com/glossary/bant",
@@ -64,6 +65,7 @@
     "https://www.pipeleap.com/glossary/go-to-market-strategy",
     "https://www.pipeleap.com/glossary/gtm-motion",
     "https://www.pipeleap.com/glossary/ideal-customer-profile",
+    "https://www.pipeleap.com/glossary/instantly-ai-review",
     "https://www.pipeleap.com/glossary/intent-data",
     "https://www.pipeleap.com/glossary/lead-enrichment",
     "https://www.pipeleap.com/glossary/lead-response-time",
@@ -82,6 +84,7 @@
     "https://www.pipeleap.com/glossary/outbound-process-automation",
     "https://www.pipeleap.com/glossary/outreach-personalization",
     "https://www.pipeleap.com/glossary/pipeline-coverage",
+    "https://www.pipeleap.com/glossary/pipeline-coverage-ratio",
     "https://www.pipeleap.com/glossary/pipeline-generation",
     "https://www.pipeleap.com/glossary/pipeline-hygiene",
     "https://www.pipeleap.com/glossary/pipeline-velocity",
@@ -368,9 +371,9 @@
       ],
       "in_sitemap": true,
       "status_code": 200,
-      "response_time_ms": 45,
+      "response_time_ms": 158,
       "content_hash": "617779aa5441f1c2695b9a7e255d300316e1281d9ae6feaad390c462b43c7b5e",
-      "captured_at": "2026-06-14T13:24:23.607952+00:00"
+      "captured_at": "2026-06-15T16:51:02.002051+00:00"
     }
   ],
   "errors": []
