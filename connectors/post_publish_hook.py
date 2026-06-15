@@ -104,7 +104,7 @@ class PostPublishHook:
         # API spec: POST /webmaster/api.svc/json/SubmitFeed?apikey=KEY
         # with JSON body: {"siteUrl": "https://www...", "feedUrl": "https://www.../sitemap.xml"}
         # See: https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.submitfeed
-        bing_api_key = os.environ.get("BING_API_KEY", "") or self.config.get("integrations", {}).get("bing_api_key", "")
+        bing_api_key = os.environ.get("BING_API_KEY", "") or self.config.get("growth_engine", {}).get("bing_api_key", "")
         if bing_api_key:
             try:
                 import requests as _req
