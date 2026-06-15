@@ -242,7 +242,7 @@ class SiteCrawler:
         self.session = requests.Session()
         self.session.headers.update(
             {
-                "User-Agent": "PipeleapSEOAgent/1.0 (+https://pipeleap.com)",
+                "User-Agent": "PipeleapSEOAgent/1.0 (+https://www.pipeleap.com)",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             }
         )

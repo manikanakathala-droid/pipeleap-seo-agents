@@ -21,7 +21,7 @@ try:
 except ImportError:
     _HAS_REQUESTS = False
 
-SITE_URL = "https://pipeleap.com"
+SITE_URL = "https://www.pipeleap.com"
 
 
 class BacklinkExecutor:
@@ -57,7 +57,7 @@ class BacklinkExecutor:
 
         print(f"[1/4] Wayback Machine: submitting {len(urls)} URLs...")
         archived, failed = [], []
-        headers = {"User-Agent": "Pipeleap-SEO-Agent/1.0 (+https://pipeleap.com)"}
+        headers = {"User-Agent": "Pipeleap-SEO-Agent/1.0 (+https://www.pipeleap.com)"}
 
         for i, url in enumerate(urls, 1):
             try:

@@ -48,7 +48,7 @@ try:
 except ImportError:
     _HAS_REQUESTS = False
 
-SITE_URL = "https://pipeleap.com"
+SITE_URL = "https://www.pipeleap.com"
 OUTPUT   = Path("outputs/backlinks/api_submissions")
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
