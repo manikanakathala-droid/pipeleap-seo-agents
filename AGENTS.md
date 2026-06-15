@@ -350,3 +350,21 @@ When enabled, template-built content passes through `core/humanize.py` transform
 **Bing API test:** `https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed` returns HTTP 200 with valid key `f2ce40b491c44f1282976da068df483c` — endpoint is functional.
 
 **Commits:** `fe19a03` (Indexing API error fix), `ecc9726` (workflow secret fix), `bfe4578` (Bing config path fix)
+
+### 23. NEPQ chat widget deployed — knowledge base + system prompt (June 16)
+**Goal:** Deploy a NEPQ-style chat agent on www.pipeleap.com that answers queries based on Pipeleap's actual positioning using website content, then leave the SEO system running autonomously for a month.
+
+**Done:**
+- `api/chat.ts` — Full knowledge base embedded in system prompt: pricing tiers ($2,500-$10,000+/mo), 4 platform modules, 6-layer outbound workflow engine, integrations, deployment timeline, differentiators, founder story, FAQ answers, results metrics, CTAs. Answers grounded in actual website content, then pivots to NEPQ diagnostic questions.
+- Chat token resolution order: `CHAT_API_KEY` → `GITHUB_TOKEN` → `LAUNCHPAD_DEPLOY_TOKEN`
+- Vercel serverless function uses raw body stream reading (bypasses Vercel's Proxy-based `req.body` which breaks on PowerShell curl quote-stripping)
+- ChatWidget.tsx (deployed earlier): floating bubble, expandable panel, typing indicator, history
+
+**Key Decisions:**
+- Knowledge base hardcoded in system prompt (not RAG) — simpler, zero infra to maintain, fits within context window
+- Answers must be grounded in knowledge base content only, then NEPQ diagnostic question
+- No AI disclaimers, no emojis, no markdown in any response
+
+**Remaining:** Confirm `CHAT_API_KEY` is set in Vercel project, then the SEO system runs autonomously. Check email notifications for failures. Return in 1 month to assess.
+
+**Commit:** `2bb0c63` (launchpad)
