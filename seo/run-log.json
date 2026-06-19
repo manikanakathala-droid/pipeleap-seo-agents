@@ -1717,5 +1717,34 @@
     "output_files": [
       "outputs/20260618T144029Z/seo_os_report.json"
     ]
+  },
+  {
+    "run_id": "20260619T143724Z",
+    "generated_at": "2026-06-19T14:37:46.750489+00:00",
+    "seo_score": 99,
+    "mode": "growth_mode",
+    "website_changes": {
+      "run_id": "20260619T143724Z",
+      "previous_run_id": "20260618T144029Z",
+      "new_pages": 0,
+      "updated_pages": 0,
+      "deleted_pages": 0,
+      "unchanged_pages": 1,
+      "broken_links": 0,
+      "orphan_pages": 0,
+      "missing_from_sitemap": 0,
+      "has_changes": false
+    },
+    "safe_actions": 8,
+    "dev_review_items": 0,
+    "content_generated": 0,
+    "keywords_researched": 20,
+    "indexing_actions": 0,
+    "errors": [
+      "content_engine: name 'case_study_clusters' is not defined"
+    ],
+    "output_files": [
+      "outputs/20260619T143724Z/seo_os_report.json"
+    ]
   }
 ]
