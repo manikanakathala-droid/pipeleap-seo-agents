@@ -1,20 +1,30 @@
 {
   "site": {
     "brand": "Pipeleap",
-    "site_url": "https://pipeleap.com",
+    "site_url": "https://www.pipeleap.com",
     "domain": "pipeleap.com",
     "product_summary": "Pipeleap is the operational layer that eliminates the non-selling work consuming 60-80% of a sales rep's time — CRM data entry, account research, contact enrichment, sequence management, reply routing, and moving data between disconnected systems."
   },
 
   "execution": {
     "output_dir": "outputs",
+    "memory_db": "outputs/pipeleap_seo_memory.sqlite",
     "log_level": "INFO"
   },
 
   "integrations": {
+    "gsc": {
+      "site_url": "sc-domain:pipeleap.com",
+      "credentials_path": "credentials/gsc_service_account.json",
+      "data_export_path": ""
+    },
     "cms": {
       "publish_dir": "pipeleap-launchpad/src/data/seo"
     }
+  },
+
+  "growth_engine": {
+    "bing_api_key": "f2ce40b491c44f1282976da068df483c"
   },
 
   "geo_engine": {
