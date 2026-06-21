@@ -1,0 +1,26 @@
+[
+  {
+    "cluster": "Revenue Operations",
+    "pillar_page": "/",
+    "spoke_articles": [
+      "/blog/ai-personalization-cold-email",
+      "/blog/cost-of-manual-prospecting",
+      "/blog/outbound-stack-too-many-tools",
+      "/blog/predictable-pipeline-without-sdrs"
+    ],
+    "glossary_links": [
+      "/glossary/sales-automation"
+    ]
+  },
+  {
+    "cluster": "Sales Orchestration",
+    "pillar_page": "/about",
+    "spoke_articles": [
+      "/blog/what-is-sales-orchestration",
+      "/blog/11-modules-outbound-engine"
+    ],
+    "glossary_links": [
+      "/glossary/sales-orchestration"
+    ]
+  }
+]
