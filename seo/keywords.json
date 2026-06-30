@@ -13315,5 +13315,212 @@
         "coverage_status": "pending"
       }
     ]
+  },
+  {
+    "run_id": "20260630T135051Z",
+    "generated_at": "2026-06-30T13:51:13.791611+00:00",
+    "count": 20,
+    "keywords": [
+      {
+        "keyword": "sales workflow operations platform",
+        "type": "transactional",
+        "cluster": "sales workflow operations",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 58.86,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "outbound automation platform for early-stage-saas",
+        "type": "transactional",
+        "cluster": "outbound automation (early)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "use_case_page",
+        "revenue_priority": 58.86,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "outbound automation platform for growth-stage-saas",
+        "type": "transactional",
+        "cluster": "outbound automation (growth)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "use_case_page",
+        "revenue_priority": 58.86,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "outbound automation platform for enterprise-saas",
+        "type": "transactional",
+        "cluster": "outbound automation (scale)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "use_case_page",
+        "revenue_priority": 58.86,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "outbound automation platform",
+        "type": "transactional",
+        "cluster": "outbound automation",
+        "difficulty": 64.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 57.88,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "outbound sales automation software",
+        "type": "transactional",
+        "cluster": "outbound automation",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 57.3,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales rep productivity software",
+        "type": "transactional",
+        "cluster": "reducing non-selling time",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 57.3,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales workflow automation platform",
+        "type": "transactional",
+        "cluster": "n8n automation templates",
+        "difficulty": 52.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 57.3,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales efficiency software",
+        "type": "transactional",
+        "cluster": "sales productivity",
+        "difficulty": 64.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 56.32,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales operations platform",
+        "type": "transactional",
+        "cluster": "revenue automation",
+        "difficulty": 64.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 56.32,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales execution platform",
+        "type": "transactional",
+        "cluster": "revenue automation",
+        "difficulty": 64.0,
+        "conversion_probability": 0.93,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 56.32,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "pipeleap pricing",
+        "type": "transactional",
+        "cluster": "revenue automation",
+        "difficulty": 58.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 56.26,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "revops workflow orchestration platform",
+        "type": "transactional",
+        "cluster": "revenue automation (scale)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 54.74,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "revops automation platform saas",
+        "type": "transactional",
+        "cluster": "revenue automation (scale)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.85,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 54.74,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "saas enterprise pipeline system",
+        "type": "transactional",
+        "cluster": "revenue automation (scale)",
+        "difficulty": 46.0,
+        "conversion_probability": 0.73,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 51.32,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "sales systems for startups",
+        "type": "transactional",
+        "cluster": "revenue automation (early)",
+        "difficulty": 46.0,
+        "conversion_probability": 0.81,
+        "recommended_page_type": "use_case_page",
+        "revenue_priority": 53.88,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "saas startup outbound system",
+        "type": "transactional",
+        "cluster": "revenue automation (early)",
+        "difficulty": 46.0,
+        "conversion_probability": 0.81,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 53.88,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "series a saas outbound system",
+        "type": "transactional",
+        "cluster": "revenue automation (growth)",
+        "difficulty": 46.0,
+        "conversion_probability": 0.81,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 53.88,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "ai sales automation system",
+        "type": "transactional",
+        "cluster": "ai sdr systems",
+        "difficulty": 52.0,
+        "conversion_probability": 0.81,
+        "recommended_page_type": "landing_page",
+        "revenue_priority": 53.46,
+        "coverage_status": "pending"
+      },
+      {
+        "keyword": "ai sales automation system for early-stage-saas",
+        "type": "transactional",
+        "cluster": "ai sdr systems (early)",
+        "difficulty": 52.0,
+        "conversion_probability": 0.81,
+        "recommended_page_type": "use_case_page",
+        "revenue_priority": 53.46,
+        "coverage_status": "pending"
+      }
+    ]
   }
 ]
