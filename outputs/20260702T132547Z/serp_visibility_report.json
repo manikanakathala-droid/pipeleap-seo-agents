@@ -1,0 +1,15 @@
+{
+  "run_id": "20260702T132547Z",
+  "generated_at": "2026-07-02T13:25:47.279758+00:00",
+  "content_briefs_generated": 8,
+  "keyword_clusters_loaded": 5,
+  "linking_clusters_loaded": 2,
+  "output_files": [
+    "outputs/20260702T132547Z/serp_snippet_recommendations.json",
+    "outputs/20260702T132547Z/offpage_action_queue.json",
+    "outputs/20260702T132547Z/linkedin_content_briefs.json",
+    "outputs/20260702T132547Z/content_plan_briefs.json",
+    "outputs/20260702T132547Z/internal_linking_clusters.json"
+  ],
+  "errors": []
+}
