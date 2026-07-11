@@ -1,9 +1,9 @@
 {
-  "active_count": 9,
+  "active_count": 12,
   "critical_count": 0,
-  "warning_count": 3,
-  "info_count": 6,
-  "last_updated": "2026-07-10T09:34:57.868007+00:00",
+  "warning_count": 4,
+  "info_count": 8,
+  "last_updated": "2026-07-11T02:36:41.176773+00:00",
   "crawl_pages": 1,
   "audit_issues": 3,
   "fixes_applied": 0
