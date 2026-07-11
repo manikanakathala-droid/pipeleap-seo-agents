@@ -1,33 +1,6 @@
 {
-  "last_updated": "2026-07-11T02:36:41.176773+00:00",
+  "last_updated": "2026-07-11T07:55:39.159712+00:00",
   "active_alerts": [
-    {
-      "issue_type": "warning",
-      "page_url": "https://www.pipeleap.com/",
-      "date": "2026-07-08",
-      "title": "Thin content \u2014 below 300 words",
-      "description": "Page body contains only 40 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
-      "source": "audit_warroom",
-      "created_at": "2026-07-08T02:40:08.434400+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com",
-      "date": "2026-07-08",
-      "title": "No favicon detected on any crawled page",
-      "description": "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. Google displays the site favicon next to search results \u2014 a missing favicon means Google falls back to a generic globe ic",
-      "source": "audit_warroom",
-      "created_at": "2026-07-08T02:40:08.434412+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com",
-      "date": "2026-07-08",
-      "title": "No WebSite structured data detected",
-      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
-      "source": "audit_warroom",
-      "created_at": "2026-07-08T02:40:08.434418+00:00"
-    },
     {
       "issue_type": "warning",
       "page_url": "https://www.pipeleap.com/",
@@ -983,6 +956,33 @@
       "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
       "source": "audit_warroom",
       "created_at": "2026-07-07T03:22:10.861098+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-07-08",
+      "title": "Thin content \u2014 below 300 words",
+      "description": "Page body contains only 40 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-07-08T02:40:08.434400+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-07-08",
+      "title": "No favicon detected on any crawled page",
+      "description": "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. Google displays the site favicon next to search results \u2014 a missing favicon means Google falls back to a generic globe ic",
+      "source": "audit_warroom",
+      "created_at": "2026-07-08T02:40:08.434412+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-07-08",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-07-08T02:40:08.434418+00:00"
     }
   ]
 }
