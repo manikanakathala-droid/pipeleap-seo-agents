@@ -3,8 +3,8 @@
   "critical_count": 1,
   "warning_count": 5,
   "info_count": 7,
-  "last_updated": "2026-07-17T13:27:37.605054+00:00",
+  "last_updated": "2026-07-18T02:27:33.212339+00:00",
   "crawl_pages": 1,
-  "audit_issues": 11,
+  "audit_issues": 3,
   "fixes_applied": 0
 }
