@@ -1,0 +1,184 @@
+{
+  "run_id": "20260722T131659Z",
+  "generated_at": "2026-07-22T13:17:00.398837+00:00",
+  "snippet_recommendations": [
+    {
+      "page_path": "/",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Revenue Operations & Pipeline Automation | Pipeleap",
+      "recommended_meta": "Pipeleap builds and runs your entire revenue engine - 11 connected modules covering ICP scoring, personalised outreach, and CRM handoff. Zero manual setup.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "How to Get 3x More Meetings Without Hiring More Reps",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/about",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "About Pipeleap - Sales Operations Platform",
+      "recommended_meta": "Pipeleap is a sales operations platform that orchestrates CRM, enrichment, and execution. No tool sprawl, no setup Saturdays. One working engine that gets smarter over time.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Your Sales Reps Are Spending 65% of Their Day on Admin. Stop It.",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/sales-ops-audit",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Free Sales Ops Audit | Pipeleap",
+      "recommended_meta": "Get a full audit of your sales operations - targeting, messaging, workflows, and pipeline health. Identify what is broken and get a fix plan in under 2 weeks.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "The 11 Modules Every Revenue Engine Needs (Most Teams Have 3)",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/faq",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Revenue Operations FAQ - Pipeleap",
+      "recommended_meta": "Answers to common questions about how Pipeleap builds, deploys, and operates revenue systems for B2B teams.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Your Sales Reps Are Spending 65% of Their Day on Admin. Stop It.",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    },
+    {
+      "page_path": "/pricing",
+      "current_title": "",
+      "current_meta": "",
+      "recommended_title": "Revenue Operations Pricing | Pipeleap",
+      "recommended_meta": "Pipeleap pricing for sales operations platform. No seat licences, no duct tape.",
+      "reason": "Proactive optimisation \u2014 align copy with primary keyword cluster",
+      "priority": "low",
+      "ctr_variant": "Your Sales Reps Are Spending 65% of Their Day on Admin. Stop It.",
+      "impressions": 0,
+      "current_ctr": 0.0,
+      "average_position": 0.0
+    }
+  ],
+  "faq_briefs": [
+    {
+      "page_path": "/faq",
+      "questions": [
+        "What is revenue operations?",
+        "How long does it take to build a working revenue system?",
+        "What is a sales ops audit and why does it matter?",
+        "What is ICP scoring in sales?",
+        "How does AI personalisation improve reply rates in cold outreach?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    },
+    {
+      "page_path": "/sales-ops-audit",
+      "questions": [
+        "What is a sales ops audit and why does it matter?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    },
+    {
+      "page_path": "/",
+      "questions": [
+        "Can sales workflows be fully automated?",
+        "How do I fix an unpredictable sales pipeline?"
+      ],
+      "schema_ready": true,
+      "action": "Add FAQPage JSON-LD schema. Each answer must be a standalone paragraph. No CTA-only text. No navigation links as answers."
+    }
+  ],
+  "breadcrumb_recommendations": [
+    {
+      "page_path": "/blog/ai-personalization-cold-email",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Revenue Operations",
+        "Ai Personalization Cold Email"
+      ],
+      "cluster": "Revenue Operations"
+    },
+    {
+      "page_path": "/blog/cost-of-manual-prospecting",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Revenue Operations",
+        "Cost Of Manual Prospecting"
+      ],
+      "cluster": "Revenue Operations"
+    },
+    {
+      "page_path": "/blog/outbound-stack-too-many-tools",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Revenue Operations",
+        "Outbound Stack Too Many Tools"
+      ],
+      "cluster": "Revenue Operations"
+    },
+    {
+      "page_path": "/blog/predictable-pipeline-without-sdrs",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Revenue Operations",
+        "Predictable Pipeline Without Sdrs"
+      ],
+      "cluster": "Revenue Operations"
+    },
+    {
+      "page_path": "/glossary/sales-automation",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Sales Automation"
+      ],
+      "cluster": "Revenue Operations"
+    },
+    {
+      "page_path": "/blog/what-is-sales-orchestration",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Sales Orchestration",
+        "What Is Sales Orchestration"
+      ],
+      "cluster": "Sales Orchestration"
+    },
+    {
+      "page_path": "/blog/11-modules-outbound-engine",
+      "breadcrumb_chain": [
+        "Home",
+        "Blog",
+        "Sales Orchestration",
+        "11 Modules Outbound Engine"
+      ],
+      "cluster": "Sales Orchestration"
+    },
+    {
+      "page_path": "/glossary/sales-orchestration",
+      "breadcrumb_chain": [
+        "Home",
+        "Glossary",
+        "Sales Orchestration"
+      ],
+      "cluster": "Sales Orchestration"
+    }
+  ],
+  "ctr_improvement_actions": [],
+  "page_two_opportunities": []
+}
