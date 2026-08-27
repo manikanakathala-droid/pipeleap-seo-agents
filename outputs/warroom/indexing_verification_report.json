@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-08-26T19:46:23.533953+00:00",
+  "verified_at": "2026-08-27T07:46:04.930547+00:00",
   "channels": {
     "indexnow": {
       "ok": true,
@@ -23,7 +23,7 @@
         {
           "ok": true,
           "submitted": 347,
-          "status": 202,
+          "status": 200,
           "endpoint": "https://yandex.com/indexnow"
         }
       ]
