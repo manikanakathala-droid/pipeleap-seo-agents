@@ -1,29 +1,29 @@
 {
-  "verified_at": "2026-10-05T04:19:23.588331+00:00",
+  "verified_at": "2026-10-05T13:44:33.341642+00:00",
   "channels": {
     "indexnow": {
       "ok": true,
       "source": "retry_1",
-      "urls_submitted": 347,
+      "urls_submitted": 349,
       "endpoints_ok": 3,
       "endpoints_total": 3,
       "results": [
         {
           "ok": true,
-          "submitted": 347,
+          "submitted": 349,
           "status": 200,
           "endpoint": "https://api.indexnow.org/indexnow"
         },
         {
           "ok": true,
-          "submitted": 347,
+          "submitted": 349,
           "status": 200,
           "endpoint": "https://www.bing.com/indexnow"
         },
         {
           "ok": true,
-          "submitted": 347,
-          "status": 202,
+          "submitted": 349,
+          "status": 200,
           "endpoint": "https://yandex.com/indexnow"
         }
       ]
