@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-10-22T16:42:21.392174+00:00",
+  "verified_at": "2026-10-22T21:14:16.800431+00:00",
   "channels": {
     "indexnow": {
       "ok": true,
@@ -34,9 +34,9 @@
       "status": 204
     },
     "gsc_sitemap": {
-      "ok": true,
-      "source": "retry_1",
-      "sitemap_url": "https://www.pipeleap.com/sitemap.xml"
+      "ok": false,
+      "source": "all_retries_failed",
+      "error": "Expecting value: line 2 column 1 (char 1)"
     },
     "google_indexing_api": {
       "ok": true,
@@ -46,5 +46,5 @@
     }
   },
   "new_urls_inspected": [],
-  "overall_ok": true
+  "overall_ok": false
 }
