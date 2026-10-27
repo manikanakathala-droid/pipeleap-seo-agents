@@ -1,15 +1,6 @@
 {
-  "last_updated": "2026-10-27T17:32:13.372975+00:00",
+  "last_updated": "2026-10-27T21:51:40.724582+00:00",
   "active_alerts": [
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-10-24",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-10-24T20:18:43.743537+00:00"
-    },
     {
       "issue_type": "warning",
       "page_url": "https://www.pipeleap.com/",
@@ -180,6 +171,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-10-27T17:32:13.369523+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-10-27",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-10-27T21:51:40.720295+00:00"
     }
   ],
   "alert_history": [
@@ -4106,6 +4106,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-10-24T15:27:35.493945+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-10-24",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-10-24T20:18:43.743537+00:00"
     }
   ]
 }
