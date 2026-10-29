@@ -1,11 +1,11 @@
 {
-  "verified_at": "2026-10-29T04:36:23.770109+00:00",
+  "verified_at": "2026-10-29T12:22:09.317619+00:00",
   "channels": {
     "indexnow": {
       "ok": true,
       "source": "retry_1",
       "urls_submitted": 347,
-      "endpoints_ok": 2,
+      "endpoints_ok": 3,
       "endpoints_total": 3,
       "results": [
         {
@@ -21,8 +21,9 @@
           "endpoint": "https://www.bing.com/indexnow"
         },
         {
-          "ok": false,
-          "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+          "ok": true,
+          "submitted": 347,
+          "status": 202,
           "endpoint": "https://yandex.com/indexnow"
         }
       ]
