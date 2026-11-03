@@ -1,24 +1,6 @@
 {
-  "last_updated": "2026-11-03T13:42:21.781265+00:00",
+  "last_updated": "2026-11-03T22:57:01.871304+00:00",
   "active_alerts": [
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-10-31",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-10-31T16:53:32.988760+00:00"
-    },
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-10-31",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-10-31T21:03:14.282476+00:00"
-    },
     {
       "issue_type": "warning",
       "page_url": "https://www.pipeleap.com/",
@@ -162,6 +144,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-03T13:42:21.776218+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-03",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-03T22:57:01.867527+00:00"
     }
   ],
   "alert_history": [
@@ -4484,6 +4475,24 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-10-31T11:45:38.479843+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-10-31",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-10-31T16:53:32.988760+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-10-31",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-10-31T21:03:14.282476+00:00"
     }
   ]
 }
