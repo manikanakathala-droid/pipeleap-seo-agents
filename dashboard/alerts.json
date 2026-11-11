@@ -1,42 +1,6 @@
 {
-  "last_updated": "2026-11-10T22:53:40.970170+00:00",
+  "last_updated": "2026-11-11T04:55:02.958755+00:00",
   "active_alerts": [
-    {
-      "issue_type": "warning",
-      "page_url": "https://www.pipeleap.com/",
-      "date": "2026-11-08",
-      "title": "Thin content \u2014 below 300 words",
-      "description": "Page body contains only 40 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
-      "source": "audit_warroom",
-      "created_at": "2026-11-08T04:42:52.621546+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com",
-      "date": "2026-11-08",
-      "title": "No favicon detected on any crawled page",
-      "description": "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. Google displays the site favicon next to search results \u2014 a missing favicon means Google falls back to a generic globe ic",
-      "source": "audit_warroom",
-      "created_at": "2026-11-08T04:42:52.621558+00:00"
-    },
-    {
-      "issue_type": "info",
-      "page_url": "https://www.pipeleap.com",
-      "date": "2026-11-08",
-      "title": "No WebSite structured data detected",
-      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
-      "source": "audit_warroom",
-      "created_at": "2026-11-08T04:42:52.621563+00:00"
-    },
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-11-08",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-11-08T04:42:52.624878+00:00"
-    },
     {
       "issue_type": "critical",
       "page_url": "",
@@ -207,6 +171,114 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-10T22:53:40.965534+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Broken page response",
+      "description": "Page returned HTTP 503.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945137+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Indexed page is marked noindex",
+      "description": "The crawler detected a noindex directive.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945151+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Thin content \u2014 below 300 words",
+      "description": "Page body contains only 34 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945155+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Images missing alt text (1/1)",
+      "description": "1 of 1 images lack alt attributes. Alt text is required for screen readers, Google image indexing, and AI agents that parse the accessibility tree.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945158+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/sitemap.xml",
+      "date": "2026-11-11",
+      "title": "Missing or unreadable sitemap",
+      "description": "No sitemap URLs were discovered from robots.txt or sitemap.xml.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945161+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Title too short (20 chars)",
+      "description": "AI-generated or auto-populated titles under 30 characters are unlikely to be descriptive enough for search snippets.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945164+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Missing canonical",
+      "description": "The page does not define a canonical URL.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945167+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "No structured data (JSON-LD) detected",
+      "description": "The page has no JSON-LD schema markup. Structured data is required for rich results (FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945170+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/sitemap.xml",
+      "date": "2026-11-11",
+      "title": "No image sitemap detected (1 images found on crawled pages)",
+      "description": "The crawled pages contain 1 images but the sitemap declares no <image:image> entries. Google relies on image sitemaps to discover images loaded via JavaScript or rendered after page load, which Google",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945173+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-11",
+      "title": "Meta description too short (46 chars)",
+      "description": "Short meta descriptions (under 70 characters) waste the snippet space and reduce click-through rates.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945175+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-11-11",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-11-11T04:55:02.945178+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-11",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-11T04:55:02.951816+00:00"
     }
   ],
   "alert_history": [
@@ -4916,6 +4988,42 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-07T21:29:38.106722+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-08",
+      "title": "Thin content \u2014 below 300 words",
+      "description": "Page body contains only 40 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-08T04:42:52.621546+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-11-08",
+      "title": "No favicon detected on any crawled page",
+      "description": "No <link rel='icon'> (or apple-touch-icon) tag was found across crawled pages. Google displays the site favicon next to search results \u2014 a missing favicon means Google falls back to a generic globe ic",
+      "source": "audit_warroom",
+      "created_at": "2026-11-08T04:42:52.621558+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-11-08",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-11-08T04:42:52.621563+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-08",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-08T04:42:52.624878+00:00"
     }
   ]
 }
