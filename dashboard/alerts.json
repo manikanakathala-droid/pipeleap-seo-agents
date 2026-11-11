@@ -1,15 +1,6 @@
 {
-  "last_updated": "2026-11-11T04:55:02.958755+00:00",
+  "last_updated": "2026-11-11T13:39:19.716340+00:00",
   "active_alerts": [
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-11-08",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-11-08T12:50:35.005670+00:00"
-    },
     {
       "issue_type": "critical",
       "page_url": "",
@@ -279,6 +270,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-11T04:55:02.951816+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-11",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-11T13:39:19.711315+00:00"
     }
   ],
   "alert_history": [
@@ -5024,6 +5024,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-08T04:42:52.624878+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-08",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-08T12:50:35.005670+00:00"
     }
   ]
 }
