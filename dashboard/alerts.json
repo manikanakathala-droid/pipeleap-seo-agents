@@ -1,15 +1,6 @@
 {
-  "last_updated": "2026-11-11T13:39:19.716340+00:00",
+  "last_updated": "2026-11-12T00:06:38.042375+00:00",
   "active_alerts": [
-    {
-      "issue_type": "critical",
-      "page_url": "",
-      "date": "2026-11-08",
-      "title": "Indexing signal failed: gsc_sitemap",
-      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
-      "source": "indexing_verifier",
-      "created_at": "2026-11-08T21:44:07.700016+00:00"
-    },
     {
       "issue_type": "warning",
       "page_url": "https://www.pipeleap.com/",
@@ -279,6 +270,114 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-11T13:39:19.711315+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Broken page response",
+      "description": "Page returned HTTP 503.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033739+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Indexed page is marked noindex",
+      "description": "The crawler detected a noindex directive.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033759+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Thin content \u2014 below 300 words",
+      "description": "Page body contains only 34 words. Thin pages rarely satisfy user intent and are unlikely to be cited in AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033765+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Images missing alt text (1/1)",
+      "description": "1 of 1 images lack alt attributes. Alt text is required for screen readers, Google image indexing, and AI agents that parse the accessibility tree.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033768+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/sitemap.xml",
+      "date": "2026-11-12",
+      "title": "Missing or unreadable sitemap",
+      "description": "No sitemap URLs were discovered from robots.txt or sitemap.xml.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033772+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Title too short (20 chars)",
+      "description": "AI-generated or auto-populated titles under 30 characters are unlikely to be descriptive enough for search snippets.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033786+00:00"
+    },
+    {
+      "issue_type": "warning",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Missing canonical",
+      "description": "The page does not define a canonical URL.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033789+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "No structured data (JSON-LD) detected",
+      "description": "The page has no JSON-LD schema markup. Structured data is required for rich results (FAQ, HowTo, Article, Product) and helps Google understand page context for AI Overviews.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033792+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/sitemap.xml",
+      "date": "2026-11-12",
+      "title": "No image sitemap detected (1 images found on crawled pages)",
+      "description": "The crawled pages contain 1 images but the sitemap declares no <image:image> entries. Google relies on image sitemaps to discover images loaded via JavaScript or rendered after page load, which Google",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033795+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com/",
+      "date": "2026-11-12",
+      "title": "Meta description too short (46 chars)",
+      "description": "Short meta descriptions (under 70 characters) waste the snippet space and reduce click-through rates.",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033798+00:00"
+    },
+    {
+      "issue_type": "info",
+      "page_url": "https://www.pipeleap.com",
+      "date": "2026-11-12",
+      "title": "No WebSite structured data detected",
+      "description": "No WebSite JSON-LD schema was found across crawled pages. Google uses WebSite structured data (with name and url properties) to determine the preferred site name shown in search results. Without it, G",
+      "source": "audit_warroom",
+      "created_at": "2026-11-12T00:06:38.033802+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-12",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-12T00:06:38.037145+00:00"
     }
   ],
   "alert_history": [
@@ -5033,6 +5132,15 @@
       "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
       "source": "indexing_verifier",
       "created_at": "2026-11-08T12:50:35.005670+00:00"
+    },
+    {
+      "issue_type": "critical",
+      "page_url": "",
+      "date": "2026-11-08",
+      "title": "Indexing signal failed: gsc_sitemap",
+      "description": "All retries exhausted for gsc_sitemap. Last error: Expecting value: line 2 column 1 (char 1)",
+      "source": "indexing_verifier",
+      "created_at": "2026-11-08T21:44:07.700016+00:00"
     }
   ]
 }
