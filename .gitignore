@@ -1,6 +1,4 @@
-# Website checkouts used only as publish targets in CI/local runs
-pipeleap-launchpad/
-temp_frontend_repo/
+# Website checkout used only as a publish target
 site/
 
 # Credentials
@@ -21,17 +19,13 @@ dist/
 build/
 
 # Generated outputs
-outputs/*
-!outputs/warroom/
-!outputs/warroom/**
-!outputs/*/post_publish_signals.json
+outputs/
 *.sqlite
 *.db
 
 # Environment files
 .env
 .env.*
-!.env.example
 
 # Logs
 *.log
