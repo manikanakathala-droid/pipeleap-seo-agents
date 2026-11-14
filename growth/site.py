@@ -100,11 +100,14 @@ class SiteModel:
                     pairs.append((question, answer))
         return pairs
 
-    def facts(self, max_chars: int = 6000) -> str:
-        """Plain-text digest of what the site says. The only allowed source of product claims."""
+    def facts(self, max_chars: int = 6000, exclude: tuple[str, ...] | list[str] = ()) -> str:
+        """Plain-text digest of what the site says. The only allowed source of product claims.
+
+        The homepage comes first so it is never cut off; legal pages are listed in `exclude`.
+        """
         parts: list[str] = []
-        for page in self.pages:
-            if page.managed:
+        for page in sorted(self.pages, key=lambda p: (p.path != "/", p.path)):
+            if page.managed or page.path in exclude:
                 continue
             parts.append(f"[{page.path}] {page.title}\n{page.meta_description}\n{page.text}")
         return "\n\n".join(parts)[:max_chars]

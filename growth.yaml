@@ -10,6 +10,7 @@ site:
   repo: manikanakathala-droid/Pipeleap-web-redesign
   branch: main
   checkout_dir: site
+  facts_exclude: [/cookie-policy]   # legal pages are not product facts for article drafting
 
 organization:
   logo: /favicon.svg
