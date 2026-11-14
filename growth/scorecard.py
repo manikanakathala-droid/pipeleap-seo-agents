@@ -72,8 +72,11 @@ def render(*, site: SiteModel, measurement: Measurement, ledger: Ledger, plan: P
         headline = "Neither search nor enquiry data is reachable. The loop is running blind and has limited itself accordingly."
     elif now["enquiries"] is None:
         headline = f"{now['clicks']} organic click(s) in {measurement.window_days} days; enquiries are not being measured yet."
+    elif now["clicks"] is None:
+        headline = (f"No enquiries recorded in {measurement.window_days} days, and search data is unavailable "
+                    f"({measurement.search.state}).")
     else:
-        headline = f"{now['clicks'] if now['clicks'] is not None else 'Unknown'} organic click(s) and no enquiries in {measurement.window_days} days."
+        headline = f"{now['clicks']} organic click(s) and no enquiries in {measurement.window_days} days."
     lines += [f"**{headline}**", ""]
 
     lines += ["## Funnel", "", f"Last {measurement.window_days} days. Change since the previous run in brackets.", "",
