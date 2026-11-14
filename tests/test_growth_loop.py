@@ -398,3 +398,9 @@ def test_dry_run_changes_nothing(site_dir, growth, tmp_path):
         measurement=measurement())
     assert {f.name: f.read_text() for f in site_dir.iterdir()} == before
     assert not (tmp_path / "state").exists()
+
+
+def test_headline_when_only_search_is_missing(site_dir, growth, tmp_path):
+    report = run(site_dir=site_dir, state_dir=tmp_path / "state", growth=growth, today=TODAY, llm=None, dry_run=True,
+                 measurement=measurement(search="error", analytics="empty"))
+    assert report["headline"].startswith("No enquiries recorded") and "Unknown" not in report["headline"]

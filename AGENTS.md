@@ -31,6 +31,16 @@ State is committed in `growth_state/`: `ledger.json` (pages, experiments, observ
 
 Configuration: `growth.yaml`. Tests: `python -m pytest tests -q` (no network needed).
 
+## Setup status (verified by the first run on master, Nov 14, 2026)
+
+| Item | Status |
+|---|---|
+| GA4 credentials (`GSC_SERVICE_ACCOUNT_JSON`) | Work. Property `533951518` returned 0 sessions for the previous 28 days. |
+| GA4 tag on the site | `G-GW7CB348F3` (the stream the previous site used). Live once `Pipeleap-web-redesign` PR #1 is merged. Mark `book_walkthrough` as a key event in GA4. |
+| Search Console API | **Disabled** in Google Cloud project `873204905433`. Enable `searchconsole.googleapis.com` there; until then search data reads "unknown". |
+| `SITE_DEPLOY_TOKEN` | Not set. Site changes are attached to each run as `site-changes.patch` instead of being pushed. |
+| LLM | GitHub Models via the workflow token (`models: read`). Not yet exercised by a real draft. |
+
 ## Rules
 
 1. **Outcomes only.** Never add a score that rewards the system's own activity. The old "SEO score" read 100/100
