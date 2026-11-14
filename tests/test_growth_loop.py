@@ -266,6 +266,7 @@ def test_gate_rejects_thin_duplicate_banned_and_unlinked(growth):
 
 # ── publishing ─────────────────────────────────────────────────────────────
 def test_foundation_is_idempotent_and_preserves_hand_edits(site_dir, growth, tmp_path):
+    growth["analytics"]["ga4_measurement_id"] = ""
     ledger = Ledger(tmp_path / "l.json")
     site = SiteModel.load(site_dir, SITE_URL)
     gaps = {g["title"] for g in publish.foundation_gaps(site, growth)}

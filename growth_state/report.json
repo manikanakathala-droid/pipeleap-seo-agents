@@ -36,11 +36,6 @@
   ],
   "manual": [
     {
-      "title": "Install analytics and enquiry tracking",
-      "why": "The site has no analytics, so visits and walkthrough clicks are invisible. Set analytics.ga4_measurement_id in growth.yaml and the loop installs the tag and click tracking.",
-      "kind": "foundation"
-    },
-    {
       "title": "Publish a page for \u201crevops workflow automation\u201d",
       "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
       "kind": "new_page"
@@ -153,7 +148,7 @@
     {
       "kind": "foundation",
       "title": "Install analytics and enquiry tracking",
-      "auto": false,
+      "auto": true,
       "priority": 95
     },
     {

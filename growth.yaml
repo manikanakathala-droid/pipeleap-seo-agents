@@ -30,7 +30,7 @@ cta:
     and where your reps' selling time is going today.
 
 analytics:
-  ga4_measurement_id: ""    # G-XXXXXXXXXX. When set, the loop installs the tag and enquiry click tracking.
+  ga4_measurement_id: G-GW7CB348F3   # same stream the previous site used, so GA4 history stays continuous
   enquiry_event: book_walkthrough
 
 measurement:

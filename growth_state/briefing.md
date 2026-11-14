@@ -21,7 +21,6 @@ Last 28 days. Change since the previous run in brackets.
 
 - **search**: unavailable. offline run
 - **analytics**: unavailable. offline run
-- The site has no analytics tag, so sessions and enquiries cannot be recorded at all.
 
 ## What the loop has learned
 
@@ -37,10 +36,6 @@ Nothing yet. 1 experiment(s) are open; the first verdicts come 14 to 56 days aft
 - Publish a page for “how to reduce sales admin work for reps”: not published; brief saved to growth_state/briefs/how-to-reduce-sales-admin-work-for-reps.md
 - Publish a page for “how to improve sales forecast accuracy with crm activity”: not published; brief saved to growth_state/briefs/how-to-improve-sales-forecast-accuracy-with-crm-activity.md
 - Site foundation: updated 92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt, index.html, pilot.html, robots.txt, sitemap.xml, vercel.json
-
-## Needs a person
-
-- **Install analytics and enquiry tracking**. The site has no analytics, so visits and walkthrough clicks are invisible. Set analytics.ga4_measurement_id in growth.yaml and the loop installs the tag and click tracking.
 
 ## Content queue (not published)
 
