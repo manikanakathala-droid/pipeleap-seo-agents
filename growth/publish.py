@@ -25,6 +25,7 @@ from growth.site import SiteModel, normalize_path
 GENERATOR = "pipeleap-growth-loop"
 HEAD_OPEN, HEAD_CLOSE = "<!-- growth:seo -->", "<!-- /growth:seo -->"
 BODY_OPEN, BODY_CLOSE = "<!-- growth:track -->", "<!-- /growth:track -->"
+CONSENT_OPEN, CONSENT_CLOSE = "<!-- growth:consent -->", "<!-- /growth:consent -->"
 ROBOTS_MARK = f"# managed by {GENERATOR}"
 
 
@@ -54,6 +55,30 @@ def _replace_block(source: str, open_mark: str, close_mark: str, block: str, bef
     if index < 0 or not wrapped:
         return source
     return source[:index] + wrapped + source[index:]
+
+
+def _replace_head_start_block(source: str, open_mark: str, close_mark: str, block: str) -> str:
+    """Insert or replace a marked block at the very start of <head> (after the charset meta, if any)."""
+    wrapped = f"{open_mark}\n{block}\n{close_mark}\n" if block else ""
+    pattern = re.compile(re.escape(open_mark) + r".*?" + re.escape(close_mark) + r"\n?", re.S)
+    if pattern.search(source):
+        return pattern.sub(lambda _: wrapped, source, count=1)
+    if not wrapped:
+        return source
+    match = re.search(r"<meta\s+charset=[^>]*>\s*\n?", source, re.I) or re.search(r"<head\b[^>]*>\s*\n?", source, re.I)
+    if not match:
+        return source
+    return source[:match.end()] + wrapped + source[match.end():]
+
+
+def consent_block(growth: dict[str, Any]) -> str:
+    """Termly consent banner. Must be the first script on the page so it can block tags until consent."""
+    uuid = str(growth.get("consent", {}).get("termly_website_uuid", "") or "").strip()
+    if not re.fullmatch(r"[0-9a-fA-F-]{32,40}", uuid):
+        return ""
+    auto_block = "on" if growth.get("consent", {}).get("auto_block", True) else "off"
+    return (f'<script type="text/javascript" src="https://app.termly.io/resource-blocker/{uuid}'
+            f'?autoBlock={auto_block}"></script>')
 
 
 # ── foundation ─────────────────────────────────────────────────────────────
@@ -185,6 +210,10 @@ def foundation_gaps(site: SiteModel, growth: dict[str, Any]) -> list[dict[str, A
                              + ("The loop will add the GA4 tag and click tracking."
                                 if configured else
                                 "Set analytics.ga4_measurement_id in growth.yaml and the loop installs the tag and click tracking."))})
+    if growth.get("analytics", {}).get("ga4_measurement_id") and not consent_block(growth):
+        gaps.append({"title": "Add a cookie consent banner", "order": 8, "auto": False,
+                     "why": "The site sets analytics cookies without asking. Set consent.termly_website_uuid in "
+                            "growth.yaml and the loop adds the Termly banner as the first script on every page."})
     section = growth.get("publish", {}).get("section", "resources")
     if any(p.managed for p in site.pages) and not any(
             f"/{section}" in p.internal_links for p in site.pages if not p.managed):
@@ -218,6 +247,7 @@ def apply_foundation(site: SiteModel, growth: dict[str, Any], ledger: Ledger, to
         source = file.read_text(encoding="utf-8")
         updated = _replace_block(source, HEAD_OPEN, HEAD_CLOSE, head_block(page.path, source, site, growth), "</head>")
         updated = _replace_block(updated, BODY_OPEN, BODY_CLOSE, tracking_block(growth), "</body>")
+        updated = _replace_head_start_block(updated, CONSENT_OPEN, CONSENT_CLOSE, consent_block(growth))
         if updated != source:
             file.write_text(updated, encoding="utf-8")
             changed.append(page.file)
@@ -329,11 +359,13 @@ def _page_shell(*, chrome: dict[str, str], site: SiteModel, growth: dict[str, An
         analytics = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={_esc(measurement_id)}"></script>\n'
                      "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
                      f"gtag('js',new Date());gtag('config','{measurement_id}');</script>\n")
+    consent = consent_block(growth)
+    consent = f"{CONSENT_OPEN}\n{consent}\n{CONSENT_CLOSE}\n" if consent else ""
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+{consent}<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{_esc(full_title)}</title>
 <meta name="description" content="{_esc(description)}">
 <meta name="generator" content="{GENERATOR}">
