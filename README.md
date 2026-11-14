@@ -1,35 +1,8 @@
-# Pipeleap growth loop
+# Pipeleap growth loop (retired)
 
-A daily loop that grows qualified organic demand for www.pipeleap.com and learns from the results.
+The automated growth loop was retired on November 14, 2026. Its GitHub Actions workflow has been removed, and `run_growth_loop.py` no longer runs the loop.
 
-```
-MEASURE  Search Console + GA4            what happened
-LEARN    experiments, cluster beliefs    what worked, and for which kind of buyer
-PLAN     guarded action queue            what to do next, and what to hold back
-ACT      site foundation + pages         change the site (static HTML repository)
-REPORT   funnel briefing                 impressions -> clicks -> sessions -> enquiries
-```
+The remaining `growth/` modules, `growth.yaml`, tests, and `growth_state/` files are retained for historical reference only. They are inactive and do not create or publish site content.
 
-```bash
-pip install -r requirements-growth.txt
-```
+The production site is maintained separately in [Pipeleap-web-redesign](https://github.com/manikanakathala-droid/Pipeleap-web-redesign).
 
-```bash
-git clone https://github.com/manikanakathala-droid/Pipeleap-web-redesign site
-```
-
-```bash
-python run_growth_loop.py --site-dir site --dry-run
-```
-
-```bash
-python -m pytest tests -q
-```
-
-- Configuration: `growth.yaml`
-- Memory: `growth_state/ledger.json`
-- Latest briefing: `growth_state/briefing.md`
-- Architecture and rules: `AGENTS.md`
-
-The previous agents (`agents/`, `core/`, `modules/`, `geo_agent/`) targeted a site that no longer exists and are
-retired; see `AGENTS.md`.
