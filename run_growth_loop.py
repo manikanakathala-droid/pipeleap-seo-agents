@@ -34,9 +34,10 @@ def main() -> int:
             logger.info("No changed URLs to submit.")
             return 0
         from connectors.indexnow_connector import IndexNowConnector
-        for result in IndexNowConnector().submit_all_endpoints(urls):
-            logger.info("IndexNow %s -> %s", result.get("endpoint"), result.get("status"))
-        return 0
+        results = IndexNowConnector().submit_all_endpoints(urls)
+        for result in results:
+            logger.info("IndexNow %s -> %s %s", result.get("endpoint"), result.get("status"), result.get("error", ""))
+        return 0 if any(r.get("ok") for r in results) else 1
 
     from growth.run import load_growth_config, run
     integrations: dict = {}
