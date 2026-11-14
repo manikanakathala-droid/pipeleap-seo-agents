@@ -434,3 +434,12 @@ def test_no_banner_and_a_reminder_without_termly_id(site_dir, growth, tmp_path):
     assert "Add a cookie consent banner" in {g["title"] for g in publish.foundation_gaps(site, growth)}
     publish.apply_foundation(site, growth, Ledger(tmp_path / "l.json"), TODAY)
     assert "termly" not in (site_dir / "index.html").read_text()
+
+
+def test_facts_put_homepage_first_and_skip_legal_pages(site_dir):
+    (site_dir / "cookie-policy.html").write_text(page("Cookie Policy", "How cookies are used.",
+                                                      "<h1>Cookie Policy</h1><p>Cookies are small data files.</p>"))
+    site = SiteModel.load(site_dir, SITE_URL)
+    facts = site.facts(exclude=["/cookie-policy"])
+    assert facts.startswith("[/]") and "Cookies are small data files" not in facts
+    assert "Cookies are small data files" in site.facts()

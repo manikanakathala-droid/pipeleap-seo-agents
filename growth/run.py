@@ -84,7 +84,7 @@ def run(*, site_dir: str | Path, state_dir: str | Path = "growth_state", growth:
     changed_files: list[str] = []
     if site.pages and not dry_run:
         baseline_pages = measurement.per_page()
-        facts = site.facts()
+        facts = site.facts(exclude=growth.get("site", {}).get("facts_exclude", []))
         existing_texts = {p.path: p.text for p in site.pages}
         briefs_written = 0
         for action in plan.actions:
