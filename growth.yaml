@@ -37,7 +37,7 @@ consent:
   # Termly website UUID (Termly dashboard -> your website -> Consent Banner -> Install).
   # When set, the Termly banner is added as the first script on every page; with auto_block
   # it holds analytics cookies until the visitor accepts.
-  termly_website_uuid: ""
+  termly_website_uuid: 358bbff1-5ad2-4973-803e-24d0470355e6
   auto_block: true
 
 measurement:
