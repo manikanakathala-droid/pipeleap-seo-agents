@@ -36,10 +36,11 @@ Configuration: `growth.yaml`. Tests: `python -m pytest tests -q` (no network nee
 | Item | Status |
 |---|---|
 | GA4 credentials (`GSC_SERVICE_ACCOUNT_JSON`) | Work. Property `533951518` returned 0 sessions for the previous 28 days. |
-| GA4 tag on the site | `G-GW7CB348F3` (the stream the previous site used). Live once `Pipeleap-web-redesign` PR #1 is merged. Mark `book_walkthrough` as a key event in GA4. |
+| GA4 tag on the site | `G-GW7CB348F3` (the stream the previous site used). Live in production since Nov 14 (`Pipeleap-web-redesign` PR #1). Mark `book_walkthrough` as a key event in GA4. |
 | Search Console API | **Disabled** in Google Cloud project `873204905433`. Enable `searchconsole.googleapis.com` there; until then search data reads "unknown". |
 | `SITE_DEPLOY_TOKEN` | Not set. Site changes are attached to each run as `site-changes.patch` instead of being pushed. |
 | LLM | GitHub Models via the workflow token (`models: read`). Not yet exercised by a real draft. |
+| Moz, Bing Webmaster and PageSpeed API keys | Exposed in public git history. Nothing still running uses them: revoke them, do not replace them. The `MOZ_*`, `BING_API_KEY` and `PAGESPEED_API_KEY` GitHub secrets are unused. |
 
 ## Rules
 

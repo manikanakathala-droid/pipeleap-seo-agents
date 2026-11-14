@@ -20,6 +20,10 @@ on:
         description: "Plan and report only; change nothing"
         type: boolean
         default: false
+      ping_only:
+        description: "Only notify search engines (IndexNow) of the URLs in growth_state/report.json"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -34,7 +38,20 @@ env:
   PUBLISH_MODE: ${{ vars.GROWTH_PUBLISH_MODE || 'branch' }}
 
 jobs:
+  ping:
+    if: ${{ inputs.ping_only }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: python run_growth_loop.py --ping
+
   loop:
+    if: ${{ !inputs.ping_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
