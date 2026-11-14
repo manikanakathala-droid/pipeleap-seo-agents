@@ -1,0 +1,179 @@
+# Growth loop configuration.
+# Everything the loop believes about the market lives here. Product facts do NOT:
+# those are read from the live site's source on every run.
+
+brand: Pipeleap
+site_url: https://www.pipeleap.com
+
+# The repository that is deployed to www.pipeleap.com.
+site:
+  repo: manikanakathala-droid/Pipeleap-web-redesign
+  branch: main
+  checkout_dir: site
+
+organization:
+  logo: /favicon.svg
+  email: info@pipeleap.com
+  description: >-
+    Pipeleap is a sales productivity and sales stack optimization platform. It works with the
+    sales tools a team already owns to reclaim selling time and unify sales information.
+  social_image: ""          # e.g. /assets/social.png (1200x630). Used for og:image once the file exists.
+  same_as: []               # LinkedIn, X, G2 profile URLs. Only list profiles that exist.
+
+cta:
+  label: Book a walkthrough
+  url: https://app.apollo.io/#/meet/b3a7c
+  hosts: [app.apollo.io]    # a click on a link to any of these counts as an enquiry
+  heading: See it on your own stack
+  text: >-
+    A walkthrough shows how Pipeleap fits the tools your team already uses,
+    and where your reps' selling time is going today.
+
+analytics:
+  ga4_measurement_id: ""    # G-XXXXXXXXXX. When set, the loop installs the tag and enquiry click tracking.
+  enquiry_event: book_walkthrough
+
+measurement:
+  window_days: 28
+  enquiry_events: [book_walkthrough, email_click]   # mark these as key events in GA4
+
+indexnow:
+  key: 92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55
+
+publish:
+  section: resources
+  section_label: Resources
+  section_heading: Getting more from the sales tools you already own
+  section_description: >-
+    Practical guides for sales leaders and revenue operations teams on reclaiming selling time,
+    simplifying the sales stack and getting value from the tools already paid for.
+  chrome_from: pilot.html             # page whose header, footer and base styles articles reuse
+  chrome_exclude_styles: [pilot]      # page-specific style blocks not to copy
+  link_targets:
+    - {path: "/", label: "Pipeleap overview: what it does and who it is for"}
+    - {path: "/pilot", label: "Founding pilot: a free 30-day pilot measured on your own numbers"}
+
+guards:
+  max_new_pages_per_week: 2
+  max_pages_without_search_data: 3    # ceiling on published pages while results cannot be measured
+  indexing_grace_days: 21
+  min_indexed_share: 0.5              # below this, new pages pause until earlier ones are indexed
+  cooldown_days: 21                   # a page is not changed again while its last change is being measured
+
+thresholds:
+  min_query_impressions: 20
+  min_page_impressions: 100
+  decay_drop: 0.4
+  min_sessions_leaky: 50
+  min_clicks_win: 3
+
+quality:
+  min_words: 800
+  max_words: 1600
+  min_internal_links: 2
+  max_similarity: 0.35
+  banned_phrases:
+    - produced with AI assistance
+    - as an AI
+    - in our experience
+    - strategy call
+    - retainer
+    - done-for-you
+    - managed service
+    - game-changer
+    - game changer
+    - revolutionize
+    - supercharge
+    - seamlessly
+    - in today's fast-paced
+    - unlock the power
+    - n8n
+
+icp:
+  description: >-
+    A sales leader, sales manager or revenue operations lead at a B2B company whose reps work
+    deals across several tools (CRM, prospecting, data, email). They feel reps spend too much time
+    on admin between those tools and that the stack costs more than it returns.
+  persona_terms: [sales leader, sales leaders, vp sales, vp of sales, cro, head of sales, sales manager,
+                  sales managers, revops, revenue operations, sales operations, sales ops, founder]
+  context_terms: [b2b, saas, crm, sales team, sales teams, sales reps, reps, sdr, sdrs, account executive,
+                  salesforce, hubspot, pipeline, revenue team]
+  solution_terms: [software, platform, tool, tools, solution, automation, automate, best, alternative,
+                   alternatives, audit, consolidation, consolidate, vs]
+  problem_terms: [how to, why, reduce, increase, improve, fix, too many, too much, stop, eliminate, checklist]
+  disqualifiers: [jobs, job description, salary, course, certification, interview questions, resume,
+                  internship, retail, real estate, car sales, b2c, call center]
+
+# Topic clusters. Learning is tracked per cluster, so a win on one query raises
+# the priority of its neighbours. Derived from the four problems and the
+# capabilities on the live homepage.
+clusters:
+  selling_time:
+    angle: Reps lose selling hours to admin between tools. Show where the time goes and how to get it back.
+    terms: [selling time, non selling, non-selling, sales admin, admin work, administrative, sales productivity,
+            rep productivity, sales capacity, time spent selling, sales efficiency]
+  stack_sprawl:
+    angle: Each tool was bought for a reason; together they make the rep the integration.
+    terms: [sales stack, sales tech stack, tech stack, too many sales tools, tool sprawl, sales tools,
+            tool consolidation, stack consolidation, context switching, switching between tools]
+  stack_roi:
+    angle: Licences and capabilities that are paid for and not used. Value comes from use inside the workflow.
+    terms: [unused licenses, unused licences, shelfware, software spend, sales technology roi, tool adoption,
+            sales tool adoption, license utilization, crm adoption, sales stack audit, tech stack audit]
+  crm_upkeep:
+    angle: The CRM stays the source of truth only if updating it stops depending on rep discipline.
+    terms: [crm data entry, log activities, activity logging, crm hygiene, crm data quality, update the crm,
+            crm updates, manual data entry, messy crm]
+  account_research:
+    angle: Context for every conversation should be prepared, not assembled by hand before each call.
+    terms: [account research, call prep, meeting prep, pre call research, pre-call research, sales research,
+            meeting brief, call preparation]
+  follow_up:
+    angle: Replies, next steps and stalled deals slip when nobody owns the work between tools.
+    terms: [follow up, follow-up, reply handling, next best action, sales inbox, stalled deals, next step,
+            deal follow]
+  revops_workflow:
+    angle: RevOps should design the motion, not police it. Workflows need the follow-through done for them.
+    terms: [revops, revenue operations, sales operations, sales ops, sales workflow, sales process automation,
+            workflow automation]
+  pipeline_visibility:
+    angle: Forecasts built on live activity rather than on what reps remembered to log.
+    terms: [pipeline visibility, forecast accuracy, sales forecast, pipeline review, deal slippage,
+            pipeline hygiene, pipeline reporting]
+
+# Hypotheses to test while there is no search data. Once Search Console reports
+# real queries, evidence-backed opportunities outrank these automatically.
+backlog:
+  - {query: how to reduce sales admin work for reps, cluster: selling_time}
+  - {query: sales tech stack consolidation, cluster: stack_sprawl}
+  - {query: how to increase sales tool adoption, cluster: stack_roi}
+  - {query: how to get sales reps to update the crm, cluster: crm_upkeep}
+  - {query: sales tech stack audit checklist, cluster: stack_sprawl}
+  - {query: too many sales tools, cluster: stack_sprawl}
+  - {query: automate crm data entry for sales reps, cluster: crm_upkeep}
+  - {query: how to automate account research for sales calls, cluster: account_research}
+  - {query: how to follow up on stalled deals, cluster: follow_up}
+  - {query: revops workflow automation, cluster: revops_workflow}
+  - {query: how to improve sales forecast accuracy with crm activity, cluster: pipeline_visibility}
+
+# URLs from the previous site that have a clear equivalent on the new one.
+# The old /blog, /glossary and /tools pages are deliberately not blanket-redirected:
+# a mass redirect to the homepage is treated as a soft 404. If Search Console shows
+# one of them still earning impressions, the loop redirects that URL individually.
+redirects:
+  - {source: /pricing, destination: /pilot}
+  - {source: /contact, destination: /}
+  - {source: /about, destination: /}
+  - {source: /faq, destination: /}
+  - {source: /platform, destination: /}
+  - {source: /services, destination: /}
+  - {source: /how-it-works, destination: /}
+  - {source: /integrations, destination: /}
+  - {source: /sales-operations-platform, destination: /}
+  - {source: /outbound-automation, destination: /}
+  - {source: /outbound-operating-system, destination: /}
+  - {source: /ai-sales, destination: /}
+  - {source: /architecture, destination: /}
+  - {source: /sales-ops-audit, destination: /pilot}
+  - {source: /gtm-audit, destination: /pilot}
+  - {source: /case-studies, destination: /}

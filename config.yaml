@@ -82,7 +82,7 @@
       "conversion_export_path": "outputs/conversions.csv"
     },
     "pagespeed": {
-      "api_key": "AIzaSyDiqiEkaf6aq1PamHcPNaEONgKa3ebtj1g"
+      "api_key": "${PAGESPEED_API_KEY}"
     },
     "cms": {
       "mode": "filesystem",
@@ -641,9 +641,9 @@
       "outbound automation platform"
     ],
     "ahrefs_api_key": "",
-    "moz_api_access_id": "mozscape-xSC6gI3J2B",
-    "moz_api_secret_key": "fF5ukc0XVtgFy1lO9E1RJQAbFL0OZyUd",
-    "bing_api_key": "f2ce40b491c44f1282976da068df483c",
+    "moz_api_access_id": "${MOZ_API_ACCESS_ID}",
+    "moz_api_secret_key": "${MOZ_API_SECRET_KEY}",
+    "bing_api_key": "${BING_API_KEY}",
     "default_author": "pipeleap_team",
     "ghost_mode": { "enabled": true, "contraction_rate": 0.6, "sentence_vary": true, "opinion_language": true },
     "decay_thresholds": {

@@ -1,9 +1,8 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Daily Scheduler Health Check
 
 on:
-  schedule:
-    # Every 6 hours — catches any missed schedule runs within ~6h
-    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 permissions:

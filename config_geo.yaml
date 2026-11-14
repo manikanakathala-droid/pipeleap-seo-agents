@@ -24,7 +24,7 @@
   },
 
   "growth_engine": {
-    "bing_api_key": "f2ce40b491c44f1282976da068df483c"
+    "bing_api_key": "${BING_API_KEY}"
   },
 
   "geo_engine": {

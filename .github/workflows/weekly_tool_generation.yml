@@ -1,15 +1,9 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Weekly Tool Page Generation
 
 on:
-  schedule:
-    - cron: "0 6 * * MON"
   workflow_dispatch:
-    inputs:
-      batch_size:
-        description: Number of tool pages to generate
-        required: true
-        default: "20"
-        type: number
 
 env:
   LAUNCHPAD_DEPLOY_TOKEN: ${{ secrets.LAUNCHPAD_DEPLOY_TOKEN }}

@@ -1,16 +1,9 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Daily GEO Agent Run
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Analyze only; do not publish pages"
-        required: false
-        default: false
-        type: boolean
-  workflow_run:
-    workflows: ["Daily SEO Agent Run"]
-    types: [completed]
 
 permissions:
   contents: write

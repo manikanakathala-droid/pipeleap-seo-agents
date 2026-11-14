@@ -1,16 +1,9 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Daily SERP Visibility Run
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Dry run (write outputs, skip commit)"
-        required: false
-        default: "false"
-  workflow_run:
-    workflows: ["Daily SEO Agent Run"]
-    types:
-      - completed
 
 permissions:
   contents: write

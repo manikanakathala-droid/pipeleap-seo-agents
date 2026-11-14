@@ -1,3 +1,64 @@
+# Current system (read this first)
+
+## State as of November 14, 2026
+
+**www.pipeleap.com is a new site.** On Nov 13 the domain was moved to the Vercel project `pipeleap-web-redesign`,
+deployed from `manikanakathala-droid/Pipeleap-web-redesign`: plain static HTML (`index.html`, `pilot.html`), no build
+step, pushes to `main` deploy to production. The previous React site, its repository
+(`pipeleap-launchpad-040053e5`) and its ~346 URLs (blog, glossary, tools) are gone.
+
+Everything below the "Historical notes" heading describes the previous site and the previous agents. Do not act on
+it: paths such as `temp_frontend_repo/`, `blog-articles.ts` and the launchpad workflows no longer apply.
+
+## The growth loop (`growth/`, entry point `run_growth_loop.py`)
+
+One daily workflow, `.github/workflows/growth_loop.yml`: MEASURE -> LEARN -> PLAN -> ACT -> REPORT.
+
+| Module | Role |
+|---|---|
+| `growth/site.py` | Reads the site checkout: pages, titles, links, FAQ. Product facts come from here, never from config. |
+| `growth/measure.py` | Search Console + GA4 (or CSVs in `growth_state/imports/`). Each source reports ok / empty / unavailable / error. |
+| `growth/icp.py` | Scores every query for ICP fit and assigns a topic cluster. Vocabulary in `growth.yaml`. |
+| `growth/learn.py` | Experiments with baselines and 14/28/56-day verdicts, per-cluster Beta priors, Thompson sampling, opportunity detection. |
+| `growth/plan.py` | Action queue plus guards (weekly page limit, cap without search data, pause when pages are not indexed, cooldown). |
+| `growth/write.py` | LLM drafting grounded in site facts. No template fallback: without a model it writes briefs. |
+| `growth/quality.py` | Gate: length, structure, uncited statistics, duplication, banned phrases, internal links. |
+| `growth/publish.py` | robots.txt, sitemap.xml, canonical, JSON-LD, tracking, redirects, IndexNow key; renders articles in the site's chrome. |
+| `growth/scorecard.py` | The briefing: a funnel of outcomes. No composite score. |
+
+State is committed in `growth_state/`: `ledger.json` (pages, experiments, observations, priors), `articles/*.md`
+(sources of published pages; site HTML is rendered from these), `briefs/`, `rejected/`, `briefing.md`, `report.json`.
+
+Configuration: `growth.yaml`. Tests: `python -m pytest tests -q` (no network needed).
+
+## Rules
+
+1. **Outcomes only.** Never add a score that rewards the system's own activity. The old "SEO score" read 100/100
+   for four months while the crawl saw one page and nothing was published.
+2. **Unknown is not zero.** If a data source is unreachable, say so. Never estimate or back-fill.
+3. **No uncited statistics, no invented experience.** `core/humanize.py` ("ghost mode") inserted made-up figures
+   and first-person claims. It is retired; do not reuse it.
+4. **No AI disclaimers, no agency language** (see `quality.banned_phrases` in `growth.yaml`).
+5. **Never edit copy on hand-authored pages.** The loop only writes inside `<!-- growth:seo -->` and
+   `<!-- growth:track -->` blocks and files it created (`resources/`, `resources.html`, `sitemap.xml`, `robots.txt`).
+6. **Do not blanket-redirect old URLs to the homepage.** Core pages are mapped in `growth.yaml`; other legacy URLs
+   are redirected individually only when Search Console shows they still earn impressions.
+7. **No secrets in the repository.** This repository is public. Keys go in GitHub Actions secrets.
+8. Commit and push every change immediately.
+
+## Retired
+
+The workflows `daily_seo_run`, `daily_geo_run`, `daily_seo_os_run`, `daily_serp_run`, `weekly_tool_generation`,
+`audit_warroom`, `daily_scheduler_health` and `duplicate_audit` are manual-only. They check out the deleted
+repository and cannot succeed. The legacy code (`agents/`, `core/`, `modules/`, `geo_agent/`) is kept for
+reference; the loop reuses only `connectors/gsc_connector.py`, `connectors/ga4_connector.py` and
+`connectors/indexnow_connector.py`. Also do not revive: package publishing to npm/PyPI/crates for backlinks
+(`scripts/publish_packages.py`) or automated archive/ping "backlinks" (`connectors/backlink_executor.py`).
+
+---
+
+# Historical notes (previous site and agents, before November 13, 2026)
+
 # Session Reminders
 
 ## Today (May 28, 2026)
@@ -347,7 +408,7 @@ When enabled, template-built content passes through `core/humanize.py` transform
 | 2 | `daily_seo_os_run.yml`, `daily_serp_run.yml` use `GSC_SERVICE_ACCOUNT_JSON` secret | Referenced non-existent `GSC_CREDENTIALS` → empty credentials file → all GSC ops failed | `.github/workflows/daily_seo_os_run.yml`, `.github/workflows/daily_serp_run.yml` |
 | 3 | Bing API key fallback reads from `growth_engine.bing_api_key` | Config fallback path pointed to `integrations.bing_api_key` (wrong section) | `connectors/post_publish_hook.py:107` |
 
-**Bing API test:** `https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed` returns HTTP 200 with valid key `f2ce40b491c44f1282976da068df483c` — endpoint is functional.
+**Bing API test:** `https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed` returns HTTP 200 with valid key (stored in the `BING_API_KEY` secret) — endpoint is functional.
 
 **Commits:** `fe19a03` (Indexing API error fix), `ecc9726` (workflow secret fix), `bfe4578` (Bing config path fix)
 

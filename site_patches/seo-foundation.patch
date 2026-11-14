@@ -1,0 +1,155 @@
+diff --git a/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt b/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt
+new file mode 100644
+index 0000000..aafcc86
+--- /dev/null
++++ b/92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt
+@@ -0,0 +1 @@
++92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55
+\ No newline at end of file
+diff --git a/index.html b/index.html
+index 9279a33..5c32ec4 100644
+--- a/index.html
++++ b/index.html
+@@ -676,6 +676,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
+ <script data-8b-part="motion-gate">
+ if (matchMedia('(prefers-reduced-motion: no-preference)').matches && CSS.supports('animation-timeline: view()')) document.documentElement.setAttribute('data-8b-live', '');
+ </script>
++<!-- growth:seo -->
++<link rel="canonical" href="https://www.pipeleap.com/">
++<meta property="og:url" content="https://www.pipeleap.com/">
++<meta property="og:site_name" content="Pipeleap">
++<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://www.pipeleap.com/#organization","name":"Pipeleap","url":"https://www.pipeleap.com/","logo":"https://www.pipeleap.com/favicon.svg","email":"info@pipeleap.com","description":"Pipeleap is a sales productivity and sales stack optimization platform. It works with the sales tools a team already owns to reclaim selling time and unify sales information."},{"@type":"WebSite","@id":"https://www.pipeleap.com/#website","url":"https://www.pipeleap.com/","name":"Pipeleap","publisher":{"@id":"https://www.pipeleap.com/#organization"}},{"@type":"SoftwareApplication","name":"Pipeleap","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://www.pipeleap.com/","description":"Pipeleap is a sales productivity and sales stack optimization platform. It works with the sales tools you already own to reclaim selling time, unify sales information and get more from your technology investment.","publisher":{"@id":"https://www.pipeleap.com/#organization"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"We already pay for several sales tools. Why add Pipeleap?","acceptedAnswer":{"@type":"Answer","text":"Because the return on those tools depends on how much your reps use them. Pipeleap increases that use and removes the admin around it. If it does not create more value than it costs, it has not done its job."}},{"@type":"Question","name":"We have integrations and automation in place. What does Pipeleap add?","acceptedAnswer":{"@type":"Answer","text":"Integrations move data between applications. Pipeleap handles the work that follows: research, drafting, preparation, follow-up and CRM updates. It works alongside what you have built."}},{"@type":"Question","name":"Does Pipeleap replace our CRM?","acceptedAnswer":{"@type":"Answer","text":"No. Your CRM stays the source of truth. Pipeleap reads from it and writes activity back to it."}},{"@type":"Question","name":"Do reps lose control of what gets sent?","acceptedAnswer":{"@type":"Answer","text":"No. Pipeleap prepares drafts and suggestions. Reps review and send."}},{"@type":"Question","name":"How do you measure time saved?","acceptedAnswer":{"@type":"Answer","text":"Each completed piece of work is credited a fixed number of minutes, and reports mark every figure as measured or estimated. You can replace the default minutes with your own."}},{"@type":"Question","name":"Which tools does it work with?","acceptedAnswer":{"@type":"Answer","text":"Pipeleap works on top of the prospecting and data tools your team already uses. We’ll show you how it fits your stack in the walkthrough."}},{"@type":"Question","name":"More questions 12","acceptedAnswer":{"@type":"Answer","text":"How long does it take to get running? You connect the tools you already use, and there is nothing to migrate or rebuild. The walkthrough shows the exact steps on your own stack."}},{"@type":"Question","name":"Will my reps actually use it?","acceptedAnswer":{"@type":"Answer","text":"They do not have to learn a new routine. Pipeleap puts the next action in front of them, and approving a draft takes less effort than writing one."}},{"@type":"Question","name":"What happens to our data?","acceptedAnswer":{"@type":"Answer","text":"It stays in your CRM, which remains the source of truth. You set the roles, bring your own AI key if you want, and cap AI spend."}},{"@type":"Question","name":"Can we trust what the AI writes?","acceptedAnswer":{"@type":"Answer","text":"Nothing reaches a buyer without a rep’s approval. Every draft is a starting point, not a send."}},{"@type":"Question","name":"What does it cost?","acceptedAnswer":{"@type":"Answer","text":"It depends on your team and stack. In the walkthrough we set the cost next to what your idle licences and lost selling time already cost you."}},{"@type":"Question","name":"Our CRM data is messy. Will that break it?","acceptedAnswer":{"@type":"Answer","text":"That is usually the reason teams start. Pipeleap flags gaps, retries failed syncs and keeps the CRM current as reps work."}},{"@type":"Question","name":"Is this for a team our size?","acceptedAnswer":{"@type":"Answer","text":"If your reps use more than one tool to work a deal, the gap Pipeleap closes is already there, whether you have five reps or fifty."}},{"@type":"Question","name":"Will managers use it to watch reps?","acceptedAnswer":{"@type":"Answer","text":"It shows where the time goes so managers can coach and remove admin, not to count keystrokes. Your team decides which pages count as selling time."}},{"@type":"Question","name":"We’re in a busy quarter. Can this wait?","acceptedAnswer":{"@type":"Answer","text":"A busy quarter is when it matters most. Every week it waits, follow-ups slip, stalled deals go unseen and next quarter’s pipeline does not get built, and that shows up in revenue later. The walkthrough shows what it adds up to on your stack."}},{"@type":"Question","name":"What if it doesn’t work for us?","acceptedAnswer":{"@type":"Answer","text":"Your tools and CRM stay exactly as they are, so stopping changes nothing you rely on. You keep everything Pipeleap wrote back."}},{"@type":"Question","name":"What happens in the walkthrough?","acceptedAnswer":{"@type":"Answer","text":"We map your stack, show where the time goes, and run Pipeleap’s work on scenarios from your own tools. You leave with the numbers whether you buy or not."}},{"@type":"Question","name":"Who should join the walkthrough?","acceptedAnswer":{"@type":"Answer","text":"Whoever owns the number and whoever owns the systems, usually a sales leader and RevOps. Together you see both sides in one session."}}]}]}</script>
++<!-- /growth:seo -->
+ </head>
+ <body>
+ <!-- navigation: fixed top bar: wordmark, five section links, Book a walkthrough button; hides on scroll down; full-screen phone menu -->
+diff --git a/pilot.html b/pilot.html
+index 97e9fbd..09f8b60 100644
+--- a/pilot.html
++++ b/pilot.html
+@@ -315,6 +315,12 @@ input[type=range] { width: 100%; accent-color: var(--color-7); }
+ }
+ </style>
+ <script>document.documentElement.classList.add('js')</script>
++<!-- growth:seo -->
++<link rel="canonical" href="https://www.pipeleap.com/pilot">
++<meta property="og:url" content="https://www.pipeleap.com/pilot">
++<meta property="og:site_name" content="Pipeleap">
++<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://www.pipeleap.com/pilot#webpage","url":"https://www.pipeleap.com/pilot","name":"Founding pilot · Pipeleap","isPartOf":{"@id":"https://www.pipeleap.com/#website"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.pipeleap.com/"},{"@type":"ListItem","position":2,"name":"Founding pilot · Pipeleap","item":"https://www.pipeleap.com/pilot"}]}]}</script>
++<!-- /growth:seo -->
+ </head>
+ <body>
+ <header id="site-nav" class="nav" data-8b-section="navigation">
+diff --git a/robots.txt b/robots.txt
+new file mode 100644
+index 0000000..caf3da0
+--- /dev/null
++++ b/robots.txt
+@@ -0,0 +1,5 @@
++# managed by pipeleap-growth-loop
++User-agent: *
++Allow: /
++
++Sitemap: https://www.pipeleap.com/sitemap.xml
+diff --git a/sitemap.xml b/sitemap.xml
+new file mode 100644
+index 0000000..c8e0c37
+--- /dev/null
++++ b/sitemap.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
++  <url><loc>https://www.pipeleap.com/</loc><lastmod>2026-11-14</lastmod></url>
++  <url><loc>https://www.pipeleap.com/pilot</loc><lastmod>2026-11-14</lastmod></url>
++</urlset>
+diff --git a/vercel.json b/vercel.json
+index bd6fd8f..d266177 100644
+--- a/vercel.json
++++ b/vercel.json
+@@ -1,3 +1,85 @@
+ {
+-  "cleanUrls": true
++  "cleanUrls": true,
++  "redirects": [
++    {
++      "source": "/pricing",
++      "destination": "/pilot",
++      "permanent": true
++    },
++    {
++      "source": "/contact",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/about",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/faq",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/platform",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/services",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/how-it-works",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/integrations",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/sales-operations-platform",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/outbound-automation",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/outbound-operating-system",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/ai-sales",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/architecture",
++      "destination": "/",
++      "permanent": true
++    },
++    {
++      "source": "/sales-ops-audit",
++      "destination": "/pilot",
++      "permanent": true
++    },
++    {
++      "source": "/gtm-audit",
++      "destination": "/pilot",
++      "permanent": true
++    },
++    {
++      "source": "/case-studies",
++      "destination": "/",
++      "permanent": true
++    }
++  ]
+ }

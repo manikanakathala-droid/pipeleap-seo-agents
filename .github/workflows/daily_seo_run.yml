@@ -1,21 +1,9 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Daily SEO Agent Run
 
 on:
-  schedule:
-    # 5:30 PM IST = 12:00 UTC daily (primary; backup handled by daily_scheduler_health.yml)
-    - cron: "0 12 * * *"
   workflow_dispatch:
-    inputs:
-      disable_crawl:
-        description: "Skip live site crawl"
-        required: false
-        default: false
-        type: boolean
-      run_growth_engine:
-        description: "Also run the growth engine module"
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   contents: write
