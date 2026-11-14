@@ -180,7 +180,7 @@ def main():
 
     if not os.getenv("BING_API_KEY"):
         print("\n  NOTE: Bing API key not found in env. Set with:")
-        print("    $env:BING_API_KEY='f2ce40b491c44f1282976da068df483c'")
+        print("    $env:BING_API_KEY='<your key>'")
 
 if __name__ == "__main__":
     main()

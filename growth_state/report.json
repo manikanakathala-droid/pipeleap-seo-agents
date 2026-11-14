@@ -1,0 +1,227 @@
+{
+  "date": "2026-11-14",
+  "headline": "Neither search nor enquiry data is reachable. The loop is running blind and has limited itself accordingly.",
+  "funnel": {
+    "indexable_pages": 2,
+    "pages_with_impressions": null,
+    "impressions": null,
+    "clicks": null,
+    "sessions": null,
+    "enquiries": null
+  },
+  "sources": {
+    "search": "unavailable",
+    "analytics": "unavailable"
+  },
+  "holds": [
+    "No LLM credentials in this environment: pages cannot be drafted, so briefs are written instead."
+  ],
+  "executed": [
+    {
+      "title": "Publish a page for \u201crevops workflow automation\u201d",
+      "result": "not published; brief saved to growth_state/briefs/revops-workflow-automation.md"
+    },
+    {
+      "title": "Publish a page for \u201chow to reduce sales admin work for reps\u201d",
+      "result": "not published; brief saved to growth_state/briefs/how-to-reduce-sales-admin-work-for-reps.md"
+    },
+    {
+      "title": "Publish a page for \u201chow to improve sales forecast accuracy with crm activity\u201d",
+      "result": "not published; brief saved to growth_state/briefs/how-to-improve-sales-forecast-accuracy-with-crm-activity.md"
+    },
+    {
+      "title": "Site foundation",
+      "result": "updated 92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt, index.html, pilot.html, robots.txt, sitemap.xml, vercel.json"
+    }
+  ],
+  "manual": [
+    {
+      "title": "Publish a page for \u201crevops workflow automation\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to reduce sales admin work for reps\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to improve sales forecast accuracy with crm activity\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201csales tech stack consolidation\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to increase sales tool adoption\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201csales tech stack audit checklist\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201ctoo many sales tools\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to follow up on stalled deals\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201cautomate crm data entry for sales reps\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to get sales reps to update the crm\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    },
+    {
+      "title": "Publish a page for \u201chow to automate account research for sales calls\u201d",
+      "why": "Backlog hypothesis; no search evidence yet. (source: backlog)",
+      "kind": "new_page"
+    }
+  ],
+  "weights": {
+    "selling_time": 0.9186,
+    "stack_sprawl": 0.6469,
+    "stack_roi": 0.7083,
+    "crm_upkeep": 0.3471,
+    "account_research": 0.4043,
+    "follow_up": 0.7449,
+    "revops_workflow": 0.8651,
+    "pipeline_visibility": 0.8382
+  },
+  "changed_files": [
+    "92dd2f32d73275ee15cc3962bb19802ea100bc9c1acba36838239c0d4f6d9d55.txt",
+    "index.html",
+    "pilot.html",
+    "robots.txt",
+    "sitemap.xml",
+    "vercel.json"
+  ],
+  "changed_urls": [
+    "https://www.pipeleap.com/",
+    "https://www.pipeleap.com/pilot"
+  ],
+  "opportunities": [],
+  "queue": [
+    {
+      "kind": "foundation",
+      "title": "Add robots.txt",
+      "auto": true,
+      "priority": 99
+    },
+    {
+      "kind": "foundation",
+      "title": "Add sitemap.xml",
+      "auto": true,
+      "priority": 98
+    },
+    {
+      "kind": "foundation",
+      "title": "Add canonical URL and structured data to /",
+      "auto": true,
+      "priority": 97
+    },
+    {
+      "kind": "foundation",
+      "title": "Add canonical URL and structured data to /pilot",
+      "auto": true,
+      "priority": 97
+    },
+    {
+      "kind": "foundation",
+      "title": "Publish the IndexNow key file",
+      "auto": true,
+      "priority": 96
+    },
+    {
+      "kind": "foundation",
+      "title": "Install analytics and enquiry tracking",
+      "auto": true,
+      "priority": 95
+    },
+    {
+      "kind": "foundation",
+      "title": "Redirect 16 URL pattern(s) from the previous site",
+      "auto": true,
+      "priority": 94
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201crevops workflow automation\u201d",
+      "auto": false,
+      "priority": 20.6
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to reduce sales admin work for reps\u201d",
+      "auto": false,
+      "priority": 20.6
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to improve sales forecast accuracy with crm activity\u201d",
+      "auto": false,
+      "priority": 20.0
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201csales tech stack consolidation\u201d",
+      "auto": false,
+      "priority": 18.1
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to increase sales tool adoption\u201d",
+      "auto": false,
+      "priority": 17.6
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201csales tech stack audit checklist\u201d",
+      "auto": false,
+      "priority": 17.2
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201ctoo many sales tools\u201d",
+      "auto": false,
+      "priority": 17.2
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to follow up on stalled deals\u201d",
+      "auto": false,
+      "priority": 16.8
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201cautomate crm data entry for sales reps\u201d",
+      "auto": false,
+      "priority": 16.4
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to get sales reps to update the crm\u201d",
+      "auto": false,
+      "priority": 15.7
+    },
+    {
+      "kind": "new_page",
+      "title": "Publish a page for \u201chow to automate account research for sales calls\u201d",
+      "auto": false,
+      "priority": 15.0
+    }
+  ]
+}

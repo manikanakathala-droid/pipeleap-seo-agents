@@ -1,0 +1,10 @@
+# Everything the growth loop needs. Deliberately small.
+requests>=2.31.0
+PyYAML>=6.0
+markdown>=3.5
+openai>=1.0.0
+google-api-python-client>=2.100.0
+google-auth>=2.20.0
+google-auth-httplib2>=0.2.0
+google-analytics-data>=0.18.0
+pytest>=7.4.3

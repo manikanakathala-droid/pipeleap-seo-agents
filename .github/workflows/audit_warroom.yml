@@ -1,8 +1,8 @@
+# RETIRED 2026-11-14: targets the pipeleap-launchpad repository, which no longer exists and no longer serves
+# www.pipeleap.com. Schedules removed so it stops failing several times a day. Replaced by growth_loop.yml.
 name: Audit War Room
 
 on:
-  schedule:
-    - cron: "0 */6 * * *"   # every 6 hours
   workflow_dispatch:
 
 permissions:
