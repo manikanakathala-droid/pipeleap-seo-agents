@@ -33,6 +33,13 @@ analytics:
   ga4_measurement_id: G-GW7CB348F3   # same stream the previous site used, so GA4 history stays continuous
   enquiry_event: book_walkthrough
 
+consent:
+  # Termly website UUID (Termly dashboard -> your website -> Consent Banner -> Install).
+  # When set, the Termly banner is added as the first script on every page; with auto_block
+  # it holds analytics cookies until the visitor accepts.
+  termly_website_uuid: ""
+  auto_block: true
+
 measurement:
   window_days: 28
   enquiry_events: [book_walkthrough, email_click]   # mark these as key events in GA4

@@ -404,3 +404,33 @@ def test_headline_when_only_search_is_missing(site_dir, growth, tmp_path):
     report = run(site_dir=site_dir, state_dir=tmp_path / "state", growth=growth, today=TODAY, llm=None, dry_run=True,
                  measurement=measurement(search="error", analytics="empty"))
     assert report["headline"].startswith("No enquiries recorded") and "Unknown" not in report["headline"]
+
+
+def test_termly_banner_is_first_script_and_reaches_articles(site_dir, growth, tmp_path):
+    uuid = "0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0"
+    growth["consent"] = {"termly_website_uuid": uuid, "auto_block": True}
+    growth["analytics"]["ga4_measurement_id"] = "G-TEST123456"
+    ledger = Ledger(tmp_path / "l.json")
+    publish.apply_foundation(SiteModel.load(site_dir, SITE_URL), growth, ledger, TODAY)
+    home = (site_dir / "index.html").read_text()
+    termly = home.find(f"app.termly.io/resource-blocker/{uuid}?autoBlock=on")
+    assert 0 < termly < home.find("<script") + 200 and termly < home.find("googletagmanager")
+    assert home.count(publish.CONSENT_OPEN) == 1
+    publish.apply_foundation(SiteModel.load(site_dir, SITE_URL), growth, ledger, TODAY)
+    assert (site_dir / "index.html").read_text() == home
+
+    sources = tmp_path / "articles"
+    publish.save_source(sources, path="/resources/x", title="How to reduce sales admin work", description="d" * 120,
+                        query="q", cluster="selling_time", markdown_body=GOOD_BODY)
+    publish.sync_articles(SiteModel.load(site_dir, SITE_URL), growth, ledger, sources, TODAY)
+    article = (site_dir / "resources/x.html").read_text()
+    assert article.find("app.termly.io") < article.find("googletagmanager")
+
+
+def test_no_banner_and_a_reminder_without_termly_id(site_dir, growth, tmp_path):
+    growth["consent"] = {"termly_website_uuid": ""}
+    growth["analytics"]["ga4_measurement_id"] = "G-TEST123456"
+    site = SiteModel.load(site_dir, SITE_URL)
+    assert "Add a cookie consent banner" in {g["title"] for g in publish.foundation_gaps(site, growth)}
+    publish.apply_foundation(site, growth, Ledger(tmp_path / "l.json"), TODAY)
+    assert "termly" not in (site_dir / "index.html").read_text()
