@@ -43,4 +43,5 @@ Thumbs.db
 # IDE and local assistant state
 .vscode/
 .idea/
-.claude/
+.claude/*
+!.claude/skills/
