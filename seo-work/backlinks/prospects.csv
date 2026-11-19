@@ -1,0 +1,9 @@
+domain,url,type,relevance(1-3),why_relevant,contact_or_submit_url,status,next_action,date_updated,link_live_url,notes
+linkedin.com,https://www.linkedin.com/company/,directory,3,Company page is the first entity signal for brand search and AI assistants,https://www.linkedin.com/company/setup/new/,researched,User creates company page; copy from seo-work/brand/entity.md,2026-11-20,,Also add Pipeleap to founder profile
+crunchbase.com,https://www.crunchbase.com,directory,2,Entity signal used by search engines and AI assistants,https://www.crunchbase.com/add-new,researched,User submits organization,2026-11-20,,
+g2.com,https://www.g2.com,review-site,3,Buyers compare sales tools here; competitors listed,https://sell.g2.com/,researched,User claims a free listing; category sales productivity / sales intelligence,2026-11-20,,Reviews only from real pilot users
+capterra.com,https://www.capterra.com,review-site,3,Gartner network (Capterra/GetApp/Software Advice) in one listing,https://www.capterra.com/vendors/sign-up,researched,User creates vendor account,2026-11-20,,
+trustradius.com,https://www.trustradius.com,review-site,2,B2B buyers; competitors listed,https://www.trustradius.com/vendor,researched,User claims listing,2026-11-20,,
+saashub.com,https://www.saashub.com,directory,2,Lists competitors; free submission,https://www.saashub.com/submit,researched,User submits,2026-11-20,,
+alternativeto.net,https://alternativeto.net,directory,1,Alternatives listings,https://alternativeto.net/manage-item/,researched,User submits,2026-11-20,,Low priority until there's an obvious "alternative to"
+producthunt.com,https://www.producthunt.com,directory,2,Launch drives links and mentions,https://www.producthunt.com/posts/new,researched,Plan a launch with the founding pilot story; not a quiet listing,2026-11-20,,
