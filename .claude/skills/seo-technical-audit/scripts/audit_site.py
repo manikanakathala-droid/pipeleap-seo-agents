@@ -3,8 +3,11 @@
 
 Reads robots.txt and sitemap.xml, fetches every page (or one --url), and checks
 status, redirects, title, meta description, headings, canonical, robots
-directives, Open Graph, JSON-LD, hreflang, image alt text, internal links and
-host/protocol redirects. Optionally queries PageSpeed Insights.
+directives, viewport, Open Graph and Twitter tags, JSON-LD validity and required
+fields (and that FAQ markup matches visible text), hreflang, images (alt, size,
+format, dimensions), mixed content, security headers, internal links and anchor
+text, the custom 404 page and host/protocol redirects. Optionally queries
+PageSpeed Insights.
 
 Usage:
   python audit_site.py --site https://www.pipeleap.com --out seo-work/audits/2026-11-15
@@ -31,6 +34,20 @@ from html.parser import HTMLParser
 UA = "Mozilla/5.0 (compatible; PipeleapSEOAudit/1.0)"
 TITLE_RANGE = (30, 60)
 DESC_RANGE = (120, 160)
+IMG_MAX_BYTES = 200_000
+GENERIC_ANCHORS = {"click here", "here", "read more", "learn more", "more", "this", "link", "this page"}
+# Fields Google needs (required) or uses (recommended) for the rich results we care about.
+SCHEMA_FIELDS = {
+    "Organization": (["name", "url"], ["logo", "sameAs"]),
+    "WebSite": (["name", "url"], []),
+    "SoftwareApplication": (["name"], ["applicationCategory", "operatingSystem", "offers", "description"]),
+    "FAQPage": (["mainEntity"], []),
+    "BreadcrumbList": (["itemListElement"], []),
+    "Article": (["headline"], ["author", "datePublished", "image"]),
+    "BlogPosting": (["headline"], ["author", "datePublished", "image"]),
+    "Person": (["name"], ["url", "sameAs", "jobTitle"]),
+    "VideoObject": (["name", "thumbnailUrl", "uploadDate"], ["description", "contentUrl"]),
+}
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -73,6 +90,10 @@ class PageParser(HTMLParser):
         self.lang = None
         self.text_parts = []
         self._skip = 0
+        self.anchors = []      # (href, text)
+        self._a = None
+        self.img_list = []     # attribute dicts
+        self.resources = []    # src/href of scripts, styles, images, iframes
 
     def handle_starttag(self, tag, attrs):
         a = {k.lower(): (v or "") for k, v in attrs}
@@ -94,16 +115,28 @@ class PageParser(HTMLParser):
                 self.hreflang.append((a["hreflang"], a.get("href", "")))
         elif tag == "a" and a.get("href"):
             self.links.append(a["href"])
+            self._a = [a["href"], [], a.get("aria-label", "")]
         elif tag == "img":
             self.imgs += 1
+            self.img_list.append(a)
             if "alt" not in a:
                 self.imgs_no_alt += 1
+            if self._a is not None and a.get("alt"):
+                self._a[1].append(a["alt"])
         elif tag == "script" and a.get("type", "").lower() == "application/ld+json":
             self._in, self._buf = "jsonld", []
+        if tag in ("script", "img", "iframe", "source") and a.get("src"):
+            self.resources.append(a["src"])
+        if tag == "link" and "stylesheet" in a.get("rel", "").lower() and a.get("href"):
+            self.resources.append(a["href"])
         if tag in ("script", "style", "noscript", "svg") and self._in != "jsonld":
             self._skip += 1
 
     def handle_endtag(self, tag):
+        if tag == "a" and self._a is not None:
+            href, buf, label = self._a
+            self.anchors.append((href, re.sub(r"\s+", " ", "".join(buf)).strip() or label.strip()))
+            self._a = None
         if self._in == "title" and tag == "title":
             self.title = "".join(self._buf).strip()
             self._in = None
@@ -119,6 +152,8 @@ class PageParser(HTMLParser):
     def handle_data(self, data):
         if self._in:
             self._buf.append(data)
+        if self._a is not None:
+            self._a[1].append(data)
         if not self._skip:
             self.text_parts.append(data)
 
@@ -143,6 +178,48 @@ def schema_types(blob) -> list[str]:
     return out
 
 
+def schema_objects(blob) -> list[dict]:
+    """Every typed object in a JSON-LD blob, including @graph members and nested ones."""
+    out = []
+    if isinstance(blob, list):
+        for b in blob:
+            out += schema_objects(b)
+    elif isinstance(blob, dict):
+        if blob.get("@type"):
+            out.append(blob)
+        for v in blob.values():
+            if isinstance(v, (dict, list)):
+                out += schema_objects(v)
+    return out
+
+
+def schema_issues(objs: list[dict], page_text: str) -> list[tuple[str, str]]:
+    out = []
+    text = re.sub(r"\s+", " ", page_text).lower()
+    for o in objs:
+        types = o["@type"] if isinstance(o["@type"], list) else [o["@type"]]
+        for t in types:
+            req, rec = SCHEMA_FIELDS.get(t, ([], []))
+            miss_req = [f for f in req if not o.get(f)]
+            miss_rec = [f for f in rec if not o.get(f)]
+            if miss_req:
+                out.append(("error", f"{t} structured data is missing required {', '.join(miss_req)}"))
+            if miss_rec:
+                out.append(("info", f"{t} structured data has no {', '.join(miss_rec)} (recommended)"))
+            if t == "FAQPage":
+                qs = o.get("mainEntity") or []
+                qs = qs if isinstance(qs, list) else [qs]
+                for q in qs:
+                    name = (q.get("name") or "").strip() if isinstance(q, dict) else ""
+                    ans = q.get("acceptedAnswer") if isinstance(q, dict) else None
+                    ans = ans[0] if isinstance(ans, list) and ans else ans
+                    if not name or not isinstance(ans, dict) or not ans.get("text"):
+                        out.append(("error", "FAQPage has a question without a name or acceptedAnswer text"))
+                    elif re.sub(r"\s+", " ", name).lower() not in text:
+                        out.append(("warning", f"FAQ question in markup not found in visible text: '{name[:70]}'"))
+    return out
+
+
 def audit_page(url: str, host: str) -> dict:
     r = fetch(url)
     page = {"url": url, "status": r["status"], "final_url": r["final_url"], "ms": r["ms"],
@@ -163,10 +240,12 @@ def audit_page(url: str, host: str) -> dict:
     h1 = [t for lvl, t in p.headings if lvl == "h1"]
     desc = p.meta.get("description")
     robots = (p.meta.get("robots", "") + " " + r["headers"].get("X-Robots-Tag", "")).lower()
-    types, ld_errors = [], 0
+    types, ld_errors, objs = [], 0, []
     for blob in p.jsonld:
         try:
-            types += schema_types(json.loads(blob))
+            data = json.loads(blob)
+            types += schema_types(data)
+            objs += schema_objects(data)
         except Exception:
             ld_errors += 1
 
@@ -210,9 +289,52 @@ def audit_page(url: str, host: str) -> dict:
         issue("error", "Page is noindex")
     if not p.lang:
         issue("warning", "<html> has no lang attribute")
+    vp = p.meta.get("viewport", "")
+    if "width=device-width" not in vp.replace(" ", ""):
+        issue("error", "No mobile viewport meta tag (width=device-width); Google indexes the mobile version")
     for k in ("og:title", "og:description", "og:image"):
         if k not in p.meta:
             issue("warning", f"Missing {k}")
+    if "twitter:card" not in p.meta:
+        issue("info", "No twitter:card meta tag (X/Twitter falls back to a plain link)")
+    for sev, msg in schema_issues(objs, " ".join(p.text_parts)):
+        issue(sev, msg)
+    if url.startswith("https://"):
+        mixed = sorted({u for u in p.resources if u.startswith("http://")})
+        if mixed:
+            issue("error", f"Mixed content: {len(mixed)} resource(s) loaded over http:// ({', '.join(mixed[:3])})")
+        hdrs = {k.lower(): v for k, v in r["headers"].items()}
+        if "strict-transport-security" not in hdrs:
+            issue("info", "No Strict-Transport-Security (HSTS) header")
+        if hdrs.get("x-content-type-options", "").lower() != "nosniff":
+            issue("info", "No X-Content-Type-Options: nosniff header")
+    generic = sorted({t for h, t in p.anchors if t.lower() in GENERIC_ANCHORS
+                      and urllib.parse.urlparse(urllib.parse.urljoin(r["final_url"], h)).netloc == host})
+    empty = sum(1 for h, t in p.anchors if not t and not h.startswith(("mailto:", "tel:")))
+    if generic:
+        issue("info", f"Internal links with generic anchor text: {', '.join(repr(g) for g in generic)} (describe the target page instead)")
+    if empty:
+        issue("warning", f"{empty} link(s) with no text or aria-label (no anchor signal, and inaccessible to screen readers)")
+    page["images_detail"] = []
+    for img in p.img_list:
+        src = img.get("src", "")
+        if not src or src.startswith("data:"):
+            continue
+        absu = urllib.parse.urljoin(r["final_url"], src)
+        d = {"src": absu}
+        if urllib.parse.urlparse(absu).netloc == host:
+            h = fetch(absu, method="HEAD")
+            size = int({k.lower(): v for k, v in h["headers"].items()}.get("content-length", 0) or 0)
+            d["bytes"] = size
+            if h["status"] >= 400:
+                issue("error", f"Broken image {absu} (HTTP {h['status']})")
+            elif size > IMG_MAX_BYTES:
+                issue("warning", f"Image {absu} is {size // 1000} KB (compress or resize; aim under {IMG_MAX_BYTES // 1000} KB)")
+        if re.search(r"\.(png|jpe?g|gif|bmp)(\?|$)", absu, re.I):
+            issue("info", f"Image {absu.rsplit('/', 1)[-1]} could be WebP or AVIF")
+        if not (img.get("width") and img.get("height")) and not absu.endswith(".svg"):
+            issue("info", f"Image {absu.rsplit('/', 1)[-1]} has no width/height (can cause layout shift)")
+        page["images_detail"].append(d)
     if ld_errors:
         issue("error", f"{ld_errors} JSON-LD block(s) do not parse")
     if not types:
@@ -288,6 +410,21 @@ def site_checks(site: str, host: str) -> list[dict]:
             issues.append({"severity": "warning", "message": f"{variant} returns {r['status']} (want 301/308 to the canonical host)"})
         elif loc and urllib.parse.urlparse(urllib.parse.urljoin(variant, loc)).netloc != host:
             issues.append({"severity": "warning", "message": f"{variant} redirects to {loc}, not to {host}"})
+    missing = urllib.parse.urljoin(site, f"/seo-audit-missing-page-{int(time.time())}")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(missing, headers={"User-Agent": UA}), timeout=20) as r:
+            status, body = r.status, ""
+    except urllib.error.HTTPError as e:
+        status, body = e.code, e.read().decode("utf-8", errors="replace")
+    except Exception:
+        status, body = 0, ""
+    if status == 200:
+        issues.append({"severity": "error", "message": "A missing page returns HTTP 200 (soft 404); it should return 404"})
+    elif status in (404, 410):
+        if not re.search(r'href=["\'](/|https?://%s/?)["\']' % re.escape(host), body):
+            issues.append({"severity": "info", "message": "The 404 page has no link back to the homepage (add navigation and a booking CTA)"})
+    else:
+        issues.append({"severity": "warning", "message": f"A missing page returns HTTP {status} (want 404)"})
     return issues
 
 

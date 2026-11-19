@@ -23,7 +23,7 @@ python .claude/skills/seo-technical-audit/scripts/audit_site.py \
   --out seo-work/audits/$(date +%F)
 ```
 
-The script reads robots.txt and the sitemap, crawls every page it finds, and checks status codes, redirects, www and https host redirects, title and description length, H1 count, canonical tags, noindex, `lang`, Open Graph tags, JSON-LD validity, image alt text, broken internal links, orphan pages, sitemap mismatches and duplicate titles or descriptions. `--psi` adds PageSpeed Insights mobile scores (set `PAGESPEED_API_KEY` for higher limits; it works without one at low volume). It exits non-zero if it finds errors.
+The script reads robots.txt and the sitemap, crawls every page it finds, and checks status codes, redirects, www and https host redirects, title and description length, H1 count, canonical tags, noindex, `lang`, the mobile viewport tag, Open Graph and Twitter tags, JSON-LD validity and required fields (and that FAQ markup matches the visible questions), images (alt text, broken, over 200 KB, old formats, missing width and height), mixed content, HSTS and nosniff headers, links with no text or generic anchor text, the custom 404 page (and soft 404s), broken internal links, orphan pages, sitemap mismatches and duplicate titles or descriptions. `--psi` adds PageSpeed Insights mobile scores (set `PAGESPEED_API_KEY` for higher limits; it works without one at low volume). It exits non-zero if it finds errors.
 
 Use `--url <page>` to check a single page, including a local file served with `python -m http.server`.
 
@@ -35,7 +35,9 @@ Use `--url <page>` to check a single page, including a local file served with `p
 - **Conversion path**: every page has a visible booking CTA, its `href` is the Apollo meeting link or `/pilot`, and the link works. Treat a broken CTA as the most severe issue, because it loses meetings directly.
 - **AI crawlers**: robots.txt does not block OAI-SearchBot, ChatGPT-User, PerplexityBot, ClaudeBot, Claude-SearchBot, Google-Extended, Applebot or Bingbot, and `/llms.txt` exists (see `seo-ai-visibility`).
 - **Old URLs**: a sample of old `/blog/`, `/glossary/` and `/tools/` URLs still returns 404 or 410, and old main pages still redirect (see `vercel.json`).
-- **Structured data**: for important pages, check the JSON-LD matches the visible content (for example, the FAQ answers on the page).
+- **Structured data**: for important pages, check the JSON-LD matches the visible content (for example, the FAQ answers on the page), and run the homepage and any new page type through Google's Rich Results Test (search.google.com/test/rich-results) in the browser.
+- **Accessibility basics**: headings in order (no H3 before the first H2), visible keyboard focus, enough colour contrast on CTAs, form fields with labels. Accessible pages are easier for crawlers to parse and for every buyer to use; Lighthouse's accessibility score (PageSpeed Insights) is a quick check.
+- **Links pointing in**: in Search Console → Links, look for sudden bursts of links from unrelated or spammy domains. Usually ignore them (Google discounts most spam links); only consider a disavow file if there is a manual action for unnatural links, and only with the user's yes.
 
 ## Step 3: Prioritise
 

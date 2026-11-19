@@ -54,7 +54,12 @@ python .claude/skills/seo-keyword-research/scripts/autocomplete.py \
 Add other sources where available:
 - **Search Console** queries the site already gets impressions for (see `pipeleap-seo/references/measurement.md`). These are proven and the cheapest wins.
 - **"People also ask" and related searches**: use web search on the top 10 seeds and note the questions shown.
-- **Paid tool exports**: if the user has Ahrefs, Semrush or Keyword Planner, ask for a CSV and use its volume and difficulty columns. Without one, don't invent search volumes; use the relative signals below.
+- **Free volume sources** (use them before falling back to relative signals):
+  - **Google Keyword Planner**: free with a Google Ads account (no spend needed; volumes show as ranges without active campaigns). Ask the user to export "Discover new keywords" and "Get search volume" for the seeds, by country, as CSV.
+  - **Bing Webmaster Tools → Keyword Research**: free once the site is verified; gives Bing volumes and trends by country, a useful proxy for relative demand.
+  - **Google Trends**: compare up to five terms and see which countries search them most, for example "sales productivity" vs "sales efficiency", or "optimization" vs "optimisation". Good for choosing the wording of a page.
+  - **Search Console**: impressions are a real volume floor for queries the site already appears for.
+- **Paid tool exports**: if the user has Ahrefs, Semrush or similar, ask for a CSV and use its volume and difficulty columns. Without any volume source, don't invent search volumes; use the relative signals below, and say so in the summary.
 
 ## Step 3: Judge each keyword
 
@@ -64,7 +69,7 @@ For each candidate, look at the actual search results (web search) for the main 
 |---|---|
 | `intent` | `buy` (software lists, vendor pages, comparisons rank), `solve` (how-to guides rank), `learn` (definitions, theory), `navigate` (a brand) |
 | `business_potential` | 3 = Pipeleap is the answer, 2 = Pipeleap is a strong part of the answer, 1 = loosely related, 0 = no fit |
-| `demand_signal` | high / medium / low: appears in autocomplete in several countries, has related searches, shows in Search Console, or has volume in a paid tool |
+| `demand_signal` | high / medium / low: appears in autocomplete in several countries, has related searches, shows in Search Console, or has volume in Keyword Planner, Bing or a paid tool. Record the actual volume range in `notes` when you have one |
 | `difficulty_signal` | low / medium / high: who ranks in the top 10? Forums, small sites and thin pages = low. G2, HubSpot, Salesforce, Gartner everywhere = high |
 | `countries` | Where suggestions appeared |
 | `serp_format` | What ranks: listicle, product page, guide, comparison, tool or calculator, video |

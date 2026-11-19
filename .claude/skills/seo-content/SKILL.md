@@ -8,7 +8,9 @@ description: >-
   productivity and sales stack optimization software, ways to grow sales revenue, or ways to improve
   sales rep performance, each built to rank and to book walkthroughs and founding pilots. Use whenever
   the user asks for a new page, landing page, article, guide, blog post, comparison page, content
-  brief, content calendar or "content to rank for X", even if they don't mention SEO.
+  brief, content calendar or "content to rank for X", even if they don't mention SEO. Also covers site
+  structure (topic hubs and internal linking), trust pages written with seo-brand-trust, and video for
+  search.
 ---
 
 # Content: brief, write, publish
@@ -49,8 +51,24 @@ Show the brief to the user and get a yes before writing the page, unless they ha
 | Comparison or alternatives | "X vs Y", "X alternatives", "tools like X" | Fair, dated, sourced from competitors' own pages. Often the most honest angle is "use X with Pipeleap", since it works on top of existing tools |
 | Buyer's guide | "how to choose…", "best … tools" | Criteria, honest options and a checklist. Include Pipeleap where it genuinely fits; don't rank it first by default |
 | Calculator or tool | ROI, "cost of unused licences", "selling time lost to admin", "pipeline capacity per rep" | Earns links and captures leads. Inputs and formulas visible; assumptions labelled as estimates |
+| Trust page | About, founder or author profile, security and data (see `seo-brand-trust`) | Built from facts the user supplies; never filled with guesses |
 
 Don't put new pages under `/blog/`, `/glossary/` or `/tools/` (those paths were removed on purpose). Use `/<slug>` for solution and comparison pages, and propose a `/guides/<slug>` section only once there are at least three guides.
+
+## Site structure: topic hubs and internal links
+
+The site will grow from four pages, and its structure should tell Google and readers what Pipeleap is an authority on:
+- **One hub per main theme.** The hubs follow the themes in the keyword map: admin vs selling time (the first and most important, with the cornerstone guide as its hub), sales stack optimization, revenue and sales velocity, rep performance visibility. Each hub page summarises the topic and links to every page in it; every page in the topic links back to its hub and to one or two siblings.
+- **Every page within two clicks of the homepage**, through the homepage, a hub or the navigation. The audit's orphan check catches pages nothing links to.
+- **Descriptive anchor text** that says what the target page is about ("how to measure selling time"), never "click here" (the audit flags generic anchors).
+- **URLs** are short, lowercase, hyphenated and describe the topic (`/admin-vs-selling-time`, `/sales-tech-stack-audit`). No dates in URLs. Don't reuse `/blog/`, `/glossary/` or `/tools/`.
+- **Navigation changes are design decisions.** When a hub has three or more pages, propose adding it to the navigation or footer; don't change them silently.
+
+Record the intended structure in `seo-work/plan.md` under "Site structure" and keep it updated as pages are added.
+
+## Video for search
+
+Google results and AI answers often include YouTube videos for how-to and "what is" searches. When the results for a top cluster show videos, propose one to the user: for example a short screen recording of the walkthrough flow, or the founder explaining how to measure admin vs selling time. Claude can draft the script, title, description (with a link to the matching page), chapters and tags; the user records and uploads. Embed the video on the matching page with VideoObject structured data (name, description, thumbnailUrl, uploadDate) and a short text summary, so the page doesn't depend on the video to be understood. Only propose video if someone will actually record it.
 
 ## Revenue and rep-performance topics
 
@@ -79,6 +97,7 @@ Consider a cornerstone page that sets out the argument in full. The strongest ca
 - Every claim about Pipeleap must trace back to `business-context.md`. Every external statistic gets a link to a source you opened. When you lack proof, describe how Pipeleap measures the result instead of stating one.
 - Add a short FAQ built from real questions (People also ask, Search Console queries), with FAQPage JSON-LD that mirrors it exactly.
 - Make the page skimmable: descriptive H2s, short paragraphs, tables where they compare things.
+- Guides and articles carry a byline (a named author with a profile, see `seo-brand-trust`), the published date and a "last updated" date, matching `author`, `datePublished` and `dateModified` in Article structured data. Ask the user for first-hand detail the author can add (what they've seen in sales teams, how pilots measure selling time); it's what separates the page from generic content.
 - Length follows intent: as long as it takes to beat the current top results on usefulness, no longer.
 
 ## Step 4: Build and publish

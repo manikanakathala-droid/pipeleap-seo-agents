@@ -8,7 +8,8 @@ description: >-
   demos/meetings/pilots from search", an SEO plan, roadmap or monthly SEO run, or asks "what should we
   do for SEO this week/month". It holds the business context, guardrails and measurement plan that the
   other seo-* skills rely on, and routes the work to them (keyword research, competitor gap, technical
-  audit, on-page, content, link building, AI search visibility, reporting). Also use it for questions about showing up in ChatGPT, Perplexity, Gemini or other AI assistants.
+  audit, on-page, content, link building, brand search and trust, AI search visibility, reporting).
+  Also use it for questions about showing up in ChatGPT, Perplexity, Gemini or other AI assistants.
 ---
 
 # Pipeleap SEO playbook
@@ -47,6 +48,9 @@ All skills read and write to `seo-work/` in this repository, so each job builds 
 | `seo-work/backlinks/prospects.csv` | seo-link-building | Link prospects, status and outreach drafts |
 | `seo-work/reports/` | seo-reporting | Monthly reports (`YYYY-MM.md`) |
 | `seo-work/ai-visibility/` | seo-ai-visibility | Prompt panel, answer log and monthly AI visibility notes |
+| `seo-work/brand/` | seo-brand-trust | Brand search results log, company facts (`entity.md`), profile copy |
+| `seo-work/onpage-log.csv` | seo-on-page | Every page change with its baseline, for judging results later |
+| `seo-work/rank-tracking.csv` | seo-reporting | Monthly positions for the target keywords, by country |
 | `seo-work/plan.md` | this skill | The current 90-day plan and this month's task list |
 
 Create a folder when it's first needed. Before starting any task, check whether earlier output exists and build on it instead of redoing it.
@@ -63,6 +67,8 @@ Create a folder when it's first needed. Before starting any task, check whether 
 | Backlinks, directories, guest posts, PR, mentions | `seo-link-building` |
 | How SEO is doing, monthly report, did it produce meetings | `seo-reporting` |
 | Being found and recommended by ChatGPT, Perplexity, Gemini, Copilot, Google AI Overviews | `seo-ai-visibility` |
+| Searches for "pipeleap", Knowledge Panel, About page, author bios, security page, trust and E-E-A-T | `seo-brand-trust` |
+| Pages losing traffic, two pages competing, refreshing or retiring old pages | `seo-on-page` (content upkeep) |
 | A plan, a roadmap, "run this month's SEO" | This skill: follow the calendar below |
 
 When a request spans several jobs, do them in the order of the calendar and say which skill each step used.
@@ -76,28 +82,35 @@ This is the rhythm an in-house SEO team keeps. When asked to "run SEO", "do this
 2. Technical audit of the whole site (`seo-technical-audit`).
 3. Keyword research and keyword map (`seo-keyword-research`).
 4. Competitor gap analysis (`seo-competitor-gap`).
-5. Write `seo-work/plan.md`: a 90-day plan listing the pages to optimize, the pages to create (highest buying intent first), the link-building targets, and the number we expect each to move.
+5. Brand search check, company facts and trust pages plan (`seo-brand-trust`): if "pipeleap" doesn't bring up the site first, that goes to the top of the plan.
+6. Write `seo-work/plan.md`: a 90-day plan listing the pages to optimize, the pages to create (highest buying intent first), the link-building targets, and the number we expect each to move.
 
 **Every week**
 - Ship one or two pieces of work from the plan: a new page (`seo-content`) or an improved page (`seo-on-page`). Two strong pages a month beat ten weak ones.
 - One link-building batch: research about ten prospects and draft outreach for the user to send (`seo-link-building`).
 - A quick Search Console look: new queries, pages that dropped, indexing errors. Note anything odd in `plan.md`.
+- Check the Google Search Status Dashboard (status.search.google.com) and Bing's webmaster blog for core or spam updates. If one rolled out, note its dates in `plan.md` so ranking changes in the report can be read against it, and don't react to movement until the rollout has finished.
 
 **Every month**
 - Run the AI assistant prompt panel and fix the gaps (`seo-ai-visibility`).
 - Monthly report (`seo-reporting`), tied to walkthroughs and pilots booked, not just clicks.
 - Striking-distance pass: pages ranking in positions 5 to 20 for buying-intent queries get an on-page refresh, because moving them up is cheaper than ranking something new.
 - Re-run the technical audit and fix new issues.
+- Brand search check (`seo-brand-trust`, step 1).
+- Content upkeep pass (`seo-on-page`, content upkeep mode): pages losing clicks, pages competing for the same query, guides due a refresh.
+- Conversion review: booking-CTA click rate for each landing page (`seo-reporting`); the weakest page with real traffic gets a conversion fix (`seo-on-page`).
 - Update `plan.md`: what shipped, what moved, what is next.
 
 **Every quarter**
 - Refresh keyword research and the competitor gap. Retire tactics that did not produce meetings and double down on the ones that did.
+- Review the site structure (`seo-content`, site structure): are the topic hubs still the right ones, does every page sit two clicks or fewer from the homepage, does the navigation need a section yet.
+- Review video (`seo-content`, video): if the search results for the top clusters show videos, plan one.
 
 ## Prioritisation rule
 
 When choosing between tasks, rank them by expected meetings, not expected traffic:
 
-1. Fix anything that stops pages being crawled, indexed or converting (broken CTA, noindex, missing from the sitemap).
+1. Fix anything that stops pages being crawled, indexed or converting (broken CTA, noindex, missing from the sitemap), and make sure a search for "pipeleap" finds the site (`seo-brand-trust`).
    Then the **admin vs selling time** cluster: the topic Pipeleap should own.
 2. Pages for searches where the person is choosing a product now: "sales productivity software", "tools to reduce sales admin", "tools to track sales rep selling time", "sales performance tools", comparisons and alternatives.
 3. Pages for searches where the person has the problem and is looking for how to fix it: "reps spend too much time on CRM updates", "too many sales tools", "how to increase sales without hiring more reps", "why are my sales reps missing quota", "how to improve sales rep performance".
@@ -107,7 +120,7 @@ When choosing between tasks, rank them by expected meetings, not expected traffi
 
 ## Automation
 
-Each skill can run when asked, or on a schedule using the `schedule` skill (for example a weekly "run this week's SEO" routine). Scheduled runs prepare work and drafts. They don't publish pages or send emails; a person approves those (see guardrails). The retired `growth/` loop in this repository is not part of this skill set; don't run or revive it.
+Each skill can run when asked, or on a schedule using the `schedule` skill. The intended setup is one weekly routine that runs this calendar's weekly items (and the monthly items in the first week of each month), saves its output in `seo-work/` on a branch, opens one pull request on this repository with the week's findings and drafts, and opens site pull requests for any fixes. Scheduled runs prepare work and drafts. They never merge, publish or send; a person approves those (see guardrails). Steps that need the user's signed-in browser (Search Console, GA4, AI assistant checks) are listed in the weekly PR for the next interactive session when the routine can't reach the data. The retired `growth/` loop in this repository is not part of this skill set; don't run or revive it.
 
 ## Finishing a task
 

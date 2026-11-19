@@ -31,8 +31,18 @@ For the reporting period (default: last full calendar month, compared with the m
 | Referring domains and new links | `seo-work/backlinks/prospects.csv` (status `live`) | Count new this month |
 | Work shipped | `seo-work/onpage-log.csv`, published briefs, merged PRs | What changed this month |
 | AI assistant visibility | `seo-work/ai-visibility/` (from `seo-ai-visibility`) | Share of buyer prompts where Pipeleap is mentioned, per assistant; GA4 referrals from chatgpt.com, perplexity.ai, gemini.google.com and copilot.microsoft.com |
+| Brand search | `seo-work/brand/brand-serp.md` (from `seo-brand-trust`) and Search Console | Position for "pipeleap", branded clicks, anything wrong in the brand results |
+| Target keyword positions | `seo-work/rank-tracking.csv` | See "Rank tracking" below |
+| Search engine updates | `seo-work/plan.md` | Dates of any Google or Bing core or spam update during the period |
 
 Use the API, the browser or a CSV export, in the order given in measurement.md. When a source is unavailable, say so in the report rather than leaving a silent gap.
+
+## Rank tracking
+
+Search Console only shows queries the site already appears for. Keep `seo-work/rank-tracking.csv` (`date,keyword,country,position,url,source`) for the top 20 to 30 keywords in the keyword map (business_potential 3 first, and every cluster with a page):
+- Where Search Console has the query, use its average position for the month, by country.
+- Where it doesn't, record a spot check: search the keyword (web search, or the user's Chrome with a country set and signed out) and note whether a pipeleap.com page appears in the top 50 and where. Mark these `source=spot-check`; single searches are noisy, so watch the trend over months.
+- If the user has a rank-tracking tool, use its export instead.
 
 ## Step 2: Analyse
 
@@ -42,6 +52,9 @@ Use the API, the browser or a CSV export, in the order given in measurement.md. 
 - **Countries:** where impressions and clicks come from, and whether those markets book meetings.
 - **Striking distance:** buying-intent queries at positions 5 to 20; hand them to `seo-on-page`.
 - **Attribution:** state the rule from measurement.md and show both counts if they differ.
+- **Conversion by landing page:** organic sessions, `book_walkthrough` clicks and click rate per landing page. A page with visits but few clicks goes to `seo-on-page` (conversion fixes); a page with a good rate but few visits needs ranking or links.
+- **Brand:** is "pipeleap" first, and are branded searches growing (a sign that podcasts, outreach and word of mouth are working)?
+- **Updates:** if a search engine update rolled out in the period, read ranking moves against its dates before calling them wins or losses.
 
 At low volume (a new site often has single-digit clicks), don't over-read percentages: "3 clicks to 6" is not "100% growth" in any useful sense. Say what's signal and what's noise.
 

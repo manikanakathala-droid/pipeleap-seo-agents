@@ -1,14 +1,15 @@
 ---
 name: seo-ai-visibility
 description: >-
-  AI search visibility (also called GEO, AEO or LLM optimization) for Pipeleap: makes Pipeleap the product that
-  ChatGPT, Perplexity, Google AI Overviews and AI Mode, Gemini, Microsoft Copilot and Claude find, cite and
-  recommend when sales executives, sales managers or sales operations leaders ask about reps' admin vs selling
-  time, sales productivity, sales stack optimization, growing sales revenue or sales rep performance. Tests a
-  fixed set of buyer prompts across AI assistants, tracks whether Pipeleap is mentioned, finds the sources the
-  assistants rely on, and fixes the gaps (crawler access, llms.txt, answer-ready content, entity consistency,
-  third-party mentions). Use whenever the user mentions AI search, ChatGPT, Perplexity, Gemini, Copilot, AI
-  Overviews, LLMs, "show up in AI answers", "get recommended by AI" or being found on AI platforms.
+  AI search visibility (also called GEO, AEO or LLM optimization) for Pipeleap: makes Pipeleap the
+  product that ChatGPT, Perplexity, Google AI Overviews and AI Mode, Gemini, Microsoft Copilot and
+  Claude find, cite and recommend when sales executives, sales managers or sales operations leaders
+  ask about reps' admin vs selling time, sales productivity, sales stack optimization, growing sales
+  revenue or sales rep performance. Tests a fixed set of buyer prompts across AI assistants, tracks
+  whether Pipeleap is mentioned, finds the sources the assistants rely on, and fixes the gaps (crawler
+  access, llms.txt, answer-ready content, entity consistency, third-party mentions). Use whenever the
+  user mentions AI search, ChatGPT, Perplexity, Gemini, Copilot, AI Overviews, LLMs, "show up in AI
+  answers", "get recommended by AI" or being found on AI platforms.
 ---
 
 # AI search visibility
@@ -61,7 +62,7 @@ Work through these, highest impact first:
 2. **llms.txt.** Add `/llms.txt` to the site: a short Markdown summary of what Pipeleap is, who it's for, the point of view, the main pages with one line each, and how to book a walkthrough or apply for the pilot. Use only facts from business-context.md. It's an emerging convention, cheap to add and harmless; don't oversell its effect.
 3. **Answer-ready pages.** Assistants quote pages that answer a question directly. Each important page should state its answer in the first two or three sentences, use question-style headings that match how buyers ask, include a clear definition where relevant ("Selling time is…"), and keep facts in plain HTML (not only in images or scripts). FAQ sections with FAQPage markup that mirrors the visible text help both search and assistants.
 4. **Own the admin vs selling time answer.** The cornerstone guide and calculator (see `seo-content`) should be the most complete and most quotable source on how much time reps spend on admin vs selling and how to measure and recover it. Original, well-explained methodology is what assistants cite.
-5. **Consistent entity facts.** Describe Pipeleap the same way everywhere: the site, Organization and SoftwareApplication structured data (add `sameAs` links to the official profiles once they exist), LinkedIn, Crunchbase, G2, Capterra and any directory listing. Same name, same one-line description ("a sales productivity and sales stack optimization platform…"), same category. Assistants trust facts that agree across sources.
+5. **Consistent entity facts.** The company facts live in `seo-work/brand/entity.md` and the official profiles and trust pages are built by `seo-brand-trust`; use them. Describe Pipeleap the same way everywhere: the site, Organization and SoftwareApplication structured data (add `sameAs` links to the official profiles once they exist), LinkedIn, Crunchbase, G2, Capterra and any directory listing. Same name, same one-line description ("a sales productivity and sales stack optimization platform…"), same category. Assistants trust facts that agree across sources.
 6. **Third-party corroboration.** Assistants lean on reviews, comparisons, community discussions and publications. Earn genuine mentions there through `seo-link-building`: real reviews from pilot users who choose to write them, expert answers, podcasts and guest articles on the point of view.
 7. **Correct inaccuracies.** If an assistant gets Pipeleap wrong, fix the source it likely used (our page, a directory listing), and make sure the correct fact is stated clearly on the site.
 
