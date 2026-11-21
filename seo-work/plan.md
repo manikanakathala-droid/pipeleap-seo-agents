@@ -39,7 +39,7 @@ Rankings for competitive terms take longer than 90 days for a new domain with no
 | 3 | ~~Noindex app.pipeleap.com~~ **Done 2026-11-21**: pipeleap-frontend PR #32 (meta robots, X-Robots-Tag, robots.txt allowing crawl); live | Claude (approved) | technical audit |
 | 4 | Fill the **NEEDED** facts in `seo-work/brand/entity.md` (logo, founding year, HQ, founder name, role, LinkedIn, background) | **User** | brand-trust |
 | 5 | Create LinkedIn company page, Crunchbase, G2, Capterra (copy prepared from entity.md) | **User** creates accounts | brand-trust, link-building |
-| 6 | On-page PR #1 (site): homepage meta description; titles and descriptions for /pilot and policy pages; og:image on all pages (needs a 1200×630 image); twitter:card; text for the icon-only links; a link home and booking CTA on the 404 page; `/llms.txt`; Organization schema with logo, email, founder and sameAs | **Done 2026-11-21** (Pipeleap-web-redesign PR #9, live; IndexNow sent, homepage recrawl requested). Still open: og:image (needs a 1200×630 image), sameAs (needs profiles) | on-page, ai-visibility |
+| 6 | On-page PR #1 (site): homepage meta description; titles and descriptions for /pilot and policy pages; og:image on all pages (needs a 1200×630 image); twitter:card; text for the icon-only links; a link home and booking CTA on the 404 page; `/llms.txt`; Organization schema with logo, email, founder and sameAs | **Done 2026-11-21** (Pipeleap-web-redesign PR #9, live; IndexNow sent, homepage recrawl requested). og:image added 2026-11-21 (site PR #10, live). Still open: sameAs (needs profiles) | on-page, ai-visibility |
 | 7 | Homepage H1 and section headings: propose an H1 that says what Pipeleap is in the buyer's words (for example "Pipeleap: less admin, more selling time for your sales team") and H2s in buyers' words. **Brand decision** — show before/after, ask first | H1 **done 2026-11-21**: "The sales productivity platform that gives your reps more selling time" (user chose option A; wordmark kept as visual). Section H2s still to propose | on-page |
 | 8 | Run the AI assistant prompt panel for the first time (baseline) | Claude via the user's Chrome | ai-visibility |
 
@@ -91,7 +91,7 @@ Week 1–4: directory foundations (`seo-work/backlinks/prospects.csv`: LinkedIn,
 - [x] Yes/no: noindex app.pipeleap.com (yes, done)
 - [ ] Fill the NEEDED facts in `seo-work/brand/entity.md`
 - [ ] Create LinkedIn company page, Crunchbase, G2, Capterra
-- [ ] A 1200×630 share image (og:image), or a yes for Claude to propose one from the site's design
+- [x] A 1200×630 share image (og:image): designed by Claude in the site style, live at /assets/og-image.png
 - [ ] Yes/no: remove the `/about` redirect so an About page can be built
 - [x] Decide on the homepage H1 proposal (task 7): option A, live
 - [ ] Optional: PAGESPEED_API_KEY for automated speed checks; re-add the Search Console service account to the `pipeleap.com` property for API access
@@ -106,3 +106,4 @@ Week 1–4: directory foundations (`seo-work/backlinks/prospects.csv`: LinkedIn,
 
 - 2026-11-20: Foundation phase run. Audit `seo-work/audits/2026-11-20.md`, keywords `seo-work/keywords/`, gaps `seo-work/competitors/gaps.md`, brand `seo-work/brand/`.
 - 2026-11-21: GA4 key event set; app.pipeleap.com noindexed (frontend PR #32); on-page fixes live (site PR #9: H1, meta, 404 page, llms.txt); IndexNow sent; homepage recrawl requested. Interactive sessions may now merge after a preview check (guardrails).
+- 2026-11-21: Share image (og:image, large Twitter card) live on all pages (site PR #10).
