@@ -2,7 +2,9 @@
 
 Source for `www.pipeleap.com/assets/og-image.png` (link preview) and `assets/pipeleap-share.mp4` / `.gif` (animated version for posts, Slack, email).
 
-`make_anim_html.py` writes `og-anim.html`, a 1200×630 page whose state is set by `#t=<seconds>` (0 to 5.2). Copy `hero.svg` and `favicon.svg` from the site repo next to it, then render and encode:
+**Current design (since 2026-11-21): `make_simple.py`** writes `og-simple.html`: only the wordmark ("Pipe" solid, "leap" filled with hero.svg) and the tagline "Less admin. More selling time." running from the descender of the final p. Render it exactly as below, using `og-simple.html` in place of `og-anim.html` and `--virtual-time-budget=4000`. Timeline: 0–2.3s streams converge on a wide panel; 2.3–3.5s the panel dissolves into the wordmark; 3.5–4.4s the tagline draws out from the p; hold to 5.2s.
+
+Previous design: `make_anim_html.py` writes `og-anim.html`, a 1200×630 page whose state is set by `#t=<seconds>` (0 to 5.2). Copy `hero.svg` and `favicon.svg` from the site repo next to it, then render and encode:
 
 ```bash
 python make_anim_html.py
