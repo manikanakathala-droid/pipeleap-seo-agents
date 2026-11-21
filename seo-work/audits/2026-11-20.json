@@ -1,0 +1,454 @@
+{
+  "site": "https://www.pipeleap.com",
+  "generated": "2026-11-20 03:22",
+  "site_issues": [
+    {
+      "severity": "warning",
+      "message": "http://pipeleap.com/ redirects to https://pipeleap.com/, not to www.pipeleap.com"
+    },
+    {
+      "severity": "info",
+      "message": "The 404 page has no link back to the homepage (add navigation and a booking CTA)"
+    }
+  ],
+  "pages": [
+    {
+      "url": "https://www.pipeleap.com/",
+      "status": 200,
+      "final_url": "https://www.pipeleap.com/",
+      "ms": 72,
+      "bytes": 122251,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "Meta description is 212 chars (aim 120-160)"
+        },
+        {
+          "severity": "warning",
+          "message": "H1 is a single word ('Pipeleap'), so it says nothing about what the page is about"
+        },
+        {
+          "severity": "warning",
+          "message": "Missing og:image"
+        },
+        {
+          "severity": "info",
+          "message": "Organization structured data has no sameAs (recommended)"
+        },
+        {
+          "severity": "info",
+          "message": "SoftwareApplication structured data has no offers (recommended)"
+        },
+        {
+          "severity": "info",
+          "message": "No X-Content-Type-Options: nosniff header"
+        }
+      ],
+      "title": "Pipeleap: Less admin. More selling time.",
+      "title_len": 40,
+      "description": "Pipeleap is a sales productivity and sales stack optimization platform. It works with the sales tools you already own to reclaim selling time, unify sales information and get more from your technology investment.",
+      "description_len": 212,
+      "h1": [
+        "Pipeleap"
+      ],
+      "h2": [
+        "Four problems",
+        "Capabilities",
+        "Connected Work",
+        "Built for",
+        "Four steps from scattered tools to a connected sales operation.",
+        "Outcomes",
+        "Questions",
+        "Your stack",
+        "Walkthrough"
+      ],
+      "canonical": [
+        "https://www.pipeleap.com/"
+      ],
+      "robots": "",
+      "lang": "en",
+      "og": {
+        "og:type": "website",
+        "og:title": "Pipeleap: Less admin. More selling time.",
+        "og:description": "Pipeleap is a sales productivity and sales stack optimization platform. It works with the sales tools you already own to reclaim selling time, unify sales information and get more from your technology investment.",
+        "twitter:card": "summary",
+        "og:url": "https://www.pipeleap.com/",
+        "og:site_name": "Pipeleap"
+      },
+      "schema_types": [
+        "FAQPage",
+        "Organization",
+        "SoftwareApplication",
+        "WebSite"
+      ],
+      "hreflang": [],
+      "images": 16,
+      "images_missing_alt": 0,
+      "word_count": 2705,
+      "internal_links": [
+        "https://www.pipeleap.com/cookie-policy",
+        "https://www.pipeleap.com/pilot",
+        "https://www.pipeleap.com/privacy-policy"
+      ],
+      "external_links": [
+        "https://8b.com/",
+        "https://app.apollo.io/",
+        "https://app.pipeleap.com/"
+      ],
+      "images_detail": [
+        {
+          "src": "https://www.pipeleap.com/favicon.svg",
+          "bytes": 955
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/hero.svg",
+          "bytes": 6182
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/hero.svg",
+          "bytes": 6182
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/problem-tools.svg",
+          "bytes": 62165
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/problem-admin.svg",
+          "bytes": 60745
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/problem-data.svg",
+          "bytes": 70798
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/problem-unused.svg",
+          "bytes": 104889
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/environment.svg",
+          "bytes": 47168
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/role-leaders.svg",
+          "bytes": 47114
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/revops-extend.svg",
+          "bytes": 52647
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/role-managers.svg",
+          "bytes": 53592
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/role-reps.svg",
+          "bytes": 48913
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/steps.svg",
+          "bytes": 51539
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/pillar-time.svg",
+          "bytes": 55371
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/pillar-unify.svg",
+          "bytes": 57820
+        },
+        {
+          "src": "https://www.pipeleap.com/assets/pillar-value.svg",
+          "bytes": 50915
+        }
+      ],
+      "pagespeed": {
+        "error": "PageSpeed unavailable, HTTP 429 (rate-limited: set PAGESPEED_API_KEY)"
+      }
+    },
+    {
+      "url": "https://www.pipeleap.com/cookie-policy",
+      "status": 200,
+      "final_url": "https://www.pipeleap.com/cookie-policy",
+      "ms": 60,
+      "bytes": 33406,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "Title is 24 chars (aim 30-60)"
+        },
+        {
+          "severity": "warning",
+          "message": "Missing og:image"
+        },
+        {
+          "severity": "info",
+          "message": "No X-Content-Type-Options: nosniff header"
+        },
+        {
+          "severity": "warning",
+          "message": "1 link(s) with no text or aria-label (no anchor signal, and inaccessible to screen readers)"
+        }
+      ],
+      "title": "Cookie Policy \u00b7 Pipeleap",
+      "title_len": 24,
+      "description": "How Pipeleap uses cookies and similar technologies on pipeleap.com, and how to accept, reject or change your cookie choices.",
+      "description_len": 124,
+      "h1": [
+        "Cookie Policy"
+      ],
+      "h2": [
+        "What are cookies?",
+        "Why do we use cookies?",
+        "How can I control cookies?",
+        "Do my choices apply on all my devices?",
+        "How can I control cookies on my browser?",
+        "What about other tracking technologies, like web beacons?",
+        "Do you serve targeted advertising?",
+        "How often will you update this Cookie Policy?",
+        "Where can I get further information?"
+      ],
+      "canonical": [
+        "https://www.pipeleap.com/cookie-policy"
+      ],
+      "robots": "",
+      "lang": "en",
+      "og": {
+        "og:type": "website",
+        "og:title": "Cookie Policy \u00b7 Pipeleap",
+        "og:description": "How Pipeleap uses cookies and similar technologies on pipeleap.com, and how to change your cookie choices.",
+        "twitter:card": "summary",
+        "og:url": "https://www.pipeleap.com/cookie-policy",
+        "og:site_name": "Pipeleap"
+      },
+      "schema_types": [
+        "BreadcrumbList",
+        "WebPage"
+      ],
+      "hreflang": [],
+      "images": 1,
+      "images_missing_alt": 0,
+      "word_count": 1222,
+      "internal_links": [
+        "https://www.pipeleap.com/",
+        "https://www.pipeleap.com/cookie-policy",
+        "https://www.pipeleap.com/pilot",
+        "https://www.pipeleap.com/privacy-policy"
+      ],
+      "external_links": [
+        "http://www.aboutads.info/choices/",
+        "http://www.youronlinechoices.com/",
+        "https://8b.com/",
+        "https://app.apollo.io/",
+        "https://app.pipeleap.com/",
+        "https://app.termly.io/dsar/46ad7d95-7599-4be5-991f-3335ab90669f",
+        "https://business.safety.google/privacy/",
+        "https://help.opera.com/en/latest/web-preferences/",
+        "https://support.apple.com/en-ie/guide/safari/sfri11471/mac",
+        "https://support.google.com/chrome/answer/95647",
+        "https://support.microsoft.com/en-us/windows/delete-and-manage-cookies-168dab11-0753-043d-7c16-ede5947fc64d",
+        "https://support.microsoft.com/en-us/windows/microsoft-edge-browsing-data-and-privacy-bb8174ba-9d73-dcf2-9b4a-c582b4e640dd",
+        "https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop?redirectslug=enable-and-disable-cookies-website-preferences&redirectlocale=en-US",
+        "https://termly.io/products/cookie-consent-manager/",
+        "https://youradchoices.ca/"
+      ],
+      "images_detail": [
+        {
+          "src": "https://www.pipeleap.com/favicon.svg",
+          "bytes": 955
+        }
+      ],
+      "pagespeed": {
+        "error": "PageSpeed unavailable, HTTP 429 (rate-limited: set PAGESPEED_API_KEY)"
+      }
+    },
+    {
+      "url": "https://www.pipeleap.com/privacy-policy",
+      "status": 200,
+      "final_url": "https://www.pipeleap.com/privacy-policy",
+      "ms": 75,
+      "bytes": 132068,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "Title is 25 chars (aim 30-60)"
+        },
+        {
+          "severity": "warning",
+          "message": "Meta description is 109 chars (aim 120-160)"
+        },
+        {
+          "severity": "warning",
+          "message": "Missing og:image"
+        },
+        {
+          "severity": "info",
+          "message": "No X-Content-Type-Options: nosniff header"
+        },
+        {
+          "severity": "warning",
+          "message": "1 link(s) with no text or aria-label (no anchor signal, and inaccessible to screen readers)"
+        }
+      ],
+      "title": "Privacy Policy \u00b7 Pipeleap",
+      "title_len": 25,
+      "description": "How Pipeleap collects, uses, and protects personal information, and how you can exercise your privacy rights.",
+      "description_len": 109,
+      "h1": [
+        "PRIVACY POLICY"
+      ],
+      "h2": [
+        "SUMMARY OF KEY POINTS",
+        "TABLE OF CONTENTS",
+        "1. WHAT INFORMATION DO WE COLLECT?",
+        "2. HOW DO WE PROCESS YOUR INFORMATION?",
+        "3. WHEN AND WITH WHOM DO WE SHARE YOUR PERSONAL INFORMATION?",
+        "4. DO WE USE COOKIES AND OTHER TRACKING TECHNOLOGIES?",
+        "5. DO WE OFFER ARTIFICIAL INTELLIGENCE-BASED PRODUCTS?",
+        "6. HOW DO WE HANDLE YOUR SOCIAL LOGINS?",
+        "7. HOW LONG DO WE KEEP YOUR INFORMATION?",
+        "8. DO WE COLLECT INFORMATION FROM MINORS?",
+        "9. WHAT ARE YOUR PRIVACY RIGHTS?",
+        "10. CONTROLS FOR DO-NOT-TRACK FEATURES",
+        "11. DO OTHER REGIONS HAVE SPECIFIC PRIVACY RIGHTS?",
+        "12. DO WE MAKE UPDATES TO THIS NOTICE?",
+        "13. HOW CAN YOU CONTACT US ABOUT THIS NOTICE?",
+        "14. HOW CAN YOU REVIEW, UPDATE, OR DELETE THE DATA WE COLLECT FROM YOU?"
+      ],
+      "canonical": [
+        "https://www.pipeleap.com/privacy-policy"
+      ],
+      "robots": "",
+      "lang": "en",
+      "og": {
+        "og:type": "website",
+        "og:title": "Privacy Policy \u00b7 Pipeleap",
+        "og:description": "How Pipeleap collects, uses, and protects personal information, and how you can exercise your privacy rights.",
+        "twitter:card": "summary",
+        "og:url": "https://www.pipeleap.com/privacy-policy",
+        "og:site_name": "Pipeleap"
+      },
+      "schema_types": [
+        "BreadcrumbList",
+        "WebPage"
+      ],
+      "hreflang": [],
+      "images": 1,
+      "images_missing_alt": 0,
+      "word_count": 3993,
+      "internal_links": [
+        "https://www.pipeleap.com/",
+        "https://www.pipeleap.com/cookie-policy",
+        "https://www.pipeleap.com/pilot",
+        "https://www.pipeleap.com/privacy-policy"
+      ],
+      "external_links": [
+        "http://optout.networkadvertising.org/",
+        "http://www.networkadvertising.org/mobile-choice",
+        "https://8b.com/",
+        "https://adssettings.google.com/",
+        "https://app.apollo.io/",
+        "https://app.pipeleap.com/",
+        "https://app.termly.io/dsar/841e0d61-ff8c-40f9-9ec5-291e1f1983c8",
+        "https://developers.google.com/terms/api-services-user-data-policy",
+        "https://policies.google.com/privacy",
+        "https://termly.io/products/privacy-policy-generator/",
+        "https://tools.google.com/dlpage/gaoptout",
+        "https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us",
+        "https://www.privacy.org.nz/your-rights/making-a-complaint/"
+      ],
+      "images_detail": [
+        {
+          "src": "https://www.pipeleap.com/favicon.svg",
+          "bytes": 955
+        }
+      ],
+      "pagespeed": {
+        "error": "PageSpeed unavailable, HTTP 429 (rate-limited: set PAGESPEED_API_KEY)"
+      }
+    },
+    {
+      "url": "https://www.pipeleap.com/pilot",
+      "status": 200,
+      "final_url": "https://www.pipeleap.com/pilot",
+      "ms": 114,
+      "bytes": 33910,
+      "issues": [
+        {
+          "severity": "warning",
+          "message": "Title is 25 chars (aim 30-60)"
+        },
+        {
+          "severity": "warning",
+          "message": "Meta description is 106 chars (aim 120-160)"
+        },
+        {
+          "severity": "warning",
+          "message": "Missing og:image"
+        },
+        {
+          "severity": "info",
+          "message": "No X-Content-Type-Options: nosniff header"
+        }
+      ],
+      "title": "Founding pilot \u00b7 Pipeleap",
+      "title_len": 25,
+      "description": "A free 30-day founding pilot: choose the number we measure, shape the setup and help set Pipeleap's price.",
+      "description_len": 106,
+      "h1": [
+        "Build Pipeleap with us."
+      ],
+      "h2": [
+        "Three things are yours to decide",
+        "No charge while you build it",
+        "Help us build the version your team keeps."
+      ],
+      "canonical": [
+        "https://www.pipeleap.com/pilot"
+      ],
+      "robots": "",
+      "lang": "en",
+      "og": {
+        "og:type": "website",
+        "og:title": "Founding pilot \u00b7 Pipeleap",
+        "og:description": "A free 30-day founding pilot: see your reps' real selling time before and after, and help set the price.",
+        "twitter:card": "summary",
+        "og:url": "https://www.pipeleap.com/pilot",
+        "og:site_name": "Pipeleap"
+      },
+      "schema_types": [
+        "BreadcrumbList",
+        "WebPage"
+      ],
+      "hreflang": [],
+      "images": 1,
+      "images_missing_alt": 0,
+      "word_count": 324,
+      "internal_links": [
+        "https://www.pipeleap.com/",
+        "https://www.pipeleap.com/cookie-policy",
+        "https://www.pipeleap.com/pilot",
+        "https://www.pipeleap.com/privacy-policy"
+      ],
+      "external_links": [
+        "https://8b.com/",
+        "https://app.apollo.io/",
+        "https://app.pipeleap.com/"
+      ],
+      "images_detail": [
+        {
+          "src": "https://www.pipeleap.com/favicon.svg",
+          "bytes": 955
+        }
+      ],
+      "pagespeed": {
+        "error": "PageSpeed unavailable, HTTP 429 (rate-limited: set PAGESPEED_API_KEY)"
+      }
+    }
+  ],
+  "sitemap_urls": [
+    "https://www.pipeleap.com/",
+    "https://www.pipeleap.com/cookie-policy",
+    "https://www.pipeleap.com/privacy-policy",
+    "https://www.pipeleap.com/pilot"
+  ]
+}

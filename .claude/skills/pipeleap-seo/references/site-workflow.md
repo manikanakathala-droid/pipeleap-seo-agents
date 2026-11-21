@@ -49,7 +49,7 @@ git push -u origin HEAD
 gh pr create --title "<short title>" --body "<what changed, target keyword, how to check it>"
 ```
 
-In the PR description list: the target query, the title and description before and after, new URLs, and what the reviewer should look at in the Vercel preview. Give the user the PR link. Don't merge it yourself.
+In the PR description list: the target query, the title and description before and after, new URLs, and what the reviewer should look at in the Vercel preview. Give the user the PR link. Merge it yourself only in an interactive session where the user has asked you to, and only after checking the Vercel preview: open the preview URL from the PR's deployment, check the changed pages at desktop and phone width, confirm the booking links and the consent banner still work, then `gh pr merge <n> --merge`. Scheduled runs never merge.
 
 ## 6. After the owner merges
 

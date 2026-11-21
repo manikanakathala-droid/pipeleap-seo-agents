@@ -6,12 +6,12 @@ These rules protect the domain, the brand and the user's accounts. They come fro
 
 | Action | What Claude does | What the person does |
 |---|---|---|
-| Change the website | Opens a pull request on `Pipeleap-web-redesign` (see `site-workflow.md`) | Reviews the Vercel preview and merges |
+| Change the website | Opens a pull request on `Pipeleap-web-redesign` (see `site-workflow.md`). In an interactive session where the user has asked Claude to merge, Claude checks the Vercel preview (desktop and phone width, booking links, consent banner) and then merges | Reviews and merges, or asks Claude to; reviews anything brand-visible (homepage hero, positioning copy) before it merges |
 | Outreach for links, PR or guest posts | Drafts the email or message into `seo-work/backlinks/` | Sends it from their own account |
 | Directory or review-site listings | Prepares the listing copy and the field values | Creates the account and submits |
 | Search Console actions (removals, indexing requests) | Can do them in the browser when asked | Has asked for it in this conversation |
 
-Scheduled runs prepare work. They never merge, publish or send.
+Scheduled runs prepare work. They never merge, publish or send. Merging is only for interactive sessions, after the preview check, and never for changes the user hasn't seen described.
 
 ## Content rules
 
