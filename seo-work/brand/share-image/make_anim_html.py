@@ -37,7 +37,8 @@ html,body{{width:1200px;height:630px;overflow:hidden}}
 body{{background:var(--c1);position:relative;font-family:"Stack Sans Text","Stack Sans Text Fallback",Arial,sans-serif}}
 body:before{{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 0% 0%,rgba(101,88,245,.10),transparent 60%),radial-gradient(50% 70% at 100% 100%,rgba(59,130,246,.10),transparent 60%)}}
 .left{{position:absolute;left:72px;top:64px;bottom:60px;width:560px;display:flex;flex-direction:column}}
-.mark{{width:48px;height:48px}}
+.mark{{width:30px;height:30px}}
+.sig{{display:flex;align-items:center;gap:10px}}
 h1{{margin-top:auto;font-family:"Stack Sans Headline","Stack Sans Headline Fallback",Arial,sans-serif;font-weight:500;font-size:72px;line-height:.98;letter-spacing:-.04em;color:var(--c2)}}
 h1 span{{color:var(--c7);display:block}}
 p{{margin-top:24px;font-size:24px;line-height:1.35;font-weight:500;color:var(--c4);max-width:520px}}
@@ -48,10 +49,9 @@ svg.art{{position:absolute;left:652px;top:56px;width:{W}px;height:{H}px;overflow
 .word{{font-family:"Stack Sans Headline","Stack Sans Headline Fallback",Arial,sans-serif;font-weight:600;font-size:128px;letter-spacing:-6px}}
 </style></head><body>
 <div class="left">
-  <img class="mark" src="favicon.svg" alt="">
   <h1>Less admin.<span>More selling time.</span></h1>
   <p>The sales productivity platform that works with the sales tools you already own.</p>
-  <div class="tag"><span>[Founding pilot · free for 30 days]</span><b>pipeleap.com</b></div>
+  <div class="tag"><span>[Founding pilot · free for 30 days]</span><b class="sig"><img class="mark" src="favicon.svg" alt="">pipeleap.com</b></div>
 </div>
 <div id="shadow"></div>
 <svg class="art" viewBox="0 0 {W} {H}">
