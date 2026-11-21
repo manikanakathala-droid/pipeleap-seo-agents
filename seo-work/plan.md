@@ -108,3 +108,4 @@ Week 1–4: directory foundations (`seo-work/backlinks/prospects.csv`: LinkedIn,
 - 2026-11-21: GA4 key event set; app.pipeleap.com noindexed (frontend PR #32); on-page fixes live (site PR #9: H1, meta, 404 page, llms.txt); IndexNow sent; homepage recrawl requested. Interactive sessions may now merge after a preview check (guardrails).
 - 2026-11-21: Share image (og:image, large Twitter card) live on all pages (site PR #10).
 - 2026-11-21: Share image redesigned (site PR #11): ends on the homepage wordmark; animated MP4/GIF at /assets/pipeleap-share.mp4 and .gif for posts. Source in seo-work/brand/share-image/.
+- 2026-11-21: Share image simplified (site PR #13): only the wordmark and the tagline running from the p; source make_simple.py.
